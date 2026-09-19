@@ -1,0 +1,2727 @@
+openapi: 3.1.0
+info:
+  title: remoterunner.v1
+paths:
+  /v1/runner-profiles:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: ListRunnerProfiles
+      operationId: remoterunner.v1.RemoteRunnerService.ListRunnerProfiles
+      parameters:
+        - name: organizationId
+          in: query
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+            minLength: 1
+        - name: includeUnavailable
+          in: query
+          schema:
+            type: boolean
+            title: include_unavailable
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.ListRunnerProfilesResponse'
+  /v1/runner-sessions:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: ListRunnerSessions
+      operationId: remoterunner.v1.RemoteRunnerService.ListRunnerSessions
+      parameters:
+        - name: organizationId
+          in: query
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+            minLength: 1
+        - name: state
+          in: query
+          schema:
+            title: state
+            $ref: '#/components/schemas/remoterunner.v1.RunnerSessionState'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            title: limit
+            maximum: 200
+            format: int32
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            title: offset
+            format: int32
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.ListRunnerSessionsResponse'
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: CreateRunnerSession
+      operationId: remoterunner.v1.RemoteRunnerService.CreateRunnerSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/remoterunner.v1.CreateRunnerSessionRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.CreateRunnerSessionResponse'
+  /v1/runner-sessions/{runner_session_id}/adopt-computer-mission:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: AdoptRunnerSessionForComputerMission
+      operationId: remoterunner.v1.RemoteRunnerService.AdoptRunnerSessionForComputerMission
+      parameters:
+        - name: runner_session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: runner_session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationId:
+                  type: string
+                  title: organization_id
+                  minLength: 1
+                workspaceId:
+                  type: string
+                  title: workspace_id
+                  minLength: 1
+                reservationId:
+                  type: string
+                  title: reservation_id
+                  minLength: 1
+                missionId:
+                  type: string
+                  title: mission_id
+                  minLength: 1
+                runtimeRunId:
+                  type: string
+                  title: runtime_run_id
+                  minLength: 1
+              title: AdoptRunnerSessionForComputerMissionRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.AdoptRunnerSessionForComputerMissionResponse'
+  /v1/runner-sessions/{session_id}:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: GetRunnerSession
+      operationId: remoterunner.v1.RemoteRunnerService.GetRunnerSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.GetRunnerSessionResponse'
+  /v1/runner-restores:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: ListRunnerRestores
+      operationId: remoterunner.v1.RemoteRunnerService.ListRunnerRestores
+      parameters:
+        - name: organizationId
+          in: query
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+            minLength: 1
+        - name: state
+          in: query
+          schema:
+            title: state
+            $ref: '#/components/schemas/remoterunner.v1.RunnerRestoreState'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            title: limit
+            maximum: 200
+            format: int32
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            title: offset
+            format: int32
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.ListRunnerRestoresResponse'
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: CreateRunnerRestore
+      operationId: remoterunner.v1.RemoteRunnerService.CreateRunnerRestore
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/remoterunner.v1.CreateRunnerRestoreRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.CreateRunnerRestoreResponse'
+  /v1/runner-restores/{restore_id}:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: GetRunnerRestore
+      operationId: remoterunner.v1.RemoteRunnerService.GetRunnerRestore
+      parameters:
+        - name: restore_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: restore_id
+            minLength: 1
+        - name: organizationId
+          in: query
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+            minLength: 1
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.GetRunnerRestoreResponse'
+  /v1/runner-sessions/{session_id}/stop:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: StopRunnerSession
+      operationId: remoterunner.v1.RemoteRunnerService.StopRunnerSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  title: reason
+                organizationId:
+                  type: string
+                  title: organization_id
+                  minLength: 1
+                workspaceId:
+                  type: string
+                  title: workspace_id
+                  minLength: 1
+              title: StopRunnerSessionRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.StopRunnerSessionResponse'
+  /v1/runner-sessions/{session_id}/extend:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: ExtendRunnerSession
+      operationId: remoterunner.v1.RemoteRunnerService.ExtendRunnerSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                additionalMinutes:
+                  type: integer
+                  title: additional_minutes
+                  maximum: 1440
+                  minimum: 1
+                  format: int32
+                additionalIdleMinutes:
+                  type: integer
+                  title: additional_idle_minutes
+                  maximum: 1440
+                  format: int32
+                reason:
+                  type: string
+                  title: reason
+              title: ExtendRunnerSessionRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.ExtendRunnerSessionResponse'
+  /v1/runner-sessions/{session_id}/attach-token:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: MintAttachToken
+      operationId: remoterunner.v1.RemoteRunnerService.MintAttachToken
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subjectId:
+                  type: string
+                  title: subject_id
+                roles:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/remoterunner.v1.RunnerAttachRole'
+                  title: roles
+                ttlMinutes:
+                  type: integer
+                  title: ttl_minutes
+                  maximum: 60
+                  format: int32
+              title: MintAttachTokenRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.MintAttachTokenResponse'
+  /v1/runner-sessions/{session_id}/attach-tokens/{token_id}/revoke:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: RevokeAttachToken
+      operationId: remoterunner.v1.RemoteRunnerService.RevokeAttachToken
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+        - name: token_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: token_id
+            minLength: 1
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.RevokeAttachTokenResponse'
+  /v1/runner-sessions/{session_id}/events:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: ListRunnerSessionEvents
+      operationId: remoterunner.v1.RemoteRunnerService.ListRunnerSessionEvents
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+        - name: afterSequence
+          in: query
+          schema:
+            type:
+              - integer
+              - string
+            title: after_sequence
+            format: int64
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            title: limit
+            maximum: 500
+            format: int32
+        - name: organizationId
+          in: query
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+            minLength: 1
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.ListRunnerSessionEventsResponse'
+  /v1/runner-sessions/{session_id}/artifact-lifecycle:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: RecordRunnerSessionArtifactLifecycle
+      operationId: remoterunner.v1.RemoteRunnerService.RecordRunnerSessionArtifactLifecycle
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                artifactClass:
+                  title: artifact_class
+                  $ref: '#/components/schemas/remoterunner.v1.RunnerArtifactClass'
+                state:
+                  title: state
+                  $ref: '#/components/schemas/remoterunner.v1.RunnerArtifactLifecycleState'
+                artifactUri:
+                  type: string
+                  title: artifact_uri
+                manifestPath:
+                  type: string
+                  title: manifest_path
+                reason:
+                  type: string
+                  title: reason
+                message:
+                  type: string
+                  title: message
+                retentionExpiresAt:
+                  title: retention_expires_at
+                  $ref: '#/components/schemas/google.protobuf.Timestamp'
+              title: RecordRunnerSessionArtifactLifecycleRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.RecordRunnerSessionArtifactLifecycleResponse'
+  /v1/runner-sessions/{session_id}/steps:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: ExecuteRunnerSessionStep
+      operationId: remoterunner.v1.RemoteRunnerService.ExecuteRunnerSessionStep
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationId:
+                  type: string
+                  title: organization_id
+                  minLength: 1
+                workspaceId:
+                  type: string
+                  title: workspace_id
+                  minLength: 1
+                idempotencyKey:
+                  type: string
+                  title: idempotency_key
+                  minLength: 1
+                argv:
+                  type: array
+                  items:
+                    type: string
+                    maxItems: 64
+                  title: argv
+                  maxItems: 64
+                cwd:
+                  type: string
+                  title: cwd
+                timeoutSeconds:
+                  type: integer
+                  title: timeout_seconds
+                  maximum: 3600
+                  minimum: 1
+                ownerBinding:
+                  title: owner_binding
+                  nullable: true
+                  $ref: '#/components/schemas/remoterunner.v1.RunnerSessionOwnerBinding'
+                operation:
+                  title: operation
+                  $ref: '#/components/schemas/remoterunner.v1.RunnerSessionStepOperation'
+                stdin:
+                  type: string
+                  title: stdin
+                  maxLength: 1398104
+                  x-protobuf-bytes-max-length: 1048576
+                  format: byte
+                expectedSnapshotId:
+                  type: string
+                  title: expected_snapshot_id
+                expectedSandboxSessionId:
+                  type: string
+                  title: expected_sandbox_session_id
+                expectedSandboxId:
+                  type: string
+                  title: expected_sandbox_id
+                expectedRunnerSessionId:
+                  type: string
+                  title: expected_runner_session_id
+                expectedCheckpointId:
+                  type: string
+                  title: expected_checkpoint_id
+                instructionArtifactRef:
+                  type: string
+                  title: instruction_artifact_ref
+                instructionDigestSha256:
+                  type: string
+                  title: instruction_digest_sha256
+                instructionByteCount:
+                  type:
+                    - integer
+                    - string
+                  title: instruction_byte_count
+                  format: int64
+                claimLeaseGeneration:
+                  type:
+                    - integer
+                    - string
+                  title: claim_lease_generation
+                  format: int64
+              title: ExecuteRunnerSessionStepRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.ExecuteRunnerSessionStepResponse'
+  /v1/runner-sessions/{session_id}/checkpoints:
+    post:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: CreateRunnerSessionCheckpoint
+      operationId: remoterunner.v1.RemoteRunnerService.CreateRunnerSessionCheckpoint
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: session_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationId:
+                  type: string
+                  title: organization_id
+                  minLength: 1
+                workspaceId:
+                  type: string
+                  title: workspace_id
+                  minLength: 1
+                idempotencyKey:
+                  type: string
+                  title: idempotency_key
+                  minLength: 1
+                ownerBinding:
+                  title: owner_binding
+                  nullable: true
+                  $ref: '#/components/schemas/remoterunner.v1.RunnerSessionOwnerBinding'
+              title: CreateRunnerSessionCheckpointRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.CreateRunnerSessionCheckpointResponse'
+  /v1/runner-account-policies/{organization_id}:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: GetRunnerAccountPolicy
+      operationId: remoterunner.v1.RemoteRunnerService.GetRunnerAccountPolicy
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.GetRunnerAccountPolicyResponse'
+    put:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: UpsertRunnerAccountPolicy
+      operationId: remoterunner.v1.RemoteRunnerService.UpsertRunnerAccountPolicy
+      parameters:
+        - name: organization_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: organization_id
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workspaceId:
+                  type: string
+                  title: workspace_id
+                policy:
+                  title: policy
+                  $ref: '#/components/schemas/remoterunner.v1.RunnerAccountPolicy'
+              title: UpsertRunnerAccountPolicyRequest
+              additionalProperties: false
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.UpsertRunnerAccountPolicyResponse'
+  /v1/remote-runner/status:
+    get:
+      tags:
+        - remoterunner.v1.RemoteRunnerService
+      summary: GetStatus
+      operationId: remoterunner.v1.RemoteRunnerService.GetStatus
+      parameters:
+        - name: workspaceId
+          in: query
+          schema:
+            type: string
+            title: workspace_id
+            minLength: 1
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/remoterunner.v1.GetStatusResponse'
+components:
+  schemas:
+    google.protobuf.NullValue:
+      type: string
+      title: NullValue
+      enum:
+        - NULL_VALUE
+      description: |-
+        `NullValue` is a singleton enumeration to represent the null value for the
+         `Value` type union.
+
+         The JSON representation for `NullValue` is JSON `null`.
+    remoterunner.v1.RunnerArtifactClass:
+      type: string
+      title: RunnerArtifactClass
+      enum:
+        - RUNNER_ARTIFACT_CLASS_UNSPECIFIED
+        - RUNNER_ARTIFACT_CLASS_CONTROL_PLANE_METADATA
+        - RUNNER_ARTIFACT_CLASS_WORKSPACE_EXPORT
+        - RUNNER_ARTIFACT_CLASS_RUNTIME_SNAPSHOT
+        - RUNNER_ARTIFACT_CLASS_RUNTIME_LOGS
+    remoterunner.v1.RunnerArtifactLifecycleState:
+      type: string
+      title: RunnerArtifactLifecycleState
+      enum:
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_UNSPECIFIED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_UPLOAD_REQUESTED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_UPLOADED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_UPLOAD_SKIPPED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_RETENTION_EXPIRED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_DELETE_REQUESTED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_DELETED
+        - RUNNER_ARTIFACT_LIFECYCLE_STATE_CLEANUP_FAILED
+    remoterunner.v1.RunnerAttachRole:
+      type: string
+      title: RunnerAttachRole
+      enum:
+        - RUNNER_ATTACH_ROLE_UNSPECIFIED
+        - RUNNER_ATTACH_ROLE_VIEWER
+        - RUNNER_ATTACH_ROLE_CONTROLLER
+        - RUNNER_ATTACH_ROLE_ADMIN
+    remoterunner.v1.RunnerRestoreFailureCode:
+      type: string
+      title: RunnerRestoreFailureCode
+      enum:
+        - RUNNER_RESTORE_FAILURE_CODE_UNSPECIFIED
+        - RUNNER_RESTORE_FAILURE_CODE_MISSING_ARTIFACT
+        - RUNNER_RESTORE_FAILURE_CODE_INVALID_MANIFEST
+        - RUNNER_RESTORE_FAILURE_CODE_WORKSPACE_ESCAPE
+        - RUNNER_RESTORE_FAILURE_CODE_PROVIDER_TIMEOUT
+        - RUNNER_RESTORE_FAILURE_CODE_RUNTIME_NOT_READY
+        - RUNNER_RESTORE_FAILURE_CODE_OWNER_MISMATCH
+        - RUNNER_RESTORE_FAILURE_CODE_HYDRATION_UNAVAILABLE
+        - RUNNER_RESTORE_FAILURE_CODE_POLICY_DENIED
+        - RUNNER_RESTORE_FAILURE_CODE_SESSION_CREATE_FAILED
+    remoterunner.v1.RunnerRestoreState:
+      type: string
+      title: RunnerRestoreState
+      enum:
+        - RUNNER_RESTORE_STATE_UNSPECIFIED
+        - RUNNER_RESTORE_STATE_REQUESTED
+        - RUNNER_RESTORE_STATE_ARTIFACTS_HYDRATING
+        - RUNNER_RESTORE_STATE_PROVIDER_STARTING
+        - RUNNER_RESTORE_STATE_IDENTITY_READY
+        - RUNNER_RESTORE_STATE_ATTACHABLE
+        - RUNNER_RESTORE_STATE_FAILED
+        - RUNNER_RESTORE_STATE_EXPIRED
+    remoterunner.v1.RunnerSessionApexAuthorityState:
+      type: string
+      title: RunnerSessionApexAuthorityState
+      enum:
+        - RUNNER_SESSION_APEX_AUTHORITY_STATE_UNSPECIFIED
+        - RUNNER_SESSION_APEX_AUTHORITY_STATE_NOT_REQUIRED
+        - RUNNER_SESSION_APEX_AUTHORITY_STATE_PENDING_RESERVATION
+        - RUNNER_SESSION_APEX_AUTHORITY_STATE_RESERVATION_VALIDATED
+        - RUNNER_SESSION_APEX_AUTHORITY_STATE_MISSION_ADOPTED
+    remoterunner.v1.RunnerSessionRestoreFailurePolicy:
+      type: string
+      title: RunnerSessionRestoreFailurePolicy
+      enum:
+        - RUNNER_SESSION_RESTORE_FAILURE_POLICY_UNSPECIFIED
+        - RUNNER_SESSION_RESTORE_FAILURE_POLICY_FAIL_SESSION
+        - RUNNER_SESSION_RESTORE_FAILURE_POLICY_COLD_START
+    remoterunner.v1.RunnerSessionRestoreState:
+      type: string
+      title: RunnerSessionRestoreState
+      enum:
+        - RUNNER_SESSION_RESTORE_STATE_UNSPECIFIED
+        - RUNNER_SESSION_RESTORE_STATE_REQUESTED
+        - RUNNER_SESSION_RESTORE_STATE_ARTIFACTS_HYDRATING
+        - RUNNER_SESSION_RESTORE_STATE_PROVIDER_STARTING
+        - RUNNER_SESSION_RESTORE_STATE_IDENTITY_READY
+        - RUNNER_SESSION_RESTORE_STATE_ATTACHABLE
+        - RUNNER_SESSION_RESTORE_STATE_FAILED
+        - RUNNER_SESSION_RESTORE_STATE_EXPIRED
+    remoterunner.v1.RunnerSessionState:
+      type: string
+      title: RunnerSessionState
+      enum:
+        - RUNNER_SESSION_STATE_UNSPECIFIED
+        - RUNNER_SESSION_STATE_REQUESTED
+        - RUNNER_SESSION_STATE_PROVISIONING
+        - RUNNER_SESSION_STATE_RUNNING
+        - RUNNER_SESSION_STATE_IDLE
+        - RUNNER_SESSION_STATE_STOPPING
+        - RUNNER_SESSION_STATE_STOPPED
+        - RUNNER_SESSION_STATE_EXPIRED
+        - RUNNER_SESSION_STATE_FAILED
+        - RUNNER_SESSION_STATE_LOST
+    remoterunner.v1.RunnerSessionStepOperation:
+      type: string
+      title: RunnerSessionStepOperation
+      enum:
+        - RUNNER_SESSION_STEP_OPERATION_UNSPECIFIED
+        - RUNNER_SESSION_STEP_OPERATION_GENERIC
+        - RUNNER_SESSION_STEP_OPERATION_APEX_HYDRATE
+        - RUNNER_SESSION_STEP_OPERATION_APEX_DISCOVER
+        - RUNNER_SESSION_STEP_OPERATION_APEX_FREEZE
+        - RUNNER_SESSION_STEP_OPERATION_APEX_GRADE
+        - RUNNER_SESSION_STEP_OPERATION_APEX_MCP_CALL
+        - RUNNER_SESSION_STEP_OPERATION_APEX_STAGE_INPUTS
+        - RUNNER_SESSION_STEP_OPERATION_APEX_STAGE_GRADING
+        - RUNNER_SESSION_STEP_OPERATION_APEX_TASK_INSTRUCTIONS
+    google.protobuf.ListValue:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/google.protobuf.Value'
+          title: values
+          description: Repeated field of dynamically typed values.
+      title: ListValue
+      additionalProperties: false
+      description: |-
+        `ListValue` is a wrapper around a repeated field of values.
+
+         The JSON representation for `ListValue` is JSON array.
+    google.protobuf.Struct:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/google.protobuf.Value'
+      description: |-
+        `Struct` represents a structured data value, consisting of fields
+         which map to dynamically typed values. In some languages, `Struct`
+         might be supported by a native representation. For example, in
+         scripting languages like JS a struct is represented as an
+         object. The details of that representation are described together
+         with the proto support for the language.
+
+         The JSON representation for `Struct` is JSON object.
+    google.protobuf.Struct.FieldsEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          title: value
+          $ref: '#/components/schemas/google.protobuf.Value'
+      title: FieldsEntry
+      additionalProperties: false
+    google.protobuf.Timestamp:
+      type: string
+      examples:
+        - 1s
+        - 1.000340012s
+      format: date-time
+      description: |-
+        A Timestamp represents a point in time independent of any time zone or local
+         calendar, encoded as a count of seconds and fractions of seconds at
+         nanosecond resolution. The count is relative to an epoch at UTC midnight on
+         January 1, 1970, in the proleptic Gregorian calendar which extends the
+         Gregorian calendar backwards to year one.
+
+         All minutes are 60 seconds long. Leap seconds are "smeared" so that no leap
+         second table is needed for interpretation, using a [24-hour linear
+         smear](https://developers.google.com/time/smear).
+
+         The range is from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999999999Z. By
+         restricting to that range, we ensure that we can convert to and from [RFC
+         3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
+
+         # Examples
+
+         Example 1: Compute Timestamp from POSIX `time()`.
+
+             Timestamp timestamp;
+             timestamp.set_seconds(time(NULL));
+             timestamp.set_nanos(0);
+
+         Example 2: Compute Timestamp from POSIX `gettimeofday()`.
+
+             struct timeval tv;
+             gettimeofday(&tv, NULL);
+
+             Timestamp timestamp;
+             timestamp.set_seconds(tv.tv_sec);
+             timestamp.set_nanos(tv.tv_usec * 1000);
+
+         Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
+
+             FILETIME ft;
+             GetSystemTimeAsFileTime(&ft);
+             UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+
+             // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
+             // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
+             Timestamp timestamp;
+             timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));
+             timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
+
+         Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
+
+             long millis = System.currentTimeMillis();
+
+             Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
+                 .setNanos((int) ((millis % 1000) * 1000000)).build();
+
+         Example 5: Compute Timestamp from Java `Instant.now()`.
+
+             Instant now = Instant.now();
+
+             Timestamp timestamp =
+                 Timestamp.newBuilder().setSeconds(now.getEpochSecond())
+                     .setNanos(now.getNano()).build();
+
+         Example 6: Compute Timestamp from current time in Python.
+
+             timestamp = Timestamp()
+             timestamp.GetCurrentTime()
+
+         # JSON Mapping
+
+         In JSON format, the Timestamp type is encoded as a string in the
+         [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
+         format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
+         where {year} is always expressed using four digits while {month}, {day},
+         {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional
+         seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),
+         are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone
+         is required. A proto3 JSON serializer should always use UTC (as indicated by
+         "Z") when printing the Timestamp type and a proto3 JSON parser should be
+         able to accept both UTC and other timezones (as indicated by an offset).
+
+         For example, "2017-01-15T01:30:15.01Z" encodes 15.01 seconds past
+         01:30 UTC on January 15, 2017.
+
+         In JavaScript, one can convert a Date object to this format using the
+         standard
+         [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
+         method. In Python, a standard `datetime.datetime` object can be converted
+         to this format using
+         [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
+         the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use
+         the Joda Time's [`ISODateTimeFormat.dateTime()`](
+         http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
+         ) to obtain a formatter capable of generating timestamps in this format.
+    google.protobuf.Value:
+      oneOf:
+        - type: "null"
+        - type: number
+        - type: string
+        - type: boolean
+        - type: array
+        - type: object
+          additionalProperties: true
+      description: |-
+        `Value` represents a dynamically typed value which can be either
+         null, a number, a string, a boolean, a recursive struct value, or a
+         list of values. A producer of value is expected to set one of these
+         variants. Absence of any variant indicates an error.
+
+         The JSON representation for `Value` is JSON value.
+    remoterunner.v1.AdoptRunnerSessionForComputerMissionRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        reservationId:
+          type: string
+          title: reservation_id
+          minLength: 1
+        runnerSessionId:
+          type: string
+          title: runner_session_id
+          minLength: 1
+        missionId:
+          type: string
+          title: mission_id
+          minLength: 1
+        runtimeRunId:
+          type: string
+          title: runtime_run_id
+          minLength: 1
+      title: AdoptRunnerSessionForComputerMissionRequest
+      additionalProperties: false
+    remoterunner.v1.AdoptRunnerSessionForComputerMissionResponse:
+      type: object
+      properties:
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+        ownerBinding:
+          title: owner_binding
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionOwnerBinding'
+        replayed:
+          type: boolean
+          title: replayed
+      title: AdoptRunnerSessionForComputerMissionResponse
+      required:
+        - session
+        - ownerBinding
+      additionalProperties: false
+    remoterunner.v1.CreateRunnerRestoreRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        userId:
+          type: string
+          title: user_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        sourceSessionId:
+          type: string
+          title: source_session_id
+        maestroSessionId:
+          type: string
+          title: maestro_session_id
+        artifactRef:
+          type: string
+          title: artifact_ref
+        manifestPath:
+          type: string
+          title: manifest_path
+        runnerProfile:
+          type: string
+          title: runner_profile
+          minLength: 1
+        runnerImage:
+          type: string
+          title: runner_image
+        workspaceSource:
+          type: string
+          title: workspace_source
+        repoUrl:
+          type: string
+          title: repo_url
+        branch:
+          type: string
+          title: branch
+        model:
+          type: string
+          title: model
+        ttlMinutes:
+          type: integer
+          title: ttl_minutes
+          maximum: 1440
+          minimum: 1
+          format: int32
+        idleTtlMinutes:
+          type: integer
+          title: idle_ttl_minutes
+          maximum: 1440
+          format: int32
+        metadata:
+          title: metadata
+          $ref: '#/components/schemas/google.protobuf.Struct'
+        runnerSessionId:
+          type: string
+          title: runner_session_id
+        runtimeGeneration:
+          type:
+            - integer
+            - string
+          title: runtime_generation
+          format: int64
+        activationGeneration:
+          type:
+            - integer
+            - string
+          title: activation_generation
+          format: int64
+        workspaceHydrationEnvelope:
+          title: workspace_hydration_envelope
+          $ref: '#/components/schemas/remoterunner.v1.WorkspaceHydrationEnvelope'
+      title: CreateRunnerRestoreRequest
+      additionalProperties: false
+    remoterunner.v1.CreateRunnerRestoreResponse:
+      type: object
+      properties:
+        restore:
+          title: restore
+          $ref: '#/components/schemas/remoterunner.v1.RunnerRestore'
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+          title: events
+        replayed:
+          type: boolean
+          title: replayed
+      title: CreateRunnerRestoreResponse
+      additionalProperties: false
+    remoterunner.v1.CreateRunnerSessionCheckpointRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        ownerBinding:
+          title: owner_binding
+          nullable: true
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionOwnerBinding'
+      title: CreateRunnerSessionCheckpointRequest
+      additionalProperties: false
+    remoterunner.v1.CreateRunnerSessionCheckpointResponse:
+      type: object
+      properties:
+        receipt:
+          title: receipt
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionCheckpointReceipt'
+        event:
+          title: event
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+      title: CreateRunnerSessionCheckpointResponse
+      additionalProperties: false
+    remoterunner.v1.CreateRunnerSessionRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        userId:
+          type: string
+          title: user_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        runnerProfile:
+          type: string
+          title: runner_profile
+          minLength: 1
+        runnerImage:
+          type: string
+          title: runner_image
+        workspaceSource:
+          type: string
+          title: workspace_source
+        repoUrl:
+          type: string
+          title: repo_url
+        branch:
+          type: string
+          title: branch
+        model:
+          type: string
+          title: model
+        ttlMinutes:
+          type: integer
+          title: ttl_minutes
+          maximum: 1440
+          minimum: 1
+          format: int32
+        idleTtlMinutes:
+          type: integer
+          title: idle_ttl_minutes
+          maximum: 1440
+          format: int32
+        metadata:
+          title: metadata
+          $ref: '#/components/schemas/google.protobuf.Struct'
+        restore:
+          title: restore
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionRestoreSpec'
+        agentRunId:
+          type: string
+          title: agent_run_id
+        maestroSessionId:
+          type: string
+          title: maestro_session_id
+        apexReservationId:
+          type: string
+          title: apex_reservation_id
+        runnerSessionId:
+          type: string
+          title: runner_session_id
+        runtimeGeneration:
+          type:
+            - integer
+            - string
+          title: runtime_generation
+          format: int64
+        activationGeneration:
+          type:
+            - integer
+            - string
+          title: activation_generation
+          format: int64
+        workspaceHydrationEnvelope:
+          title: workspace_hydration_envelope
+          $ref: '#/components/schemas/remoterunner.v1.WorkspaceHydrationEnvelope'
+      title: CreateRunnerSessionRequest
+      additionalProperties: false
+    remoterunner.v1.CreateRunnerSessionResponse:
+      type: object
+      properties:
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+          title: events
+        replayed:
+          type: boolean
+          title: replayed
+      title: CreateRunnerSessionResponse
+      additionalProperties: false
+    remoterunner.v1.ExecuteRunnerSessionStepRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        argv:
+          type: array
+          items:
+            type: string
+            maxItems: 64
+          title: argv
+          maxItems: 64
+        cwd:
+          type: string
+          title: cwd
+        timeoutSeconds:
+          type: integer
+          title: timeout_seconds
+          maximum: 3600
+          minimum: 1
+        ownerBinding:
+          title: owner_binding
+          nullable: true
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionOwnerBinding'
+        operation:
+          title: operation
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionStepOperation'
+        stdin:
+          type: string
+          title: stdin
+          maxLength: 1398104
+          x-protobuf-bytes-max-length: 1048576
+          format: byte
+        expectedSnapshotId:
+          type: string
+          title: expected_snapshot_id
+        expectedSandboxSessionId:
+          type: string
+          title: expected_sandbox_session_id
+        expectedSandboxId:
+          type: string
+          title: expected_sandbox_id
+        expectedRunnerSessionId:
+          type: string
+          title: expected_runner_session_id
+        expectedCheckpointId:
+          type: string
+          title: expected_checkpoint_id
+        instructionArtifactRef:
+          type: string
+          title: instruction_artifact_ref
+        instructionDigestSha256:
+          type: string
+          title: instruction_digest_sha256
+        instructionByteCount:
+          type:
+            - integer
+            - string
+          title: instruction_byte_count
+          format: int64
+        claimLeaseGeneration:
+          type:
+            - integer
+            - string
+          title: claim_lease_generation
+          format: int64
+      title: ExecuteRunnerSessionStepRequest
+      additionalProperties: false
+    remoterunner.v1.ExecuteRunnerSessionStepResponse:
+      type: object
+      properties:
+        receipt:
+          title: receipt
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionStepReceipt'
+        event:
+          title: event
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+        apexMcpOutput:
+          type: string
+          title: apex_mcp_output
+          maxLength: 1398104
+          x-protobuf-bytes-max-length: 1048576
+          format: byte
+          description: |-
+            Bounded output for fixed APEX MCP/discover/grade operations. MCP output is
+             transient; schema-validated discover/grade control output is replayable.
+        ephemeralOutput:
+          type: string
+          title: ephemeral_output
+          maxLength: 1398104
+          x-protobuf-bytes-max-length: 1048576
+          format: byte
+          description: |-
+            Live-only bytes for the fixed APEX task-instruction read. This field is
+             always empty on replay and is never copied into a receipt or event.
+      title: ExecuteRunnerSessionStepResponse
+      additionalProperties: false
+    remoterunner.v1.ExtendRunnerSessionRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        additionalMinutes:
+          type: integer
+          title: additional_minutes
+          maximum: 1440
+          minimum: 1
+          format: int32
+        additionalIdleMinutes:
+          type: integer
+          title: additional_idle_minutes
+          maximum: 1440
+          format: int32
+        reason:
+          type: string
+          title: reason
+      title: ExtendRunnerSessionRequest
+      additionalProperties: false
+    remoterunner.v1.ExtendRunnerSessionResponse:
+      type: object
+      properties:
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+        event:
+          title: event
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+      title: ExtendRunnerSessionResponse
+      additionalProperties: false
+    remoterunner.v1.GetRunnerAccountPolicyRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+      title: GetRunnerAccountPolicyRequest
+      additionalProperties: false
+    remoterunner.v1.GetRunnerAccountPolicyResponse:
+      type: object
+      properties:
+        policy:
+          title: policy
+          $ref: '#/components/schemas/remoterunner.v1.RunnerAccountPolicyRecord'
+      title: GetRunnerAccountPolicyResponse
+      additionalProperties: false
+    remoterunner.v1.GetRunnerRestoreRequest:
+      type: object
+      properties:
+        restoreId:
+          type: string
+          title: restore_id
+          minLength: 1
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+      title: GetRunnerRestoreRequest
+      additionalProperties: false
+    remoterunner.v1.GetRunnerRestoreResponse:
+      type: object
+      properties:
+        restore:
+          title: restore
+          $ref: '#/components/schemas/remoterunner.v1.RunnerRestore'
+      title: GetRunnerRestoreResponse
+      additionalProperties: false
+    remoterunner.v1.GetRunnerSessionRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+      title: GetRunnerSessionRequest
+      additionalProperties: false
+    remoterunner.v1.GetRunnerSessionResponse:
+      type: object
+      properties:
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+      title: GetRunnerSessionResponse
+      additionalProperties: false
+    remoterunner.v1.GetStatusRequest:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+      title: GetStatusRequest
+      additionalProperties: false
+    remoterunner.v1.GetStatusResponse:
+      type: object
+      properties:
+        service:
+          type: string
+          title: service
+        workspaceId:
+          type: string
+          title: workspace_id
+        downstreamPolicy:
+          type: string
+          title: downstream_policy
+      title: GetStatusResponse
+      additionalProperties: false
+    remoterunner.v1.ListRunnerProfilesRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        includeUnavailable:
+          type: boolean
+          title: include_unavailable
+      title: ListRunnerProfilesRequest
+      additionalProperties: false
+    remoterunner.v1.ListRunnerProfilesResponse:
+      type: object
+      properties:
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerProfileAvailability'
+          title: profiles
+      title: ListRunnerProfilesResponse
+      additionalProperties: false
+    remoterunner.v1.ListRunnerRestoresRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        state:
+          title: state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerRestoreState'
+        limit:
+          type: integer
+          title: limit
+          maximum: 200
+          format: int32
+        offset:
+          type: integer
+          title: offset
+          format: int32
+      title: ListRunnerRestoresRequest
+      additionalProperties: false
+    remoterunner.v1.ListRunnerRestoresResponse:
+      type: object
+      properties:
+        restores:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerRestore'
+          title: restores
+        nextOffset:
+          type: integer
+          title: next_offset
+          format: int32
+      title: ListRunnerRestoresResponse
+      additionalProperties: false
+    remoterunner.v1.ListRunnerSessionEventsRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        afterSequence:
+          type:
+            - integer
+            - string
+          title: after_sequence
+          format: int64
+        limit:
+          type: integer
+          title: limit
+          maximum: 500
+          format: int32
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+      title: ListRunnerSessionEventsRequest
+      additionalProperties: false
+    remoterunner.v1.ListRunnerSessionEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+          title: events
+        nextSequence:
+          type:
+            - integer
+            - string
+          title: next_sequence
+          format: int64
+      title: ListRunnerSessionEventsResponse
+      additionalProperties: false
+    remoterunner.v1.ListRunnerSessionsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        state:
+          title: state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionState'
+        limit:
+          type: integer
+          title: limit
+          maximum: 200
+          format: int32
+        offset:
+          type: integer
+          title: offset
+          format: int32
+      title: ListRunnerSessionsRequest
+      additionalProperties: false
+    remoterunner.v1.ListRunnerSessionsResponse:
+      type: object
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+          title: sessions
+        nextOffset:
+          type: integer
+          title: next_offset
+          format: int32
+      title: ListRunnerSessionsResponse
+      additionalProperties: false
+    remoterunner.v1.MintAttachTokenRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        subjectId:
+          type: string
+          title: subject_id
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerAttachRole'
+          title: roles
+        ttlMinutes:
+          type: integer
+          title: ttl_minutes
+          maximum: 60
+          format: int32
+      title: MintAttachTokenRequest
+      additionalProperties: false
+    remoterunner.v1.MintAttachTokenResponse:
+      type: object
+      properties:
+        token:
+          title: token
+          $ref: '#/components/schemas/remoterunner.v1.RunnerAttachToken'
+        tokenSecret:
+          type: string
+          title: token_secret
+        ownerInstanceId:
+          type: string
+          title: owner_instance_id
+        runnerServiceName:
+          type: string
+          title: runner_service_name
+      title: MintAttachTokenResponse
+      additionalProperties: false
+    remoterunner.v1.RecordRunnerSessionArtifactLifecycleRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        artifactClass:
+          title: artifact_class
+          $ref: '#/components/schemas/remoterunner.v1.RunnerArtifactClass'
+        state:
+          title: state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerArtifactLifecycleState'
+        artifactUri:
+          type: string
+          title: artifact_uri
+        manifestPath:
+          type: string
+          title: manifest_path
+        reason:
+          type: string
+          title: reason
+        message:
+          type: string
+          title: message
+        retentionExpiresAt:
+          title: retention_expires_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: RecordRunnerSessionArtifactLifecycleRequest
+      additionalProperties: false
+    remoterunner.v1.RecordRunnerSessionArtifactLifecycleResponse:
+      type: object
+      properties:
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+        event:
+          title: event
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+      title: RecordRunnerSessionArtifactLifecycleResponse
+      additionalProperties: false
+    remoterunner.v1.RevokeAttachTokenRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        tokenId:
+          type: string
+          title: token_id
+          minLength: 1
+      title: RevokeAttachTokenRequest
+      additionalProperties: false
+    remoterunner.v1.RevokeAttachTokenResponse:
+      type: object
+      properties:
+        token:
+          title: token
+          $ref: '#/components/schemas/remoterunner.v1.RunnerAttachToken'
+        event:
+          title: event
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+      title: RevokeAttachTokenResponse
+      additionalProperties: false
+    remoterunner.v1.RunnerAccountPolicy:
+      type: object
+      properties:
+        maxConcurrentSessions:
+          type: integer
+          title: max_concurrent_sessions
+          format: int32
+        maxSessionTtlMinutes:
+          type: integer
+          title: max_session_ttl_minutes
+          format: int32
+        maxIdleTtlMinutes:
+          type: integer
+          title: max_idle_ttl_minutes
+          format: int32
+        monthlyRunnerMinutes:
+          type:
+            - integer
+            - string
+          title: monthly_runner_minutes
+          format: int64
+        monthlySpendCapMicros:
+          type:
+            - integer
+            - string
+          title: monthly_spend_cap_micros
+          format: int64
+        runnerMinuteCostMicros:
+          type:
+            - integer
+            - string
+          title: runner_minute_cost_micros
+          format: int64
+        allowedRunnerProfiles:
+          type: array
+          items:
+            type: string
+          title: allowed_runner_profiles
+        allowedModels:
+          type: array
+          items:
+            type: string
+          title: allowed_models
+        allowedWorkspaceSources:
+          type: array
+          items:
+            type: string
+          title: allowed_workspace_sources
+        operatorOverrideScope:
+          type: string
+          title: operator_override_scope
+        workspaceScopedUsageBudgets:
+          type: boolean
+          title: workspace_scoped_usage_budgets
+      title: RunnerAccountPolicy
+      additionalProperties: false
+    remoterunner.v1.RunnerAccountPolicyRecord:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        policy:
+          title: policy
+          $ref: '#/components/schemas/remoterunner.v1.RunnerAccountPolicy'
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        source:
+          type: string
+          title: source
+      title: RunnerAccountPolicyRecord
+      additionalProperties: false
+    remoterunner.v1.RunnerAttachToken:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        sessionId:
+          type: string
+          title: session_id
+        subjectId:
+          type: string
+          title: subject_id
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/remoterunner.v1.RunnerAttachRole'
+          title: roles
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        expiresAt:
+          title: expires_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        revokedAt:
+          title: revoked_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: RunnerAttachToken
+      additionalProperties: false
+    remoterunner.v1.RunnerProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        displayName:
+          type: string
+          title: display_name
+        enabled:
+          type: boolean
+          title: enabled
+        defaultTtlMinutes:
+          type: integer
+          title: default_ttl_minutes
+          format: int32
+        maxTtlMinutes:
+          type: integer
+          title: max_ttl_minutes
+          format: int32
+        defaultIdleTtlMinutes:
+          type: integer
+          title: default_idle_ttl_minutes
+          format: int32
+        maxIdleTtlMinutes:
+          type: integer
+          title: max_idle_ttl_minutes
+          format: int32
+        isolationLevel:
+          type: string
+          title: isolation_level
+        interruption:
+          type: string
+          title: interruption
+        workspacePersistence:
+          type: string
+          title: workspace_persistence
+        costClass:
+          type: string
+          title: cost_class
+        meteringMultiplierMicros:
+          type:
+            - integer
+            - string
+          title: metering_multiplier_micros
+          format: int64
+        experimental:
+          type: boolean
+          title: experimental
+        productionEligible:
+          type: boolean
+          title: production_eligible
+      title: RunnerProfile
+      additionalProperties: false
+    remoterunner.v1.RunnerProfileAvailability:
+      type: object
+      properties:
+        profile:
+          title: profile
+          $ref: '#/components/schemas/remoterunner.v1.RunnerProfile'
+        available:
+          type: boolean
+          title: available
+        unavailableReason:
+          type: string
+          title: unavailable_reason
+        policySource:
+          type: string
+          title: policy_source
+      title: RunnerProfileAvailability
+      additionalProperties: false
+    remoterunner.v1.RunnerProviderProof:
+      type: object
+      properties:
+        provider:
+          type: string
+          title: provider
+        providerMode:
+          type: string
+          title: provider_mode
+        workerId:
+          type: string
+          title: worker_id
+        runtimeImageDigest:
+          type: string
+          title: runtime_image_digest
+      title: RunnerProviderProof
+      additionalProperties: false
+    remoterunner.v1.RunnerRestore:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        sourceSessionId:
+          type: string
+          title: source_session_id
+        targetSessionId:
+          type: string
+          title: target_session_id
+        maestroSessionId:
+          type: string
+          title: maestro_session_id
+        state:
+          title: state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerRestoreState'
+        artifactRef:
+          type: string
+          title: artifact_ref
+        manifestPath:
+          type: string
+          title: manifest_path
+        runnerProfile:
+          type: string
+          title: runner_profile
+        runnerImage:
+          type: string
+          title: runner_image
+        workspaceSource:
+          type: string
+          title: workspace_source
+        repoUrl:
+          type: string
+          title: repo_url
+        branch:
+          type: string
+          title: branch
+        model:
+          type: string
+          title: model
+        ttlMinutes:
+          type: integer
+          title: ttl_minutes
+          format: int32
+        idleTtlMinutes:
+          type: integer
+          title: idle_ttl_minutes
+          format: int32
+        ownerInstanceId:
+          type: string
+          title: owner_instance_id
+        failureCode:
+          title: failure_code
+          $ref: '#/components/schemas/remoterunner.v1.RunnerRestoreFailureCode'
+        failureMessage:
+          type: string
+          title: failure_message
+        requestedAt:
+          title: requested_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        hydratedAt:
+          title: hydrated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        providerStartedAt:
+          title: provider_started_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        identityReadyAt:
+          title: identity_ready_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        attachableAt:
+          title: attachable_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        failedAt:
+          title: failed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        expiresAt:
+          title: expires_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        metadata:
+          title: metadata
+          $ref: '#/components/schemas/google.protobuf.Struct'
+      title: RunnerRestore
+      additionalProperties: false
+    remoterunner.v1.RunnerSession:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        userId:
+          type: string
+          title: user_id
+        agentRunId:
+          type: string
+          title: agent_run_id
+        maestroSessionId:
+          type: string
+          title: maestro_session_id
+        state:
+          title: state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionState'
+        runnerProfile:
+          type: string
+          title: runner_profile
+        runnerImage:
+          type: string
+          title: runner_image
+        workspaceSource:
+          type: string
+          title: workspace_source
+        repoUrl:
+          type: string
+          title: repo_url
+        branch:
+          type: string
+          title: branch
+        model:
+          type: string
+          title: model
+        ownerInstanceId:
+          type: string
+          title: owner_instance_id
+          description: |-
+            Platform-minted runtime owner generation. Hosted runtimes must echo this
+             value on the remote-runner identity endpoint before new attach requests are
+             proxied.
+        runnerPodNamespace:
+          type: string
+          title: runner_pod_namespace
+        runnerPodName:
+          type: string
+          title: runner_pod_name
+        runnerServiceName:
+          type: string
+          title: runner_service_name
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        startedAt:
+          title: started_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        expiresAt:
+          title: expires_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        idleExpiresAt:
+          title: idle_expires_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        stoppedAt:
+          title: stopped_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        stopReason:
+          type: string
+          title: stop_reason
+        lastHeartbeatAt:
+          title: last_heartbeat_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        usedRunnerSeconds:
+          type:
+            - integer
+            - string
+          title: used_runner_seconds
+          format: int64
+        usedIdleSeconds:
+          type:
+            - integer
+            - string
+          title: used_idle_seconds
+          format: int64
+        estimatedCostMicros:
+          type:
+            - integer
+            - string
+          title: estimated_cost_micros
+          format: int64
+        metadata:
+          title: metadata
+          $ref: '#/components/schemas/google.protobuf.Struct'
+        reservedRunnerSeconds:
+          type:
+            - integer
+            - string
+          title: reserved_runner_seconds
+          format: int64
+        reservedCostMicros:
+          type:
+            - integer
+            - string
+          title: reserved_cost_micros
+          format: int64
+        resolvedProfile:
+          title: resolved_profile
+          $ref: '#/components/schemas/remoterunner.v1.RunnerProfile'
+        restore:
+          title: restore
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionRestoreSpec'
+        restoreStatus:
+          title: restore_status
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionRestoreStatus'
+        apexAuthorityState:
+          title: apex_authority_state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionApexAuthorityState'
+        apexReservationId:
+          type: string
+          title: apex_reservation_id
+      title: RunnerSession
+      additionalProperties: false
+    remoterunner.v1.RunnerSessionCheckpointReceipt:
+      type: object
+      properties:
+        checkpointId:
+          type: string
+          title: checkpoint_id
+        sourceSessionId:
+          type: string
+          title: source_session_id
+        replayed:
+          type: boolean
+          title: replayed
+      title: RunnerSessionCheckpointReceipt
+      additionalProperties: false
+    remoterunner.v1.RunnerSessionEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        sessionId:
+          type: string
+          title: session_id
+        sequence:
+          type:
+            - integer
+            - string
+          title: sequence
+          format: int64
+        eventType:
+          type: string
+          title: event_type
+        occurredAt:
+          title: occurred_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        payload:
+          title: payload
+          $ref: '#/components/schemas/google.protobuf.Struct'
+      title: RunnerSessionEvent
+      additionalProperties: false
+    remoterunner.v1.RunnerSessionOwnerBinding:
+      type: object
+      properties:
+        missionId:
+          type: string
+          title: mission_id
+          minLength: 1
+        runtimeRunId:
+          type: string
+          title: runtime_run_id
+          minLength: 1
+        authorityGrantId:
+          type: string
+          title: authority_grant_id
+          minLength: 1
+        contractVersion:
+          type: string
+          title: contract_version
+          minLength: 1
+        runnerProfile:
+          type: string
+          title: runner_profile
+          minLength: 1
+        policyVersion:
+          type: string
+          title: policy_version
+        decisionRoute:
+          type: string
+          title: decision_route
+        selectedCandidateId:
+          type: string
+          title: selected_candidate_id
+        decisionRef:
+          type: string
+          title: decision_ref
+        decisionDigestSha256:
+          type: string
+          title: decision_digest_sha256
+      title: RunnerSessionOwnerBinding
+      additionalProperties: false
+    remoterunner.v1.RunnerSessionRestoreSpec:
+      type: object
+      properties:
+        sourceRunnerSessionId:
+          type: string
+          title: source_runner_session_id
+        sourceMaestroSessionId:
+          type: string
+          title: source_maestro_session_id
+        snapshotArtifactUri:
+          type: string
+          title: snapshot_artifact_uri
+        snapshotManifestPath:
+          type: string
+          title: snapshot_manifest_path
+        snapshotManifestProtocolVersion:
+          type: string
+          title: snapshot_manifest_protocol_version
+        artifactDigest:
+          type: string
+          title: artifact_digest
+        failurePolicy:
+          title: failure_policy
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionRestoreFailurePolicy'
+        metadata:
+          title: metadata
+          $ref: '#/components/schemas/google.protobuf.Struct'
+      title: RunnerSessionRestoreSpec
+      additionalProperties: false
+    remoterunner.v1.RunnerSessionRestoreStatus:
+      type: object
+      properties:
+        state:
+          title: state
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionRestoreState'
+        localManifestPath:
+          type: string
+          title: local_manifest_path
+        hydratedArtifactUri:
+          type: string
+          title: hydrated_artifact_uri
+        failureReason:
+          type: string
+          title: failure_reason
+        failureMessage:
+          type: string
+          title: failure_message
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: RunnerSessionRestoreStatus
+      additionalProperties: false
+    remoterunner.v1.RunnerSessionStepReceipt:
+      type: object
+      properties:
+        commandId:
+          type: string
+          title: command_id
+        exitCode:
+          type: integer
+          title: exit_code
+          format: int32
+        stdout:
+          type: string
+          title: stdout
+        stderr:
+          type: string
+          title: stderr
+        replayed:
+          type: boolean
+          title: replayed
+        providerProof:
+          title: provider_proof
+          $ref: '#/components/schemas/remoterunner.v1.RunnerProviderProof'
+        stdinSha256:
+          type: string
+          title: stdin_sha256
+        outputUnavailable:
+          type: boolean
+          title: output_unavailable
+        outputDigestSha256:
+          type: string
+          title: output_digest_sha256
+        outputByteCount:
+          type:
+            - integer
+            - string
+          title: output_byte_count
+          format: int64
+      title: RunnerSessionStepReceipt
+      additionalProperties: false
+    remoterunner.v1.StopRunnerSessionRequest:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          title: session_id
+          minLength: 1
+        reason:
+          type: string
+          title: reason
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+      title: StopRunnerSessionRequest
+      additionalProperties: false
+    remoterunner.v1.StopRunnerSessionResponse:
+      type: object
+      properties:
+        session:
+          title: session
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSession'
+        event:
+          title: event
+          $ref: '#/components/schemas/remoterunner.v1.RunnerSessionEvent'
+      title: StopRunnerSessionResponse
+      additionalProperties: false
+    remoterunner.v1.UpsertRunnerAccountPolicyRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+        policy:
+          title: policy
+          $ref: '#/components/schemas/remoterunner.v1.RunnerAccountPolicy'
+      title: UpsertRunnerAccountPolicyRequest
+      additionalProperties: false
+    remoterunner.v1.UpsertRunnerAccountPolicyResponse:
+      type: object
+      properties:
+        policy:
+          title: policy
+          $ref: '#/components/schemas/remoterunner.v1.RunnerAccountPolicyRecord'
+      title: UpsertRunnerAccountPolicyResponse
+      additionalProperties: false
+    remoterunner.v1.WorkspaceHydrationClaims:
+      type: object
+      properties:
+        schemaVersion:
+          type: integer
+          title: schema_version
+        envelopeId:
+          type: string
+          title: envelope_id
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        sourceWorkspaceId:
+          type: string
+          title: source_workspace_id
+        sourceWorkspaceVersion:
+          type: string
+          title: source_workspace_version
+        sourceRevisionId:
+          type: string
+          title: source_revision_id
+        immutableSnapshotId:
+          type: string
+          title: immutable_snapshot_id
+        immutableSnapshotDigest:
+          type: string
+          title: immutable_snapshot_digest
+        workspaceSkillSetDigest:
+          type: string
+          title: workspace_skill_set_digest
+        capabilitySetDigest:
+          type: string
+          title: capability_set_digest
+        runnerSessionId:
+          type: string
+          title: runner_session_id
+        maestroSessionId:
+          type: string
+          title: maestro_session_id
+        runtimeGeneration:
+          type:
+            - integer
+            - string
+          title: runtime_generation
+          format: int64
+        activationGeneration:
+          type:
+            - integer
+            - string
+          title: activation_generation
+          format: int64
+        audience:
+          type: string
+          title: audience
+        issuedAtMs:
+          type:
+            - integer
+            - string
+          title: issued_at_ms
+          format: int64
+        notBeforeMs:
+          type:
+            - integer
+            - string
+          title: not_before_ms
+          format: int64
+        expiresAtMs:
+          type:
+            - integer
+            - string
+          title: expires_at_ms
+          format: int64
+        replayNonce:
+          type: string
+          title: replay_nonce
+        extractionPolicyVersion:
+          type: string
+          title: extraction_policy_version
+        policyVersion:
+          type: string
+          title: policy_version
+        artifactRef:
+          type: string
+          title: artifact_ref
+        signerIdentity:
+          type: string
+          title: signer_identity
+        keyId:
+          type: string
+          title: key_id
+        maxFiles:
+          type:
+            - integer
+            - string
+          title: max_files
+          format: int64
+        maxBytes:
+          type:
+            - integer
+            - string
+          title: max_bytes
+          format: int64
+      title: WorkspaceHydrationClaims
+      additionalProperties: false
+      description: |-
+        Immutable workspace authority signed by Platform for Runner Host admission.
+         Acceptance proves only the exact coordinates below; materialization remains
+         a separate owner operation.
+    remoterunner.v1.WorkspaceHydrationEnvelope:
+      type: object
+      properties:
+        claims:
+          title: claims
+          $ref: '#/components/schemas/remoterunner.v1.WorkspaceHydrationClaims'
+        signature:
+          type: string
+          title: signature
+          minLength: 1
+      title: WorkspaceHydrationEnvelope
+      required:
+        - claims
+      additionalProperties: false
+    connect-protocol-version:
+      type: number
+      title: Connect-Protocol-Version
+      enum:
+        - 1
+      description: Define the version of the Connect protocol
+      const: 1
+    connect-timeout-header:
+      type: number
+      title: Connect-Timeout-Ms
+      description: Define the timeout, in ms
+    connect.error:
+      type: object
+      properties:
+        code:
+          type: string
+          examples:
+            - not_found
+          enum:
+            - canceled
+            - unknown
+            - invalid_argument
+            - deadline_exceeded
+            - not_found
+            - already_exists
+            - permission_denied
+            - resource_exhausted
+            - failed_precondition
+            - aborted
+            - out_of_range
+            - unimplemented
+            - internal
+            - unavailable
+            - data_loss
+            - unauthenticated
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+        message:
+          type: string
+          description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+        detail:
+          $ref: '#/components/schemas/google.protobuf.Any'
+      title: Connect Error
+      additionalProperties: true
+      description: 'Error type returned by Connect: https://connectrpc.com/docs/go/errors/#http-representation'
+    google.protobuf.Any:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+          format: binary
+        debug:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+security: []
+tags:
+  - name: remoterunner.v1.RemoteRunnerService
+    description: RemoteRunnerService owns account-scoped hosted Maestro runner sessions.

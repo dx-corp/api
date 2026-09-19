@@ -1,0 +1,1709 @@
+syntax = "proto3";
+
+package deixic.v1;
+
+import "common/v1/authz.proto";
+import "console/v1/console.proto";
+import "meter/v1/meter.proto";
+
+option go_package = "github.com/evalops/platform/gen/go/deixic/v1;deixicv1";
+
+// DeixicService is the producer-owned browser contract served by Platform API.
+// Canonical message schemas remain in console.v1 for wire compatibility.
+service DeixicService {
+  // Lists built-in native business blueprints available to every authorized tenant.
+  rpc ListBusinessBlueprints(console.v1.ListBusinessBlueprintsRequest) returns (console.v1.ListBusinessBlueprintsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Clones a pinned built-in blueprint into editable tenant-owned definitions and a draft form.
+  rpc CloneBusinessBlueprint(console.v1.CloneBusinessBlueprintRequest) returns (console.v1.CloneBusinessBlueprintResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // GetBusinessProcessDefinition reads immutable process definitions within the tenant.
+  rpc GetBusinessProcessDefinition(console.v1.GetBusinessProcessDefinitionRequest) returns (console.v1.GetBusinessProcessDefinitionResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // ListBusinessProcessDefinitions reads immutable process definitions within the tenant.
+  rpc ListBusinessProcessDefinitions(console.v1.ListBusinessProcessDefinitionsRequest) returns (console.v1.ListBusinessProcessDefinitionsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // DefineBusinessProcess accesses the durable object-bound process owner.
+  rpc DefineBusinessProcess(console.v1.DefineBusinessProcessRequest) returns (console.v1.DefineBusinessProcessResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // StartBusinessProcess accesses the durable object-bound process owner.
+  rpc StartBusinessProcess(console.v1.StartBusinessProcessRequest) returns (console.v1.StartBusinessProcessResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // GetBusinessProcess accesses the durable object-bound process owner.
+  rpc GetBusinessProcess(console.v1.GetBusinessProcessRequest) returns (console.v1.GetBusinessProcessResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // ListBusinessProcesses accesses the durable object-bound process owner.
+  rpc ListBusinessProcesses(console.v1.ListBusinessProcessesRequest) returns (console.v1.ListBusinessProcessesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // TransitionBusinessProcess accesses the durable object-bound process owner.
+  rpc TransitionBusinessProcess(console.v1.TransitionBusinessProcessRequest) returns (console.v1.TransitionBusinessProcessResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Checks source-authority readiness without changing accepted state.
+  rpc PrepareBusinessObjectAuthorityTransfer(console.v1.PrepareBusinessObjectAuthorityTransferRequest) returns (console.v1.PrepareBusinessObjectAuthorityTransferResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Checks source-authority readiness without changing accepted state.
+  rpc FinalizeBusinessObjectAuthorityTransfer(console.v1.FinalizeBusinessObjectAuthorityTransferRequest) returns (console.v1.FinalizeBusinessObjectAuthorityTransferResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // DefineBusinessObjectType uses tenant-scoped durable business object state.
+  rpc DefineBusinessObjectType(console.v1.DefineBusinessObjectTypeRequest) returns (console.v1.DefineBusinessObjectTypeResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // GetBusinessObjectType reads an exact immutable published schema revision.
+  rpc GetBusinessObjectType(console.v1.GetBusinessObjectTypeRequest) returns (console.v1.GetBusinessObjectTypeResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListBusinessObjectTypes uses tenant-scoped durable business object state.
+  rpc ListBusinessObjectTypes(console.v1.ListBusinessObjectTypesRequest) returns (console.v1.ListBusinessObjectTypesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // CreateBusinessObject uses tenant-scoped durable business object state.
+  rpc CreateBusinessObject(console.v1.CreateBusinessObjectRequest) returns (console.v1.CreateBusinessObjectResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // GetBusinessObject uses tenant-scoped durable business object state.
+  rpc GetBusinessObject(console.v1.GetBusinessObjectRequest) returns (console.v1.GetBusinessObjectResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListBusinessObjects uses tenant-scoped durable business object state.
+  rpc ListBusinessObjects(console.v1.ListBusinessObjectsRequest) returns (console.v1.ListBusinessObjectsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // UpdateBusinessObject uses tenant-scoped durable business object state.
+  rpc UpdateBusinessObject(console.v1.UpdateBusinessObjectRequest) returns (console.v1.UpdateBusinessObjectResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // DeleteBusinessObject uses tenant-scoped durable business object state.
+  rpc DeleteBusinessObject(console.v1.DeleteBusinessObjectRequest) returns (console.v1.DeleteBusinessObjectResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // ListBusinessObjectRevisions uses tenant-scoped durable business object state.
+  rpc ListBusinessObjectRevisions(console.v1.ListBusinessObjectRevisionsRequest) returns (console.v1.ListBusinessObjectRevisionsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // BindBusinessObjectSource uses tenant-scoped durable business object state.
+  rpc BindBusinessObjectSource(console.v1.BindBusinessObjectSourceRequest) returns (console.v1.BindBusinessObjectSourceResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // AdmitBusinessObjectObservation uses tenant-scoped durable business object state.
+  rpc AdmitBusinessObjectObservation(console.v1.AdmitBusinessObjectObservationRequest) returns (console.v1.AdmitBusinessObjectObservationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // ListBusinessObjectRelationships uses tenant-scoped durable business object state.
+  rpc ListBusinessObjectRelationships(console.v1.ListBusinessObjectRelationshipsRequest) returns (console.v1.ListBusinessObjectRelationshipsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // CreateBusinessObjectRelationship uses tenant-scoped durable business object state.
+  rpc CreateBusinessObjectRelationship(console.v1.CreateBusinessObjectRelationshipRequest) returns (console.v1.CreateBusinessObjectRelationshipResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // DeleteBusinessObjectRelationship uses tenant-scoped durable business object state.
+  rpc DeleteBusinessObjectRelationship(console.v1.DeleteBusinessObjectRelationshipRequest) returns (console.v1.DeleteBusinessObjectRelationshipResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc CreateCaptureForm(console.v1.CreateCaptureFormRequest) returns (console.v1.CreateCaptureFormResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc ListCaptureForms(console.v1.ListCaptureFormsRequest) returns (console.v1.ListCaptureFormsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc GetCaptureForm(console.v1.GetCaptureFormRequest) returns (console.v1.GetCaptureFormResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc UpdateCaptureForm(console.v1.UpdateCaptureFormRequest) returns (console.v1.UpdateCaptureFormResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc PublishCaptureForm(console.v1.PublishCaptureFormRequest) returns (console.v1.PublishCaptureFormResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc RevokeCaptureFormPublication(console.v1.RevokeCaptureFormPublicationRequest) returns (console.v1.RevokeCaptureFormPublicationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // CreateCaptureFormInvitation uses recipient verification at the Capture Forms owner.
+  rpc CreateCaptureFormInvitation(console.v1.CreateCaptureFormInvitationRequest) returns (console.v1.CreateCaptureFormInvitationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // RevokeCaptureFormInvitation uses recipient verification at the Capture Forms owner.
+  rpc RevokeCaptureFormInvitation(console.v1.RevokeCaptureFormInvitationRequest) returns (console.v1.RevokeCaptureFormInvitationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // GetInvitedCaptureForm uses recipient verification at the Capture Forms owner.
+  rpc GetInvitedCaptureForm(console.v1.GetInvitedCaptureFormRequest) returns (console.v1.GetInvitedCaptureFormResponse) {
+    option (common.v1.public) = true;
+  }
+
+  // SubmitInvitedCaptureForm uses recipient verification at the Capture Forms owner.
+  rpc SubmitInvitedCaptureForm(console.v1.SubmitInvitedCaptureFormRequest) returns (console.v1.SubmitInvitedCaptureFormResponse) {
+    option (common.v1.public) = true;
+  }
+
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc GetPublishedCaptureForm(console.v1.GetPublishedCaptureFormRequest) returns (console.v1.GetPublishedCaptureFormResponse) {
+    option (common.v1.public) = true;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc GetPublishedCaptureFormBrandingAsset(console.v1.GetPublishedCaptureFormBrandingAssetRequest) returns (console.v1.GetPublishedCaptureFormBrandingAssetResponse) {
+    option (common.v1.public) = true;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc SubmitPublishedCaptureForm(console.v1.SubmitPublishedCaptureFormRequest) returns (console.v1.SubmitPublishedCaptureFormResponse) {
+    option (common.v1.public) = true;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc BeginPublishedCaptureFormUpload(console.v1.BeginPublishedCaptureFormUploadRequest) returns (console.v1.BeginPublishedCaptureFormUploadResponse) {
+    option (common.v1.public) = true;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc CompletePublishedCaptureFormUpload(console.v1.CompletePublishedCaptureFormUploadRequest) returns (console.v1.CompletePublishedCaptureFormUploadResponse) {
+    option (common.v1.public) = true;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc GetCaptureFormSubmission(console.v1.GetCaptureFormSubmissionRequest) returns (console.v1.GetCaptureFormSubmissionResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc ListCaptureFormSubmissions(console.v1.ListCaptureFormSubmissionsRequest) returns (console.v1.ListCaptureFormSubmissionsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService capture-form contract.
+  rpc ReviewCaptureFormSubmission(console.v1.ReviewCaptureFormSubmissionRequest) returns (console.v1.ReviewCaptureFormSubmissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // GetInferenceCreditAutoRefill uses authorized workspace billing consent.
+  rpc GetInferenceCreditAutoRefill(console.v1.GetInferenceCreditAutoRefillRequest) returns (console.v1.GetInferenceCreditAutoRefillResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // UpdateInferenceCreditAutoRefill uses authorized workspace billing consent.
+  rpc UpdateInferenceCreditAutoRefill(console.v1.UpdateInferenceCreditAutoRefillRequest) returns (console.v1.UpdateInferenceCreditAutoRefillResponse) {
+    option (common.v1.required_scopes) = "billing:admin";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // CompleteInferenceCreditAutoRefill uses authorized workspace billing consent.
+  rpc CompleteInferenceCreditAutoRefill(console.v1.CompleteInferenceCreditAutoRefillRequest) returns (console.v1.CompleteInferenceCreditAutoRefillResponse) {
+    option (common.v1.required_scopes) = "billing:admin";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // ListInferenceCreditReceipts returns verified payments for the authorized workspace.
+  rpc ListInferenceCreditReceipts(console.v1.ListInferenceCreditReceiptsRequest) returns (console.v1.ListInferenceCreditReceiptsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService.GetInferenceCreditBalance message contract.
+  rpc GetInferenceCreditBalance(console.v1.GetInferenceCreditBalanceRequest) returns (console.v1.GetInferenceCreditBalanceResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService.CreateInferenceCreditCheckout message contract.
+  rpc CreateInferenceCreditCheckout(console.v1.CreateInferenceCreditCheckoutRequest) returns (console.v1.CreateInferenceCreditCheckoutResponse) {
+    option (common.v1.required_scopes) = "billing:admin";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Uses the canonical console.v1.ConsoleService.FulfillInferenceCreditCheckout message contract.
+  rpc FulfillInferenceCreditCheckout(console.v1.FulfillInferenceCreditCheckoutRequest) returns (console.v1.FulfillInferenceCreditCheckoutResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOverview message contract.
+  rpc GetOverview(console.v1.GetOverviewRequest) returns (console.v1.GetOverviewResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListAssets message contract.
+  rpc ListAssets(console.v1.ListAssetsRequest) returns (console.v1.ListAssetsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetAsset message contract.
+  rpc GetAsset(console.v1.GetAssetRequest) returns (console.v1.GetAssetResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListFindings message contract.
+  rpc ListFindings(console.v1.ListFindingsRequest) returns (console.v1.ListFindingsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetTraceDrilldown message contract.
+  rpc GetTraceDrilldown(console.v1.GetTraceDrilldownRequest) returns (console.v1.GetTraceDrilldownResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOnboardingPlan message contract.
+  rpc GetOnboardingPlan(console.v1.GetOnboardingPlanRequest) returns (console.v1.GetOnboardingPlanResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListAuthorityPosture message contract.
+  rpc ListAuthorityPosture(console.v1.ListAuthorityPostureRequest) returns (console.v1.ListAuthorityPostureResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListAgentWorkforceRecords message contract.
+  rpc ListAgentWorkforceRecords(console.v1.ListAgentWorkforceRecordsRequest) returns (console.v1.ListAgentWorkforceRecordsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitAgentWorkforceEvidence message contract.
+  rpc SubmitAgentWorkforceEvidence(console.v1.SubmitAgentWorkforceEvidenceRequest) returns (console.v1.SubmitAgentWorkforceEvidenceResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListIntegrationTiles message contract.
+  rpc ListIntegrationTiles(console.v1.ListIntegrationTilesRequest) returns (console.v1.ListIntegrationTilesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListPinnedSources message contract.
+  rpc ListPinnedSources(console.v1.ListPinnedSourcesRequest) returns (console.v1.ListPinnedSourcesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListOrbControlTargets message contract.
+  rpc ListOrbControlTargets(console.v1.ListOrbControlTargetsRequest) returns (console.v1.ListOrbControlTargetsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOrbControlTarget message contract.
+  rpc GetOrbControlTarget(console.v1.GetOrbControlTargetRequest) returns (console.v1.GetOrbControlTargetResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitOrbControlAction message contract.
+  rpc SubmitOrbControlAction(console.v1.SubmitOrbControlActionRequest) returns (console.v1.SubmitOrbControlActionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SetPinnedSource message contract.
+  rpc SetPinnedSource(console.v1.SetPinnedSourceRequest) returns (console.v1.SetPinnedSourceResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UnpinSource message contract.
+  rpc UnpinSource(console.v1.UnpinSourceRequest) returns (console.v1.UnpinSourceResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListActivity message contract.
+  rpc ListActivity(console.v1.ListActivityRequest) returns (console.v1.ListActivityResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SearchStaffWorkspaceDirectory message contract.
+  rpc SearchStaffWorkspaceDirectory(console.v1.SearchStaffWorkspaceDirectoryRequest) returns (console.v1.SearchStaffWorkspaceDirectoryResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetStaffWorkspaceContext message contract.
+  rpc GetStaffWorkspaceContext(console.v1.GetStaffWorkspaceContextRequest) returns (console.v1.GetStaffWorkspaceContextResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Administrative composition over the existing Meter GetPrepaidCreditBalance owner.
+  rpc GetStaffManagedInferenceFunding(console.v1.GetStaffManagedInferenceFundingRequest) returns (meter.v1.GetPrepaidCreditBalanceResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.required_scopes) = "managed_inference:admin";
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Administrative composition over the existing Meter GrantDevelopmentCredits owner.
+  rpc GrantStaffManagedInferenceCredits(console.v1.GrantStaffManagedInferenceCreditsRequest) returns (meter.v1.GrantDevelopmentCreditsResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.required_scopes) = "managed_inference:admin";
+    option (common.v1.required_scopes) = "meter:credits:grant-development";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // Administrative composition over the existing Meter QueryUsage owner.
+  rpc GetStaffManagedInferenceUsage(console.v1.GetStaffManagedInferenceUsageRequest) returns (meter.v1.QueryUsageResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.required_scopes) = "managed_inference:admin";
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Administrative composition over the existing Meter GetBudgetDashboard owner.
+  rpc GetStaffManagedInferenceBudget(console.v1.GetStaffManagedInferenceBudgetRequest) returns (meter.v1.GetBudgetDashboardResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.required_scopes) = "managed_inference:admin";
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Administrative composition over the existing Meter SetBudget owner.
+  rpc SetStaffManagedInferenceBudget(console.v1.SetStaffManagedInferenceBudgetRequest) returns (meter.v1.SetBudgetResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.required_scopes) = "managed_inference:admin";
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // Read shared managed-inference readiness across tenants for an authorized administrator.
+  rpc GetStaffManagedInferenceReadiness(console.v1.GetStaffManagedInferenceReadinessRequest) returns (console.v1.GetManagedInferenceReadinessResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.required_scopes) = "managed_inference:admin";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Reports current managed-inference prerequisites for the exact authorized tenant.
+  // Informational only: execution issuance and admission recheck current authority.
+  rpc GetManagedInferenceReadiness(console.v1.GetManagedInferenceReadinessRequest) returns (console.v1.GetManagedInferenceReadinessResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Reads the canonical tenant-scoped ListManagedProviderAccessEvents audit contract.
+  rpc ListManagedProviderAccessEvents(console.v1.ListManagedProviderAccessEventsRequest) returns (console.v1.ListManagedProviderAccessEventsResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Reads the canonical tenant-scoped ListStaffManagedInferenceAdminEvents audit contract.
+  // (-- api-linter: core::0132::response-message-name=disabled
+  //     aip.dev/not-precedent: This staff facade returns the canonical Meter audit
+  //     response unchanged, preserving the published cross-service contract. --)
+  rpc ListStaffManagedInferenceAdminEvents(console.v1.ListStaffManagedInferenceAdminEventsRequest) returns (meter.v1.ListManagedInferenceAdminEventsResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Reads the canonical tenant-scoped ListStaffManagedExecutionGrantEvents audit contract.
+  rpc ListStaffManagedExecutionGrantEvents(console.v1.ListStaffManagedExecutionGrantEventsRequest) returns (console.v1.ListStaffManagedExecutionGrantEventsResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Reads the canonical tenant-scoped ListStaffManagedExecutionOutcomes audit contract.
+  rpc ListStaffManagedExecutionOutcomes(console.v1.ListStaffManagedExecutionOutcomesRequest) returns (console.v1.ListStaffManagedExecutionOutcomesResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Uses the canonical console.v1.ConsoleService.ListManagedProviderAccessGrants message contract.
+  rpc ListManagedProviderAccessGrants(console.v1.ListManagedProviderAccessGrantsRequest) returns (console.v1.ListManagedProviderAccessGrantsResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpsertManagedProviderAccessGrant message contract.
+  rpc UpsertManagedProviderAccessGrant(console.v1.UpsertManagedProviderAccessGrantRequest) returns (console.v1.UpsertManagedProviderAccessGrantResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RevokeManagedProviderAccessGrant message contract.
+  rpc RevokeManagedProviderAccessGrant(console.v1.RevokeManagedProviderAccessGrantRequest) returns (console.v1.RevokeManagedProviderAccessGrantResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.staff_cross_tenant) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetStaffInferenceRoutingProfile message contract.
+  rpc GetStaffInferenceRoutingProfile(console.v1.GetStaffInferenceRoutingProfileRequest) returns (console.v1.GetStaffInferenceRoutingProfileResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateStaffInferenceRoutingProfile message contract.
+  rpc UpdateStaffInferenceRoutingProfile(console.v1.UpdateStaffInferenceRoutingProfileRequest) returns (console.v1.UpdateStaffInferenceRoutingProfileResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListCostUsage message contract.
+  rpc ListCostUsage(console.v1.ListCostUsageRequest) returns (console.v1.ListCostUsageResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListEvalResults message contract.
+  rpc ListEvalResults(console.v1.ListEvalResultsRequest) returns (console.v1.ListEvalResultsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RecordProviderCostSnapshot message contract.
+  rpc RecordProviderCostSnapshot(console.v1.RecordProviderCostSnapshotRequest) returns (console.v1.RecordProviderCostSnapshotResponse) {
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetConsoleBootSnapshot message contract.
+  // (-- api-linter: core::0131::request-message-name=disabled
+  //     aip.dev/not-precedent: Deixic renames only the routed method while retaining
+  //     the canonical Console request bytes for legacy wire compatibility. --)
+  rpc GetDeixicBootSnapshot(console.v1.GetConsoleBootSnapshotRequest) returns (console.v1.GetConsoleBootSnapshotResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOperatorPreferences message contract.
+  rpc GetOperatorPreferences(console.v1.GetOperatorPreferencesRequest) returns (console.v1.GetOperatorPreferencesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateOperatorPreferences message contract.
+  rpc UpdateOperatorPreferences(console.v1.UpdateOperatorPreferencesRequest) returns (console.v1.UpdateOperatorPreferencesResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListWorkspaceGuardrailRules message contract.
+  rpc ListWorkspaceGuardrailRules(console.v1.ListWorkspaceGuardrailRulesRequest) returns (console.v1.ListWorkspaceGuardrailRulesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpsertWorkspaceGuardrailRule message contract.
+  rpc UpsertWorkspaceGuardrailRule(console.v1.UpsertWorkspaceGuardrailRuleRequest) returns (console.v1.ListWorkspaceGuardrailRulesResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RemoveWorkspaceGuardrailRule message contract.
+  rpc RemoveWorkspaceGuardrailRule(console.v1.RemoveWorkspaceGuardrailRuleRequest) returns (console.v1.ListWorkspaceGuardrailRulesResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateDexMcpServer message contract.
+  rpc CreateDexMcpServer(console.v1.CreateDexMcpServerRequest) returns (console.v1.CreateDexMcpServerResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListDexMcpServers message contract.
+  rpc ListDexMcpServers(console.v1.ListDexMcpServersRequest) returns (console.v1.ListDexMcpServersResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetDexMcpServer message contract.
+  rpc GetDexMcpServer(console.v1.GetDexMcpServerRequest) returns (console.v1.GetDexMcpServerResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DiscoverDexMcpServer message contract.
+  rpc DiscoverDexMcpServer(console.v1.DiscoverDexMcpServerRequest) returns (console.v1.DiscoverDexMcpServerResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateDexMcpServer message contract.
+  rpc UpdateDexMcpServer(console.v1.UpdateDexMcpServerRequest) returns (console.v1.UpdateDexMcpServerResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DeleteDexMcpServer message contract.
+  rpc DeleteDexMcpServer(console.v1.DeleteDexMcpServerRequest) returns (console.v1.DeleteDexMcpServerResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.InitiateDexMcpOAuthProfile message contract.
+  rpc InitiateDexMcpOAuthProfile(console.v1.InitiateDexMcpOAuthProfileRequest) returns (console.v1.InitiateDexMcpOAuthProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CompleteDexMcpOAuthProfile message contract.
+  rpc CompleteDexMcpOAuthProfile(console.v1.CompleteDexMcpOAuthProfileRequest) returns (console.v1.CompleteDexMcpOAuthProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_CRITICAL;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListDexMcpOAuthProfiles message contract.
+  rpc ListDexMcpOAuthProfiles(console.v1.ListDexMcpOAuthProfilesRequest) returns (console.v1.ListDexMcpOAuthProfilesResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RevokeDexMcpOAuthProfile message contract.
+  rpc RevokeDexMcpOAuthProfile(console.v1.RevokeDexMcpOAuthProfileRequest) returns (console.v1.RevokeDexMcpOAuthProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ReauthorizeDexMcpOAuthProfile message contract.
+  rpc ReauthorizeDexMcpOAuthProfile(console.v1.ReauthorizeDexMcpOAuthProfileRequest) returns (console.v1.ReauthorizeDexMcpOAuthProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_CRITICAL;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RegisterPrivateEndpoint message contract.
+  rpc RegisterPrivateEndpoint(console.v1.RegisterPrivateEndpointRequest) returns (console.v1.RegisterPrivateEndpointResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.VerifyPrivateEndpoint message contract.
+  rpc VerifyPrivateEndpoint(console.v1.VerifyPrivateEndpointRequest) returns (console.v1.VerifyPrivateEndpointResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListPrivateEndpoints message contract.
+  rpc ListPrivateEndpoints(console.v1.ListPrivateEndpointsRequest) returns (console.v1.ListPrivateEndpointsResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DeletePrivateEndpoint message contract.
+  rpc DeletePrivateEndpoint(console.v1.DeletePrivateEndpointRequest) returns (console.v1.DeletePrivateEndpointResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.AttachPrivateEndpointToProfile message contract.
+  rpc AttachPrivateEndpointToProfile(console.v1.AttachPrivateEndpointToProfileRequest) returns (console.v1.AttachPrivateEndpointToProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListGatewayEgressOrigins message contract.
+  rpc ListGatewayEgressOrigins(console.v1.ListGatewayEgressOriginsRequest) returns (console.v1.ListGatewayEgressOriginsResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListOperatingChannels message contract.
+  rpc ListOperatingChannels(console.v1.ListOperatingChannelsRequest) returns (console.v1.ListOperatingChannelsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListOperatingJobs message contract.
+  rpc ListOperatingJobs(console.v1.ListOperatingJobsRequest) returns (console.v1.ListOperatingJobsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ArchiveOperatingThread message contract.
+  rpc ArchiveOperatingThread(console.v1.ArchiveOperatingThreadRequest) returns (console.v1.ArchiveOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RenameOperatingThread message contract.
+  rpc RenameOperatingThread(console.v1.RenameOperatingThreadRequest) returns (console.v1.RenameOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOperatingThread message contract.
+  rpc GetOperatingThread(console.v1.GetOperatingThreadRequest) returns (console.v1.GetOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.BootstrapThreadGateway message contract.
+  rpc BootstrapThreadGateway(console.v1.BootstrapThreadGatewayRequest) returns (console.v1.BootstrapThreadGatewayResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.PrewarmOperatingThread message contract.
+  rpc PrewarmOperatingThread(console.v1.PrewarmOperatingThreadRequest) returns (console.v1.PrewarmOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RespondOperatingThread message contract.
+  rpc RespondOperatingThread(console.v1.RespondOperatingThreadRequest) returns (console.v1.RespondOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.InterruptOperatingThread message contract.
+  rpc InterruptOperatingThread(console.v1.InterruptOperatingThreadRequest) returns (console.v1.InterruptOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SetOperatingThreadController message contract.
+  rpc SetOperatingThreadController(console.v1.SetOperatingThreadControllerRequest) returns (console.v1.SetOperatingThreadControllerResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListOperatingThreadEvents message contract.
+  rpc ListOperatingThreadEvents(console.v1.ListOperatingThreadEventsRequest) returns (console.v1.ListOperatingThreadEventsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.WatchOperatingThread message contract.
+  rpc WatchOperatingThread(console.v1.WatchOperatingThreadRequest) returns (stream console.v1.WatchOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SearchOperatingHistory message contract.
+  rpc SearchOperatingHistory(console.v1.SearchOperatingHistoryRequest) returns (console.v1.SearchOperatingHistoryResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOperatingHistoryContext message contract.
+  rpc GetOperatingHistoryContext(console.v1.GetOperatingHistoryContextRequest) returns (console.v1.GetOperatingHistoryContextResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOperatingReceipt message contract.
+  rpc GetOperatingReceipt(console.v1.GetOperatingReceiptRequest) returns (console.v1.GetOperatingReceiptResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitComputerMission message contract.
+  rpc SubmitComputerMission(console.v1.SubmitComputerMissionRequest) returns (console.v1.SubmitComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetComputerMission message contract.
+  rpc GetComputerMission(console.v1.GetComputerMissionRequest) returns (console.v1.GetComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CancelComputerMission message contract.
+  rpc CancelComputerMission(console.v1.CancelComputerMissionRequest) returns (console.v1.CancelComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ContinueComputerMission message contract.
+  rpc ContinueComputerMission(console.v1.ContinueComputerMissionRequest) returns (console.v1.ContinueComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.PauseComputerMission message contract.
+  rpc PauseComputerMission(console.v1.PauseComputerMissionRequest) returns (console.v1.PauseComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ResumeComputerMission message contract.
+  rpc ResumeComputerMission(console.v1.ResumeComputerMissionRequest) returns (console.v1.ResumeComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.WakeComputerMission message contract.
+  rpc WakeComputerMission(console.v1.WakeComputerMissionRequest) returns (console.v1.WakeComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GuideComputerMission message contract.
+  rpc GuideComputerMission(console.v1.GuideComputerMissionRequest) returns (console.v1.GuideComputerMissionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListComputerMissionCanaryDefinitions message contract.
+  rpc ListComputerMissionCanaryDefinitions(console.v1.ListComputerMissionCanaryDefinitionsRequest) returns (console.v1.ListComputerMissionCanaryDefinitionsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.StartComputerMissionCanaryRun message contract.
+  rpc StartComputerMissionCanaryRun(console.v1.StartComputerMissionCanaryRunRequest) returns (console.v1.StartComputerMissionCanaryRunResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetComputerMissionCanaryRun message contract.
+  rpc GetComputerMissionCanaryRun(console.v1.GetComputerMissionCanaryRunRequest) returns (console.v1.GetComputerMissionCanaryRunResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListComputerMissionCanaryRuns message contract.
+  rpc ListComputerMissionCanaryRuns(console.v1.ListComputerMissionCanaryRunsRequest) returns (console.v1.ListComputerMissionCanaryRunsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetComputerMissionCanaryEvidence message contract.
+  rpc GetComputerMissionCanaryEvidence(console.v1.GetComputerMissionCanaryEvidenceRequest) returns (console.v1.GetComputerMissionCanaryEvidenceResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.OperateComputerMissionCanaryRun message contract.
+  rpc OperateComputerMissionCanaryRun(console.v1.OperateComputerMissionCanaryRunRequest) returns (console.v1.OperateComputerMissionCanaryRunResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateMissionSchedule message contract.
+  rpc CreateMissionSchedule(console.v1.CreateMissionScheduleRequest) returns (console.v1.CreateMissionScheduleResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateMissionSchedule message contract.
+  rpc UpdateMissionSchedule(console.v1.UpdateMissionScheduleRequest) returns (console.v1.UpdateMissionScheduleResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SetMissionScheduleEnabled message contract.
+  rpc SetMissionScheduleEnabled(console.v1.SetMissionScheduleEnabledRequest) returns (console.v1.SetMissionScheduleEnabledResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListMissionSchedules message contract.
+  rpc ListMissionSchedules(console.v1.ListMissionSchedulesRequest) returns (console.v1.ListMissionSchedulesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateConnectorTrigger message contract.
+  rpc CreateConnectorTrigger(console.v1.CreateConnectorTriggerRequest) returns (console.v1.CreateConnectorTriggerResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateConnectorTrigger message contract.
+  rpc UpdateConnectorTrigger(console.v1.UpdateConnectorTriggerRequest) returns (console.v1.UpdateConnectorTriggerResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListConnectorTriggers message contract.
+  rpc ListConnectorTriggers(console.v1.ListConnectorTriggersRequest) returns (console.v1.ListConnectorTriggersResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DeleteConnectorTrigger message contract.
+  rpc DeleteConnectorTrigger(console.v1.DeleteConnectorTriggerRequest) returns (console.v1.DeleteConnectorTriggerResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SetConnectorTriggerEnabled message contract.
+  rpc SetConnectorTriggerEnabled(console.v1.SetConnectorTriggerEnabledRequest) returns (console.v1.SetConnectorTriggerEnabledResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ReserveComputerMissionApexSession message contract.
+  rpc ReserveComputerMissionApexSession(console.v1.ReserveComputerMissionApexSessionRequest) returns (console.v1.ReserveComputerMissionApexSessionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "apex:reservation:reserve";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.BindComputerMissionApexSessionReservation message contract.
+  rpc BindComputerMissionApexSessionReservation(console.v1.BindComputerMissionApexSessionReservationRequest) returns (console.v1.BindComputerMissionApexSessionReservationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "apex:reservation:bind";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.BindComputerMissionApexInstructionMetadata message contract.
+  rpc BindComputerMissionApexInstructionMetadata(console.v1.BindComputerMissionApexInstructionMetadataRequest) returns (console.v1.BindComputerMissionApexInstructionMetadataResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "apex:instruction:bind";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.AuthorizeComputerMissionApexSessionAdoption message contract.
+  rpc AuthorizeComputerMissionApexSessionAdoption(console.v1.AuthorizeComputerMissionApexSessionAdoptionRequest) returns (console.v1.AuthorizeComputerMissionApexSessionAdoptionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "apex:reservation:adopt";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ResolveOperatingReceiptAction message contract.
+  rpc ResolveOperatingReceiptAction(console.v1.ResolveOperatingReceiptActionRequest) returns (console.v1.ResolveOperatingReceiptActionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitOperatingMessage message contract.
+  rpc SubmitOperatingMessage(console.v1.SubmitOperatingMessageRequest) returns (console.v1.SubmitOperatingMessageResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitOperatingCorrection message contract.
+  rpc SubmitOperatingCorrection(console.v1.SubmitOperatingCorrectionRequest) returns (console.v1.SubmitOperatingCorrectionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListWorkspaceMemories message contract.
+  rpc ListWorkspaceMemories(console.v1.ListWorkspaceMemoriesRequest) returns (console.v1.ListWorkspaceMemoriesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CorrectWorkspaceMemory message contract.
+  rpc CorrectWorkspaceMemory(console.v1.CorrectWorkspaceMemoryRequest) returns (console.v1.CorrectWorkspaceMemoryResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ReviewWorkspaceMemory message contract.
+  rpc ReviewWorkspaceMemory(console.v1.ReviewWorkspaceMemoryRequest) returns (console.v1.ReviewWorkspaceMemoryResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ForgetWorkspaceMemory message contract.
+  rpc ForgetWorkspaceMemory(console.v1.ForgetWorkspaceMemoryRequest) returns (console.v1.ForgetWorkspaceMemoryResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitOperatingFeedback message contract.
+  rpc SubmitOperatingFeedback(console.v1.SubmitOperatingFeedbackRequest) returns (console.v1.SubmitOperatingFeedbackResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RecordOperatingHomepageSuggestionFeedback message contract.
+  rpc RecordOperatingHomepageSuggestionFeedback(console.v1.RecordOperatingHomepageSuggestionFeedbackRequest) returns (console.v1.RecordOperatingHomepageSuggestionFeedbackResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SubmitProductIssueReport message contract.
+  rpc SubmitProductIssueReport(console.v1.SubmitProductIssueReportRequest) returns (console.v1.SubmitProductIssueReportResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Native clients submit to the same durable product issue owner using a narrow permission.
+  rpc SubmitNativeProductIssueReport(console.v1.SubmitNativeProductIssueReportRequest) returns (console.v1.SubmitProductIssueReportResponse) {
+    option (common.v1.required_scopes) = "product_issues:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListStaffProductIssueReports message contract.
+  rpc ListStaffProductIssueReports(console.v1.ListStaffProductIssueReportsRequest) returns (console.v1.ListStaffProductIssueReportsResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.EngageStaffProductIssueReport message contract.
+  rpc EngageStaffProductIssueReport(console.v1.EngageStaffProductIssueReportRequest) returns (console.v1.EngageStaffProductIssueReportResponse) {
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetOperatingFeedback message contract.
+  rpc GetOperatingFeedback(console.v1.GetOperatingFeedbackRequest) returns (console.v1.GetOperatingFeedbackResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ResolveOperatingFeedbackRemediation message contract.
+  rpc ResolveOperatingFeedbackRemediation(console.v1.ResolveOperatingFeedbackRemediationRequest) returns (console.v1.ResolveOperatingFeedbackRemediationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListCustomerIntelligenceFacts message contract.
+  rpc ListCustomerIntelligenceFacts(console.v1.ListCustomerIntelligenceFactsRequest) returns (console.v1.ListCustomerIntelligenceFactsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetCustomerIntelligenceFact message contract.
+  rpc GetCustomerIntelligenceFact(console.v1.GetCustomerIntelligenceFactRequest) returns (console.v1.GetCustomerIntelligenceFactResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ReviewCustomerIntelligenceFact message contract.
+  rpc ReviewCustomerIntelligenceFact(console.v1.ReviewCustomerIntelligenceFactRequest) returns (console.v1.ReviewCustomerIntelligenceFactResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ProposeCustomerIntelligenceFact message contract.
+  rpc ProposeCustomerIntelligenceFact(console.v1.ProposeCustomerIntelligenceFactRequest) returns (console.v1.ProposeCustomerIntelligenceFactResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RespondToCustomerFactConfirmation message contract.
+  rpc RespondToCustomerFactConfirmation(console.v1.RespondToCustomerFactConfirmationRequest) returns (console.v1.RespondToCustomerFactConfirmationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.AggregateCustomerIntelligencePatterns message contract.
+  rpc AggregateCustomerIntelligencePatterns(console.v1.AggregateCustomerIntelligencePatternsRequest) returns (console.v1.AggregateCustomerIntelligencePatternsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateProspectingWatchProgram message contract.
+  rpc CreateProspectingWatchProgram(console.v1.CreateProspectingWatchProgramRequest) returns (console.v1.CreateProspectingWatchProgramResponse) {
+    option (common.v1.required_scopes) = "prospecting.write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetProspectingWatchProgram message contract.
+  rpc GetProspectingWatchProgram(console.v1.GetProspectingWatchProgramRequest) returns (console.v1.GetProspectingWatchProgramResponse) {
+    option (common.v1.required_scopes) = "prospecting.read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListProspectingWatchPrograms message contract.
+  rpc ListProspectingWatchPrograms(console.v1.ListProspectingWatchProgramsRequest) returns (console.v1.ListProspectingWatchProgramsResponse) {
+    option (common.v1.required_scopes) = "prospecting.read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateProspectingWatchProgram message contract.
+  rpc UpdateProspectingWatchProgram(console.v1.UpdateProspectingWatchProgramRequest) returns (console.v1.UpdateProspectingWatchProgramResponse) {
+    option (common.v1.required_scopes) = "prospecting.write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateProspectingDraft message contract.
+  rpc CreateProspectingDraft(console.v1.CreateProspectingDraftRequest) returns (console.v1.CreateProspectingDraftResponse) {
+    option (common.v1.required_scopes) = "prospecting.write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListProspectingDrafts message contract.
+  rpc ListProspectingDrafts(console.v1.ListProspectingDraftsRequest) returns (console.v1.ListProspectingDraftsResponse) {
+    option (common.v1.required_scopes) = "prospecting.read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ReviewProspectingDraft message contract.
+  rpc ReviewProspectingDraft(console.v1.ReviewProspectingDraftRequest) returns (console.v1.ReviewProspectingDraftResponse) {
+    option (common.v1.required_scopes) = "prospecting.write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListOperatingCorrections message contract.
+  rpc ListOperatingCorrections(console.v1.ListOperatingCorrectionsRequest) returns (console.v1.ListOperatingCorrectionsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ReviewOperatingCorrection message contract.
+  rpc ReviewOperatingCorrection(console.v1.ReviewOperatingCorrectionRequest) returns (console.v1.ReviewOperatingCorrectionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.BeginOperatingAttachmentUpload message contract.
+  rpc BeginOperatingAttachmentUpload(console.v1.BeginOperatingAttachmentUploadRequest) returns (console.v1.BeginOperatingAttachmentUploadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CompleteOperatingAttachmentUpload message contract.
+  rpc CompleteOperatingAttachmentUpload(console.v1.CompleteOperatingAttachmentUploadRequest) returns (console.v1.CompleteOperatingAttachmentUploadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Explicit acceptance of a complete immutable project file snapshot.
+  rpc AcceptOperatingProjectSnapshot(console.v1.AcceptOperatingProjectSnapshotRequest) returns (console.v1.AcceptOperatingProjectSnapshotResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Imports the connected code repository's provider-observed default branch.
+  rpc ImportOperatingProjectSnapshot(console.v1.ImportOperatingProjectSnapshotRequest) returns (console.v1.AcceptOperatingProjectSnapshotResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Reads the current accepted project file snapshot.
+  // Reads retained task state without acquiring or refreshing a computer.
+  rpc GetOperatingTaskEnvironment(console.v1.GetOperatingTaskEnvironmentRequest) returns (console.v1.GetOperatingTaskEnvironmentResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc GetOperatingProjectSnapshot(console.v1.GetOperatingProjectSnapshotRequest) returns (console.v1.AcceptOperatingProjectSnapshotResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListOperatingAttachments message contract.
+  rpc ListOperatingAttachments(console.v1.ListOperatingAttachmentsRequest) returns (console.v1.ListOperatingAttachmentsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "query.organization_id";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetPrivacySettings message contract.
+  rpc GetPrivacySettings(console.v1.GetPrivacySettingsRequest) returns (console.v1.GetPrivacySettingsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.SetPrivacySettings message contract.
+  rpc SetPrivacySettings(console.v1.SetPrivacySettingsRequest) returns (console.v1.GetPrivacySettingsResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetWorkspaceSettings message contract.
+  rpc GetWorkspaceSettings(console.v1.GetWorkspaceSettingsRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetBillingSubscription message contract.
+  rpc GetBillingSubscription(console.v1.GetBillingSubscriptionRequest) returns (console.v1.GetBillingSubscriptionResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateBillingPortalSession message contract.
+  rpc CreateBillingPortalSession(console.v1.CreateBillingPortalSessionRequest) returns (console.v1.CreateBillingPortalSessionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateBillingCheckoutSession message contract.
+  rpc CreateBillingCheckoutSession(console.v1.CreateBillingCheckoutSessionRequest) returns (console.v1.CreateBillingCheckoutSessionResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspaceProfile message contract.
+  rpc UpdateWorkspaceProfile(console.v1.UpdateWorkspaceProfileRequest) returns (console.v1.UpdateWorkspaceProfileResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ArchiveWorkspace message contract.
+  rpc ArchiveWorkspace(console.v1.ArchiveWorkspaceRequest) returns (console.v1.ArchiveWorkspaceResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspacePolicy message contract.
+  rpc UpdateWorkspacePolicy(console.v1.UpdateWorkspacePolicyRequest) returns (console.v1.UpdateWorkspacePolicyResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspaceDexPolicy message contract.
+  rpc UpdateWorkspaceDexPolicy(console.v1.UpdateWorkspaceDexPolicyRequest) returns (console.v1.UpdateWorkspaceDexPolicyResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspaceArtifactStyleGuide message contract.
+  rpc UpdateWorkspaceArtifactStyleGuide(console.v1.UpdateWorkspaceArtifactStyleGuideRequest) returns (console.v1.UpdateWorkspaceArtifactStyleGuideResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.EvaluateWorkspaceArtifactStyleGuide message contract.
+  rpc EvaluateWorkspaceArtifactStyleGuide(console.v1.EvaluateWorkspaceArtifactStyleGuideRequest) returns (console.v1.EvaluateWorkspaceArtifactStyleGuideResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpsertWorkspaceIdentityProvider message contract.
+  rpc UpsertWorkspaceIdentityProvider(console.v1.UpsertWorkspaceIdentityProviderRequest) returns (console.v1.UpsertWorkspaceIdentityProviderResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RemoveWorkspaceIdentityProvider message contract.
+  rpc RemoveWorkspaceIdentityProvider(console.v1.RemoveWorkspaceIdentityProviderRequest) returns (console.v1.RemoveWorkspaceIdentityProviderResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpsertWorkspaceIntegration message contract.
+  rpc UpsertWorkspaceIntegration(console.v1.UpsertWorkspaceIntegrationRequest) returns (console.v1.UpsertWorkspaceIntegrationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RemoveWorkspaceIntegration message contract.
+  rpc RemoveWorkspaceIntegration(console.v1.RemoveWorkspaceIntegrationRequest) returns (console.v1.RemoveWorkspaceIntegrationResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspaceBilling message contract.
+  rpc UpdateWorkspaceBilling(console.v1.UpdateWorkspaceBillingRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpsertWorkspaceMember message contract.
+  rpc UpsertWorkspaceMember(console.v1.UpsertWorkspaceMemberRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.RemoveWorkspaceMember message contract.
+  rpc RemoveWorkspaceMember(console.v1.RemoveWorkspaceMemberRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspaceNotificationPreferences message contract.
+  rpc UpdateWorkspaceNotificationPreferences(console.v1.UpdateWorkspaceNotificationPreferencesRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.EnableWorkspaceBreakGlass message contract.
+  rpc EnableWorkspaceBreakGlass(console.v1.EnableWorkspaceBreakGlassRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DisableWorkspaceBreakGlass message contract.
+  rpc DisableWorkspaceBreakGlass(console.v1.DisableWorkspaceBreakGlassRequest) returns (console.v1.GetWorkspaceSettingsResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListWorkspaceSkills message contract.
+  rpc ListWorkspaceSkills(console.v1.ListWorkspaceSkillsRequest) returns (console.v1.ListWorkspaceSkillsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.BrowseDexSkillCatalog message contract.
+  rpc BrowseDexSkillCatalog(console.v1.BrowseDexSkillCatalogRequest) returns (console.v1.BrowseDexSkillCatalogResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.InstallDexSkillCatalogEntry message contract.
+  rpc InstallDexSkillCatalogEntry(console.v1.InstallDexSkillCatalogEntryRequest) returns (console.v1.InstallDexSkillCatalogEntryResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateWorkspaceSkill message contract.
+  rpc CreateWorkspaceSkill(console.v1.CreateWorkspaceSkillRequest) returns (console.v1.CreateWorkspaceSkillResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateWorkspaceSkill message contract.
+  rpc UpdateWorkspaceSkill(console.v1.UpdateWorkspaceSkillRequest) returns (console.v1.UpdateWorkspaceSkillResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DeleteWorkspaceSkill message contract.
+  rpc DeleteWorkspaceSkill(console.v1.DeleteWorkspaceSkillRequest) returns (console.v1.DeleteWorkspaceSkillResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListScenarioFixtures message contract.
+  rpc ListScenarioFixtures(console.v1.ListScenarioFixturesRequest) returns (console.v1.ListScenarioFixturesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.organization_scope_field) = "organization_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.PromoteScenarioFixture message contract.
+  rpc PromoteScenarioFixture(console.v1.PromoteScenarioFixtureRequest) returns (console.v1.PromoteScenarioFixtureResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.organization_scope_field) = "organization_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CompareScenarioFixtures message contract.
+  rpc CompareScenarioFixtures(console.v1.CompareScenarioFixturesRequest) returns (console.v1.CompareScenarioFixturesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.organization_scope_field) = "organization_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.CreateConnectorProfile message contract.
+  rpc CreateConnectorProfile(console.v1.CreateConnectorProfileRequest) returns (console.v1.CreateConnectorProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListConnectorProfiles message contract.
+  rpc ListConnectorProfiles(console.v1.ListConnectorProfilesRequest) returns (console.v1.ListConnectorProfilesResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.UpdateConnectorProfile message contract.
+  rpc UpdateConnectorProfile(console.v1.UpdateConnectorProfileRequest) returns (console.v1.UpdateConnectorProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.DeleteConnectorProfile message contract.
+  rpc DeleteConnectorProfile(console.v1.DeleteConnectorProfileRequest) returns (console.v1.DeleteConnectorProfileResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListConnectedCalls message contract.
+  rpc ListConnectedCalls(console.v1.ListConnectedCallsRequest) returns (console.v1.ListConnectedCallsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.StartMeetingCapture message contract.
+  rpc StartMeetingCapture(console.v1.StartMeetingCaptureRequest) returns (console.v1.StartMeetingCaptureResponse) {
+    option (common.v1.required_scopes) = "platform:write";
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.GetMeetingCapture message contract.
+  rpc GetMeetingCapture(console.v1.GetMeetingCaptureRequest) returns (console.v1.GetMeetingCaptureResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListMeetingCaptures message contract.
+  rpc ListMeetingCaptures(console.v1.ListMeetingCapturesRequest) returns (console.v1.ListMeetingCapturesResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.StopMeetingCapture message contract.
+  rpc StopMeetingCapture(console.v1.StopMeetingCaptureRequest) returns (console.v1.StopMeetingCaptureResponse) {
+    option (common.v1.required_scopes) = "platform:write";
+    option (common.v1.required_scopes) = "connectors:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Uses the canonical console.v1.ConsoleService.ListCommitments message contract.
+  rpc ListCommitments(console.v1.ListCommitmentsRequest) returns (console.v1.ListCommitmentsResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+}

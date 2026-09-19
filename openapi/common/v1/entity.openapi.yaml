@@ -1,0 +1,19 @@
+openapi: 3.1.0
+info:
+  title: common.v1
+paths: {}
+components:
+  schemas:
+    common.v1.EntityType:
+      type: string
+      title: EntityType
+      enum:
+        - ENTITY_TYPE_UNSPECIFIED
+        - ENTITY_TYPE_CONTACT
+        - ENTITY_TYPE_COMPANY
+        - ENTITY_TYPE_DEAL
+        - ENTITY_TYPE_TICKET
+        - ENTITY_TYPE_CUSTOMER
+        - ENTITY_TYPE_OPPORTUNITY
+      description: EntityType identifies the kind of entity across systems.
+security: []

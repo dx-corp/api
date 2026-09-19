@@ -1,0 +1,23 @@
+version: v2
+modules:
+  - path: proto
+deps:
+  - buf.build/bufbuild/protovalidate
+  - buf.build/googleapis/googleapis
+lint:
+  use:
+    - STANDARD
+  except:
+    - PACKAGE_VERSION_SUFFIX
+  ignore_only:
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - proto/console/v1/console.proto
+      - proto/deixic/v1/deixic.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - proto/console/v1/console.proto
+      - proto/deixic/v1/deixic.proto
+    RPC_REQUEST_STANDARD_NAME:
+      - proto/deixic/v1/deixic.proto
+breaking:
+  use:
+    - WIRE_JSON
