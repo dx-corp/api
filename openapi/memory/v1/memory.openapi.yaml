@@ -282,6 +282,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/memory.v1.UpdateResponse'
+  /memory.v1.MemoryService/PromoteReviewedLearning:
+    post:
+      tags:
+        - memory.v1.MemoryService
+      summary: PromoteReviewedLearning
+      description: |-
+        PromoteReviewedLearning atomically approves an exact proposed memory and
+         persists the immutable planner-impact receipt that authorized activation.
+      operationId: memory.v1.MemoryService.PromoteReviewedLearning
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/memory.v1.PromoteReviewedLearningRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/memory.v1.PromoteReviewedLearningResponse'
   /memory.v1.MemoryService/Delete:
     post:
       tags:
@@ -1277,6 +1315,59 @@ components:
       title: MemoryRelationship
       additionalProperties: false
       description: MemoryRelationship links two memories into a queryable memory graph.
+    memory.v1.PromoteReviewedLearningRequest:
+      type: object
+      properties:
+        memoryId:
+          type: string
+          title: memory_id
+          minLength: 1
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          minimum: 1
+          format: int64
+          nullable: true
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        actorId:
+          type: string
+          title: actor_id
+          minLength: 1
+        policyRef:
+          type: string
+          title: policy_ref
+          minLength: 1
+        provenanceRef:
+          type: string
+          title: provenance_ref
+          minLength: 1
+        useReason:
+          type: string
+          title: use_reason
+          minLength: 1
+        impact:
+          title: impact
+          $ref: '#/components/schemas/memory.v1.ReviewedLearningImpact'
+      title: PromoteReviewedLearningRequest
+      required:
+        - impact
+      additionalProperties: false
+    memory.v1.PromoteReviewedLearningResponse:
+      type: object
+      properties:
+        memory:
+          title: memory
+          $ref: '#/components/schemas/memory.v1.Memory'
+        receipt:
+          title: receipt
+          $ref: '#/components/schemas/memory.v1.ReviewedLearningPromotionReceipt'
+      title: PromoteReviewedLearningResponse
+      additionalProperties: false
     memory.v1.RecallKnowledgeRequest:
       type: object
       properties:
@@ -1416,6 +1507,131 @@ components:
           title: relationship_path
       title: RecallResult
       additionalProperties: false
+    memory.v1.ReviewedLearningImpact:
+      type: object
+      properties:
+        candidateDigestSha256:
+          type: string
+          title: candidate_digest_sha256
+          pattern: ^[0-9a-f]{64}$
+        reviewId:
+          type: string
+          title: review_id
+          minLength: 1
+        reviewerId:
+          type: string
+          title: reviewer_id
+          minLength: 1
+        evaluationId:
+          type: string
+          title: evaluation_id
+          minLength: 1
+        evaluatorId:
+          type: string
+          title: evaluator_id
+          minLength: 1
+        evaluationSuiteId:
+          type: string
+          title: evaluation_suite_id
+          minLength: 1
+        evaluationSuiteVersion:
+          type: string
+          title: evaluation_suite_version
+          minLength: 1
+        taskSetDigestSha256:
+          type: string
+          title: task_set_digest_sha256
+          pattern: ^[0-9a-f]{64}$
+        baselinePlannerVersion:
+          type: string
+          title: baseline_planner_version
+          minLength: 1
+        treatmentPlannerVersion:
+          type: string
+          title: treatment_planner_version
+          minLength: 1
+        sampleCount:
+          type: integer
+          title: sample_count
+          minimum: 1
+        baselineScoreBasisPoints:
+          type: integer
+          title: baseline_score_basis_points
+          maximum: 10000
+          format: int32
+        treatmentScoreBasisPoints:
+          type: integer
+          title: treatment_score_basis_points
+          maximum: 10000
+          format: int32
+        confidenceLowerBoundBasisPoints:
+          type: integer
+          title: confidence_lower_bound_basis_points
+          maximum: 10000
+          minimum: -10000
+          format: int32
+        guardrailRegressionCount:
+          type: integer
+          title: guardrail_regression_count
+        sourceReplayArtifactDigestsSha256:
+          type: array
+          items:
+            type: string
+          title: source_replay_artifact_digests_sha256
+          minItems: 1
+        evidenceRefs:
+          type: array
+          items:
+            type: string
+          title: evidence_refs
+          minItems: 1
+      title: ReviewedLearningImpact
+      additionalProperties: false
+      description: |-
+        ReviewedLearningImpact is the aggregate, content-free output of the
+         dex-core reviewed-learning decision. MemoryService verifies that the
+         candidate digest still matches the proposed row before activation.
+    memory.v1.ReviewedLearningPromotionReceipt:
+      type: object
+      properties:
+        receiptId:
+          type: string
+          title: receipt_id
+        memoryId:
+          type: string
+          title: memory_id
+        memoryRevision:
+          type:
+            - integer
+            - string
+          title: memory_revision
+          format: int64
+        lifecycleEventId:
+          type: string
+          title: lifecycle_event_id
+        impact:
+          title: impact
+          $ref: '#/components/schemas/memory.v1.ReviewedLearningImpact'
+        actorId:
+          type: string
+          title: actor_id
+        policyRef:
+          type: string
+          title: policy_ref
+        provenanceRef:
+          type: string
+          title: provenance_ref
+        useReason:
+          type: string
+          title: use_reason
+        recordedAt:
+          title: recorded_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: ReviewedLearningPromotionReceipt
+      additionalProperties: false
+      description: |-
+        ReviewedLearningPromotionReceipt is immutable evidence that one exact
+         proposal revision became recallable under one measured planner evaluation.
     memory.v1.SourceReference:
       type: object
       properties:
