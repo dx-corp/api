@@ -45,6 +45,12 @@ service MemoryService {
     option (common.v1.required_scopes) = "memories:write";
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
+  // PromoteReviewedLearning atomically approves an exact proposed memory and
+  // persists the immutable planner-impact receipt that authorized activation.
+  rpc PromoteReviewedLearning(PromoteReviewedLearningRequest) returns (PromoteReviewedLearningResponse) {
+    option (common.v1.required_scopes) = "memories:write";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
   rpc Delete(DeleteRequest) returns (DeleteResponse) {
     option (common.v1.required_scopes) = "memories:write";
     option (common.v1.risk_level) = RISK_LEVEL_HIGH;
@@ -348,6 +354,69 @@ message UpdateRequest {
 
 message UpdateResponse {
   Memory memory = 1;
+}
+
+// ReviewedLearningImpact is the aggregate, content-free output of the
+// dex-core reviewed-learning decision. MemoryService verifies that the
+// candidate digest still matches the proposed row before activation.
+message ReviewedLearningImpact {
+  string candidate_digest_sha256 = 1 [(buf.validate.field).string.pattern = "^[0-9a-f]{64}$"];
+  string review_id = 2 [(buf.validate.field).string.min_len = 1];
+  string reviewer_id = 3 [(buf.validate.field).string.min_len = 1];
+  string evaluation_id = 4 [(buf.validate.field).string.min_len = 1];
+  string evaluator_id = 5 [(buf.validate.field).string.min_len = 1];
+  string evaluation_suite_id = 6 [(buf.validate.field).string.min_len = 1];
+  string evaluation_suite_version = 7 [(buf.validate.field).string.min_len = 1];
+  string task_set_digest_sha256 = 8 [(buf.validate.field).string.pattern = "^[0-9a-f]{64}$"];
+  string baseline_planner_version = 9 [(buf.validate.field).string.min_len = 1];
+  string treatment_planner_version = 10 [(buf.validate.field).string.min_len = 1];
+  uint32 sample_count = 11 [(buf.validate.field).uint32.gte = 1];
+  int32 baseline_score_basis_points = 12 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 10000
+  }];
+  int32 treatment_score_basis_points = 13 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 10000
+  }];
+  int32 confidence_lower_bound_basis_points = 14 [(buf.validate.field).int32 = {
+    gte: -10000
+    lte: 10000
+  }];
+  uint32 guardrail_regression_count = 15;
+  repeated string source_replay_artifact_digests_sha256 = 16 [(buf.validate.field).repeated.min_items = 1];
+  repeated string evidence_refs = 17 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message PromoteReviewedLearningRequest {
+  string memory_id = 1 [(buf.validate.field).string.min_len = 1];
+  optional int64 expected_revision = 2 [(buf.validate.field).int64.gte = 1];
+  string idempotency_key = 3 [(buf.validate.field).string.min_len = 1];
+  string actor_id = 4 [(buf.validate.field).string.min_len = 1];
+  string policy_ref = 5 [(buf.validate.field).string.min_len = 1];
+  string provenance_ref = 6 [(buf.validate.field).string.min_len = 1];
+  string use_reason = 7 [(buf.validate.field).string.min_len = 1];
+  ReviewedLearningImpact impact = 8 [(buf.validate.field).required = true];
+}
+
+// ReviewedLearningPromotionReceipt is immutable evidence that one exact
+// proposal revision became recallable under one measured planner evaluation.
+message ReviewedLearningPromotionReceipt {
+  string receipt_id = 1;
+  string memory_id = 2;
+  int64 memory_revision = 3;
+  string lifecycle_event_id = 4;
+  ReviewedLearningImpact impact = 5;
+  string actor_id = 6;
+  string policy_ref = 7;
+  string provenance_ref = 8;
+  string use_reason = 9;
+  google.protobuf.Timestamp recorded_at = 10;
+}
+
+message PromoteReviewedLearningResponse {
+  Memory memory = 1;
+  ReviewedLearningPromotionReceipt receipt = 2;
 }
 
 message DeleteRequest {
