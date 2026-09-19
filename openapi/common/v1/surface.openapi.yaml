@@ -1,0 +1,22 @@
+openapi: 3.1.0
+info:
+  title: common.v1
+paths: {}
+components:
+  schemas:
+    common.v1.Surface:
+      type: string
+      title: Surface
+      enum:
+        - SURFACE_UNSPECIFIED
+        - SURFACE_ENSEMBLE
+        - SURFACE_CHAT
+        - SURFACE_MAESTRO
+        - SURFACE_CONDUCTOR
+        - SURFACE_SLACK
+        - SURFACE_EXTERNAL_AGENT
+      description: |-
+        Surface identifies the product or channel surface that originated a platform
+         action. It is shared by runtime, audit, and product-facing services so
+         callers do not invent drift-prone string labels.
+security: []

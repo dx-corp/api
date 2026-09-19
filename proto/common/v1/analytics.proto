@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package common.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/evalops/platform/gen/go/common/v1;commonv1";
+
+// TimeRange is the canonical inclusive/exclusive window used by analytics APIs.
+message TimeRange {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+// Money carries a currency code plus an amount for financial rollups.
+message Money {
+  string currency_code = 1;
+  double amount = 2;
+}
+
+// InsightSource identifies the system that produced a recommendation or rollup.
+enum InsightSource {
+  INSIGHT_SOURCE_UNSPECIFIED = 0;
+  INSIGHT_SOURCE_TRACES = 1;
+  INSIGHT_SOURCE_ATTRIBUTION = 2;
+  INSIGHT_SOURCE_METER = 3;
+  INSIGHT_SOURCE_APPROVALS = 4;
+  INSIGHT_SOURCE_AUDIT = 5;
+  INSIGHT_SOURCE_GOVERNANCE = 6;
+  INSIGHT_SOURCE_REGISTRY = 7;
+  INSIGHT_SOURCE_EVAL = 8;
+}
+
+// EvidenceRef points analytics output back to source records.
+message EvidenceRef {
+  InsightSource source = 1;
+  string record_id = 2;
+  string description = 3;
+  google.protobuf.Timestamp observed_at = 4;
+  double weight = 5;
+  google.protobuf.Struct metadata = 6;
+  string lineage_id = 7;
+}

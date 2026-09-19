@@ -1,0 +1,22 @@
+openapi: 3.1.0
+info:
+  title: common.v1
+paths: {}
+components:
+  schemas:
+    common.v1.DataClassification:
+      type: string
+      title: DataClassification
+      enum:
+        - DATA_CLASSIFICATION_UNSPECIFIED
+        - DATA_CLASSIFICATION_SAFE
+        - DATA_CLASSIFICATION_IDENTIFIER
+        - DATA_CLASSIFICATION_PATH
+        - DATA_CLASSIFICATION_CONTENT
+        - DATA_CLASSIFICATION_CREDENTIAL
+      description: |-
+        DataClassification declares what kind of data a field is allowed to carry.
+         It is declared once, on the field, and is the input to lint enforcement
+         (scripts/check-proto-classification.py) and to the generated attribute
+         manifest consumed by runtime validators.
+security: []

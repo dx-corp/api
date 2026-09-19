@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "service": "deixic.v1.DeixicService",
+  "packages": {
+    "typescript": "@evalops/deixic-sdk",
+    "python": "deixic-sdk"
+  },
+  "scope": {
+    "constructorBound": true,
+    "requestHeaders": [
+      "X-Organization-ID",
+      "X-Workspace-ID"
+    ],
+    "requestMessage": true
+  },
+  "authenticationReplay": {
+    "maximumAttempts": 1,
+    "requiresStableIdentity": true,
+    "reusesRequestBytes": true
+  },
+  "operations": [
+    {
+      "rpc": "GetOperatingThread",
+      "facade": "threads.get",
+      "kind": "query"
+    },
+    {
+      "rpc": "ListOperatingThreadEvents",
+      "facade": "events.list",
+      "kind": "query"
+    },
+    {
+      "rpc": "WatchOperatingThread",
+      "facade": "events.watch",
+      "kind": "server-stream",
+      "callerOwnsReconnect": true
+    },
+    {
+      "rpc": "SubmitOperatingMessage",
+      "facade": "messages.send",
+      "kind": "mutation",
+      "requiresIdempotencyKey": true,
+      "acceptedIsTerminal": false
+    },
+    {
+      "rpc": "InterruptOperatingThread",
+      "facade": "controls.interrupt",
+      "kind": "mutation",
+      "requiresIdempotencyKey": true
+    },
+    {
+      "rpc": "RespondOperatingThread",
+      "facade": "controls.respond",
+      "kind": "mutation",
+      "requiresIdempotencyKey": true
+    },
+    {
+      "rpc": "GetOperatingReceipt",
+      "facade": "receipts.get",
+      "kind": "query"
+    },
+    {
+      "rpc": "ResolveOperatingReceiptAction",
+      "facade": "receipts.resolve",
+      "kind": "mutation",
+      "requiresIdempotencyKey": true
+    }
+  ]
+}

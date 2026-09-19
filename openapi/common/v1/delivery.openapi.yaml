@@ -1,0 +1,18 @@
+openapi: 3.1.0
+info:
+  title: common.v1
+paths: {}
+components:
+  schemas:
+    common.v1.DeliveryChannel:
+      type: string
+      title: DeliveryChannel
+      enum:
+        - DELIVERY_CHANNEL_UNSPECIFIED
+        - DELIVERY_CHANNEL_SLACK
+        - DELIVERY_CHANNEL_EMAIL
+        - DELIVERY_CHANNEL_WEBHOOK
+        - DELIVERY_CHANNEL_IN_APP
+        - DELIVERY_CHANNEL_PUSH
+      description: DeliveryChannel identifies the notification delivery channel.
+security: []

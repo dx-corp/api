@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "github.com/evalops/platform/gen/go/common/v1;commonv1";
+
+// DeliveryChannel identifies the notification delivery channel.
+enum DeliveryChannel {
+  DELIVERY_CHANNEL_UNSPECIFIED = 0;
+  DELIVERY_CHANNEL_SLACK = 1;
+  DELIVERY_CHANNEL_EMAIL = 2;
+  DELIVERY_CHANNEL_WEBHOOK = 3;
+  DELIVERY_CHANNEL_IN_APP = 4;
+  DELIVERY_CHANNEL_PUSH = 5;
+}

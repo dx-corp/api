@@ -1,0 +1,17 @@
+openapi: 3.1.0
+info:
+  title: common.v1
+paths: {}
+components:
+  schemas:
+    common.v1.RiskLevel:
+      type: string
+      title: RiskLevel
+      enum:
+        - RISK_LEVEL_UNSPECIFIED
+        - RISK_LEVEL_LOW
+        - RISK_LEVEL_MEDIUM
+        - RISK_LEVEL_HIGH
+        - RISK_LEVEL_CRITICAL
+      description: RiskLevel classifies the risk of an action.
+security: []

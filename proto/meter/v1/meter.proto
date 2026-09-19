@@ -1,0 +1,1054 @@
+syntax = "proto3";
+
+package meter.v1;
+
+import "buf/validate/validate.proto";
+import "common/v1/authz.proto";
+import "common/v1/classification.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/evalops/platform/gen/go/meter/v1;meterv1";
+
+// MeterService records and queries usage across EvalOps services.
+service MeterService {
+  // GetPrepaidCreditBalance operates only on the caller's authorized organization and workspace.
+  // Grid staff composition returns this canonical Meter receipt unchanged.
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc GetPrepaidCreditBalance(GetPrepaidCreditBalanceRequest) returns (GetPrepaidCreditBalanceResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // GrantDevelopmentCredits issues an audited non-cash grant for the configured internal development program.
+  // Grid staff composition returns this canonical Meter receipt unchanged.
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc GrantDevelopmentCredits(GrantDevelopmentCreditsRequest) returns (GrantDevelopmentCreditsResponse) {
+    option (common.v1.required_scopes) = "meter:credits:grant-development";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // FundPrepaidCredits operates only on the caller's authorized organization and workspace.
+  rpc FundPrepaidCredits(FundPrepaidCreditsRequest) returns (FundPrepaidCreditsResponse) {
+    option (common.v1.required_scopes) = "meter:credits:fund";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  rpc ReversePrepaidCredits(ReversePrepaidCreditsRequest) returns (ReversePrepaidCreditsResponse) {
+    option (common.v1.required_scopes) = "meter:credits:reverse";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  rpc ApplyPrepaidPaymentDispute(ApplyPrepaidPaymentDisputeRequest) returns (ApplyPrepaidPaymentDisputeResponse) {
+    option (common.v1.required_scopes) = "meter:credits:reverse";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ReservePrepaidCredits operates only on the caller's authorized organization and workspace.
+  rpc ReservePrepaidCredits(ReservePrepaidCreditsRequest) returns (ReservePrepaidCreditsResponse) {
+    option (common.v1.required_scopes) = "meter:credits:reserve";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // Platform admits one immutable Work allowance before dispatch.
+  rpc AuthorizeWorkSpend(AuthorizeWorkSpendRequest) returns (AuthorizeWorkSpendResponse) {
+    option (common.v1.required_scopes) = "billing:authorize";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // A separate method makes older monetary adapters reject Work reservations.
+  rpc ReserveWorkCredits(ReserveWorkCreditsRequest) returns (ReserveWorkCreditsResponse) {
+    option (common.v1.required_scopes) = "meter:credits:reserve";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // SettlePrepaidCredits operates only on the caller's authorized organization and workspace.
+  rpc SettlePrepaidCredits(SettlePrepaidCreditsRequest) returns (SettlePrepaidCreditsResponse) {
+    option (common.v1.required_scopes) = "meter:credits:settle";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  rpc RecordUsage(RecordUsageRequest) returns (RecordUsageResponse) {
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  rpc RecordUsageBatch(RecordUsageBatchRequest) returns (RecordUsageBatchResponse) {
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Read accepted funding receipts and policy changes for one exact tenant.
+  // The staff adapter deliberately returns this same owner response.
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc ListManagedInferenceAdminEvents(ListManagedInferenceAdminEventsRequest) returns (ListManagedInferenceAdminEventsResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Grid staff composition returns this canonical Meter receipt unchanged.
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc SetBudget(SetBudgetRequest) returns (SetBudgetResponse) {
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  rpc CheckBudget(CheckBudgetRequest) returns (CheckBudgetResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Grid staff composition returns this canonical Meter receipt unchanged.
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc GetBudgetDashboard(GetBudgetDashboardRequest) returns (GetBudgetDashboardResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // ListBudgetDenials returns the refusals CheckBudget recorded, newest first.
+  // GetBudgetDashboard reports only the single most recent refusal; this reads
+  // a bounded, time-windowed page of them so a caller can show the refusals a
+  // window contains rather than one. Scope comes from the authorized caller,
+  // the same rule GetBudgetDashboard applies to last_denial.
+  rpc ListBudgetDenials(ListBudgetDenialsRequest) returns (ListBudgetDenialsResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Grid staff composition returns this canonical Meter receipt unchanged.
+  // buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
+  rpc QueryUsage(QueryUsageRequest) returns (QueryUsageResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc GetUsageSummary(GetUsageSummaryRequest) returns (GetUsageSummaryResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc GetMeterSummary(GetMeterSummaryRequest) returns (GetMeterSummaryResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc GetAdoptionMetrics(GetAdoptionMetricsRequest) returns (GetAdoptionMetricsResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc ListActiveUsers(ListActiveUsersRequest) returns (ListActiveUsersResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc IngestWideEvent(IngestWideEventRequest) returns (IngestWideEventResponse) {
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  rpc IngestWideEventBatch(IngestWideEventBatchRequest) returns (IngestWideEventBatchResponse) {
+    option (common.v1.required_scopes) = "meter:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  rpc QueryWideEvents(QueryWideEventsRequest) returns (QueryWideEventsResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  rpc GetEventDashboard(GetEventDashboardRequest) returns (GetEventDashboardResponse) {
+    option (common.v1.required_scopes) = "meter:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+}
+
+enum SummaryGroupBy {
+  SUMMARY_GROUP_BY_UNSPECIFIED = 0;
+  SUMMARY_GROUP_BY_MODEL = 1;
+  SUMMARY_GROUP_BY_PROVIDER = 2;
+  SUMMARY_GROUP_BY_TEAM = 3;
+  SUMMARY_GROUP_BY_AGENT = 4;
+  SUMMARY_GROUP_BY_SURFACE = 5;
+  SUMMARY_GROUP_BY_METADATA = 6;
+  SUMMARY_GROUP_BY_USER = 7;
+  SUMMARY_GROUP_BY_TIME_BUCKET = 8;
+}
+
+message RecordUsageRequest {
+  string team_id = 1;
+  string agent_id = 2;
+  string surface = 3;
+  string event_type = 4;
+  string model = 5;
+  string provider = 6;
+  int64 input_tokens = 7 [(buf.validate.field).int64.gte = 0];
+  int64 output_tokens = 8 [(buf.validate.field).int64.gte = 0];
+  int64 cache_read_tokens = 9 [(buf.validate.field).int64.gte = 0];
+  int64 cache_write_tokens = 10 [(buf.validate.field).int64.gte = 0];
+  double total_cost_usd = 11 [(buf.validate.field).double.gte = 0];
+  string request_id = 12;
+  google.protobuf.Struct metadata = 13;
+  google.protobuf.Struct data = 14;
+  string caller_identity = 15;
+}
+
+message RecordUsageResponse {
+  UsageRecord record = 1;
+}
+
+message RecordUsageBatchRequest {
+  repeated RecordUsageRequest records = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+message RecordUsageBatchResponse {
+  repeated UsageRecord records = 1;
+}
+
+message Budget {
+  string id = 1;
+  string organization_id = 2;
+  string team_id = 3;
+  // Empty means the budget governs every workspace in the organization.
+  // A non-empty value means the budget governs only that workspace.
+  string workspace_id = 15;
+  string period = 4;
+  double limit_usd = 5 [(buf.validate.field).double.gt = 0];
+  int32 alert_threshold_pct = 6;
+  repeated int32 warning_thresholds_pct = 7;
+  bool hard_cap = 8;
+  double current_spend_usd = 9;
+  int32 last_alert_threshold_pct = 10;
+  google.protobuf.Timestamp period_start = 11;
+  google.protobuf.Timestamp next_reset_at = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+message BudgetStatus {
+  string budget_id = 1;
+  string organization_id = 2;
+  string team_id = 3;
+  // Empty means the budget governs every workspace in the organization.
+  string workspace_id = 19;
+  string period = 4;
+  double limit_usd = 5;
+  double current_spend_usd = 6;
+  double remaining_usd = 7;
+  double usage_pct = 8;
+  bool alert_triggered = 9;
+  bool hard_cap = 10;
+  bool hard_cap_reached = 11;
+  int32 triggered_threshold_pct = 12;
+  repeated int32 warning_thresholds_pct = 13;
+  int32 last_alert_threshold_pct = 14;
+  double spend_velocity_usd_per_hour = 15;
+  double estimated_exhaustion_hours = 16;
+  google.protobuf.Timestamp period_start = 17;
+  google.protobuf.Timestamp next_reset_at = 18;
+}
+
+// Delegation is accepted only from the authenticated Platform managed-access service.
+message AdminMutationAuditContext {
+  string delegated_actor_subject = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string reason = 2 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  string request_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+message ManagedInferenceBudgetSnapshot {
+  string period = 1;
+  double limit_usd = 2;
+  repeated int32 warning_thresholds_pct = 3;
+  bool hard_cap = 4;
+}
+message ManagedInferenceAdminEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp occurred_at = 2;
+  string actor_subject = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string delegated_actor_subject = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string action = 5;
+  string resource_id = 6;
+  string reason = 7 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  string outcome = 8;
+  ManagedInferenceBudgetSnapshot before_budget = 9;
+  ManagedInferenceBudgetSnapshot after_budget = 10;
+  int64 credit_micros = 11;
+  string program_id = 12;
+  string provenance = 13 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  string request_id = 14;
+  string organization_id = 15;
+  string workspace_id = 16;
+}
+message ListManagedInferenceAdminEventsRequest {
+  string organization_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string workspace_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int32 page_size = 3 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+  string page_token = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+message ListManagedInferenceAdminEventsResponse {
+  repeated ManagedInferenceAdminEvent events = 1;
+  string next_page_token = 2;
+}
+
+message SetBudgetRequest {
+  AdminMutationAuditContext audit_context = 8;
+  string budget_id = 1;
+  string team_id = 2;
+  // Changing the period of an existing budget restarts the spend window: the
+  // service sets period_start to now, clears current_spend_usd, and derives a
+  // new next_reset_at. Sending the same period leaves the window untouched.
+  string period = 3;
+  double limit_usd = 4 [(buf.validate.field).double.gt = 0];
+  repeated int32 warning_thresholds_pct = 5;
+  bool hard_cap = 6;
+  // Empty creates or updates an organization-wide budget. A non-empty value
+  // must equal the workspace the caller was authorized for.
+  string workspace_id = 7;
+  // Empty preserves legacy non-idempotent callers. New callers supply a stable
+  // key for this exact organization and authenticated workspace.
+  string idempotency_key = 9 [(buf.validate.field).string.max_len = 256];
+}
+
+message SetBudgetResponse {
+  Budget budget = 1;
+}
+
+message CheckBudgetRequest {
+  string team_id = 1;
+  double estimated_cost_usd = 2 [(buf.validate.field).double.gte = 0];
+  // Empty checks only organization-wide budgets. A non-empty value must equal
+  // the workspace the caller was authorized for and additionally checks that
+  // workspace's budgets.
+  string workspace_id = 3;
+  // Attribution the service persists when the check denies. The caller sends
+  // what it knows about the request being admitted.
+  string request_id = 4;
+  string trace_id = 5;
+  string model = 6;
+  string provider = 7;
+}
+
+message BudgetWarning {
+  string budget_id = 1;
+  int32 threshold_pct = 2;
+  double usage_pct = 3;
+  string message = 4;
+}
+
+message CheckBudgetResponse {
+  bool allowed = 1;
+  string denial_reason = 2;
+  double remaining_budget_usd = 3;
+  repeated BudgetStatus statuses = 4;
+  repeated BudgetWarning warnings = 5;
+}
+
+message GetBudgetDashboardRequest {
+  string team_id = 1;
+  // Empty reports only organization-wide budgets. A non-empty value must equal
+  // the workspace the caller was authorized for and additionally reports that
+  // workspace's budgets.
+  string workspace_id = 2;
+}
+
+// A budget refusal meter recorded when CheckBudget returned allowed=false.
+// Meter owns this record; model-gateway does not report it back.
+message BudgetDenial {
+  string budget_id = 1;
+  string organization_id = 2;
+  string workspace_id = 3;
+  string team_id = 4;
+  google.protobuf.Timestamp denied_at = 5;
+  string request_id = 6;
+  string trace_id = 7;
+  double amount_usd = 8;
+  string model = 9;
+  string provider = 10;
+  string denial_reason = 11;
+  // Stable row identity. A reader that lists denials needs it to key a row it
+  // shows next to rows from another owner.
+  string id = 12;
+}
+
+message GetBudgetDashboardResponse {
+  string organization_id = 1;
+  string team_id = 2;
+  google.protobuf.Timestamp generated_at = 3;
+  int32 total_budgets = 4;
+  double total_limit_usd = 5;
+  double total_spend_usd = 6;
+  double total_remaining_usd = 7;
+  int32 warning_budgets = 8;
+  int32 hard_cap_budgets = 9;
+  int32 hard_cap_reached_budgets = 10;
+  repeated BudgetStatus statuses = 11;
+  string workspace_id = 12;
+  // The most recent refusal in this scope, absent when nothing was refused.
+  BudgetDenial last_denial = 13;
+}
+
+message ListBudgetDenialsRequest {
+  string team_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  // Empty reads only organization-wide denials. A non-empty value must equal
+  // the workspace the caller was authorized for.
+  string workspace_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  // Inclusive lower bound on denied_at. Absent reads from the oldest row.
+  google.protobuf.Timestamp start_time = 3;
+  // Exclusive upper bound on denied_at. Absent reads to the newest row.
+  google.protobuf.Timestamp end_time = 4;
+  // Zero applies the server default of 200, which is also the ceiling.
+  int32 limit = 5 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 200
+  }];
+  int32 offset = 6 [(buf.validate.field).int32.gte = 0];
+}
+
+message ListBudgetDenialsResponse {
+  // Newest first, at most `limit` rows.
+  repeated BudgetDenial denials = 1;
+  // True when at least one further row matched past this page. Meter does not
+  // count the whole match set, so no total is reported.
+  bool has_more = 2;
+}
+
+message UsageRecord {
+  string id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string organization_id = 3;
+  string team_id = 4;
+  string agent_id = 5;
+  string surface = 6;
+  string event_type = 7;
+  string model = 8;
+  string provider = 9;
+  int64 input_tokens = 10;
+  int64 output_tokens = 11;
+  int64 cache_read_tokens = 12;
+  int64 cache_write_tokens = 13;
+  double total_cost_usd = 14;
+  string request_id = 15;
+  google.protobuf.Struct data = 16;
+  google.protobuf.Struct metadata = 17;
+  google.protobuf.Timestamp created_at = 18;
+  string caller_identity = 19;
+}
+
+message QueryUsageRequest {
+  string team_id = 1;
+  string agent_id = 2;
+  string event_type = 3;
+  string model = 4;
+  string provider = 5;
+  string metadata_key = 6;
+  string metadata_value = 7;
+  google.protobuf.Timestamp start_time = 8;
+  google.protobuf.Timestamp end_time = 9;
+  int32 limit = 10 [(buf.validate.field).int32.lte = 200];
+  int32 offset = 11 [(buf.validate.field).int32.gte = 0];
+  string caller_identity = 12;
+}
+
+message QueryUsageResponse {
+  repeated UsageRecord records = 1;
+  int32 total = 2;
+  bool has_more = 3;
+}
+
+message GetUsageSummaryRequest {
+  string team_id = 1;
+  string agent_id = 2;
+  SummaryGroupBy group_by = 3;
+  string group_metadata_key = 4;
+  string metadata_key = 5;
+  string metadata_value = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp end_time = 8;
+  string caller_identity = 9;
+  string time_bucket = 10;
+  string event_type = 11;
+  string model = 12;
+  string provider = 13;
+}
+
+message UsageSummary {
+  string key = 1;
+  int64 total_input_tokens = 2;
+  int64 total_output_tokens = 3;
+  int64 total_cache_read_tokens = 4;
+  int64 total_cache_write_tokens = 5;
+  double total_cost_usd = 6;
+  int64 record_count = 7;
+  // Gateway coverage only; other usage sources are excluded from these counts.
+  int64 gateway_request_count = 8;
+  // No verified workload link, including older records without verification evidence.
+  int64 unattributed_request_count = 9;
+  int64 unattributed_token_count = 10;
+  int64 unpriced_request_count = 11;
+  int64 unpriced_token_count = 12;
+  // True when the bucket includes gateway usage with unavailable pricing.
+  bool cost_incomplete = 13;
+  // Known subtotal, absent when no record has available pricing. A genuine
+  // priced zero remains present. total_cost_usd retains its legacy sum, which
+  // may include unavailable-price placeholders and is not a completeness claim.
+  optional double known_total_cost_usd = 14;
+}
+
+message GetUsageSummaryResponse {
+  repeated UsageSummary buckets = 1;
+}
+
+message GetMeterSummaryRequest {
+  string meter_id = 1;
+  string team_id = 2;
+  string agent_id = 3;
+  SummaryGroupBy group_by = 4;
+  google.protobuf.Timestamp start_time = 5;
+  google.protobuf.Timestamp end_time = 6;
+}
+
+message MeterSummaryBucket {
+  string key = 1;
+  double value = 2;
+  int64 record_count = 3;
+}
+
+message GetMeterSummaryResponse {
+  string meter_id = 1;
+  repeated MeterSummaryBucket buckets = 2;
+}
+
+message GetAdoptionMetricsRequest {
+  string team_id = 1;
+  string agent_id = 2;
+  string event_type = 3;
+  string model = 4;
+  string provider = 5;
+  string surface = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp end_time = 8;
+  string time_bucket = 9;
+}
+
+message AdoptionTimeBucket {
+  string key = 1;
+  google.protobuf.Timestamp start_time = 2;
+  int64 active_users = 3;
+  int64 request_count = 4;
+  double total_cost_usd = 5;
+}
+
+message AdoptionCohort {
+  string cohort = 1;
+  int64 users = 2;
+  int64 retained_users = 3;
+  double retention_rate = 4;
+}
+
+message AdoptionFrequencyBucket {
+  string key = 1;
+  int64 users = 2;
+}
+
+message AdoptionDimensionBucket {
+  string key = 1;
+  int64 active_users = 2;
+  int64 request_count = 3;
+  double total_cost_usd = 4;
+}
+
+message GetAdoptionMetricsResponse {
+  int64 daily_active_users = 1;
+  int64 weekly_active_users = 2;
+  int64 monthly_active_users = 3;
+  int64 total_active_users = 4;
+  int64 total_teams = 5;
+  int64 request_count = 6;
+  double total_cost_usd = 7;
+  repeated AdoptionTimeBucket active_users_by_bucket = 8;
+  repeated AdoptionCohort cohorts = 9;
+  repeated AdoptionFrequencyBucket frequency_distribution = 10;
+  repeated AdoptionDimensionBucket by_team = 11;
+  repeated AdoptionDimensionBucket by_model = 12;
+  repeated AdoptionDimensionBucket by_provider = 13;
+  repeated AdoptionDimensionBucket by_agent = 14;
+}
+
+message ListActiveUsersRequest {
+  string team_id = 1;
+  string agent_id = 2;
+  string event_type = 3;
+  string model = 4;
+  string provider = 5;
+  string surface = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp end_time = 8;
+  int32 limit = 9 [(buf.validate.field).int32.lte = 200];
+  int32 offset = 10 [(buf.validate.field).int32.gte = 0];
+}
+
+message ActiveUser {
+  string caller_identity = 1;
+  string team_id = 2;
+  google.protobuf.Timestamp first_seen = 3;
+  google.protobuf.Timestamp last_seen = 4;
+  int64 request_count = 5;
+  double total_cost_usd = 6;
+  repeated string models = 7;
+  repeated string providers = 8;
+  repeated string agents = 9;
+}
+
+message ListActiveUsersResponse {
+  repeated ActiveUser users = 1;
+  int32 total = 2;
+  bool has_more = 3;
+}
+
+message WideEventMetrics {
+  int64 input_tokens = 1 [(buf.validate.field).int64.gte = 0];
+  int64 output_tokens = 2 [(buf.validate.field).int64.gte = 0];
+  int64 cache_read_tokens = 3 [(buf.validate.field).int64.gte = 0];
+  int64 cache_write_tokens = 4 [(buf.validate.field).int64.gte = 0];
+  double total_cost_usd = 5 [(buf.validate.field).double.gte = 0];
+  int64 duration_ms = 6 [(buf.validate.field).int64.gte = 0];
+  int64 time_to_first_token_ms = 7 [(buf.validate.field).int64.gte = 0];
+  int64 tool_calls_count = 8 [(buf.validate.field).int64.gte = 0];
+}
+
+// WideEventAttributes declares every metadata key a wide event may carry.
+//
+// IngestWideEventRequest.metadata is a google.protobuf.Struct, so the wire
+// format cannot constrain its keys. This message is the declaration of record:
+// one field per allowed key, each carrying its data classification.
+// scripts/gen-classification-manifest.py projects it into
+// gen/classification/manifest.json, and the meter ingest path drops any
+// metadata key the manifest does not name.
+//
+// This message is not sent on the wire. Adding a key here is how a producer
+// gets a new wide-event attribute accepted.
+message WideEventAttributes {
+  string event_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string conversation_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string message_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string workspace_id = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string session_id = 5 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string execution_source = 6 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string lifecycle_phase = 7 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string outcome = 8 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string error_type = 9 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string skill_id = 10 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string skill_name = 11 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string feedback_type = 12 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string generation_id = 13 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string request_method = 14 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string request_path = 15 [(common.v1.classification) = DATA_CLASSIFICATION_PATH];
+  bool cancelled_by_user = 16 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  bool response_truncated = 17 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+}
+
+message IngestWideEventRequest {
+  google.protobuf.Timestamp timestamp = 1;
+  string team_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string agent_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string surface = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string event_type = 5 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string model = 6 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string provider = 7 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string request_id = 8 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  google.protobuf.Struct metadata = 9 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  google.protobuf.Struct data = 10 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  WideEventMetrics metrics = 11;
+}
+
+message WideEvent {
+  string id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  google.protobuf.Timestamp timestamp = 2;
+  string organization_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string team_id = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string agent_id = 5 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string surface = 6 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string event_type = 7 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string model = 8 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string provider = 9 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string request_id = 10 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  google.protobuf.Struct metadata = 11 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  google.protobuf.Struct data = 12 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  WideEventMetrics metrics = 13;
+  google.protobuf.Timestamp created_at = 14;
+}
+
+message IngestWideEventResponse {
+  WideEvent event = 1;
+  bool budget_exceeded = 2; // true when this event pushed the agent or team over budget
+  string budget_message = 3 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT]; // human-readable budget status, empty when within budget
+}
+
+message IngestWideEventBatchRequest {
+  repeated IngestWideEventRequest events = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 100
+  ];
+}
+
+message IngestWideEventBatchResponse {
+  // Per-event result keyed by input index (0-based).
+  repeated IngestWideEventBatchItemResult results = 1;
+  // Top-level signal — true if any event hit a budget cap.
+  bool budget_exceeded = 2;
+  string budget_message = 3 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+}
+
+message IngestWideEventBatchItemResult {
+  int32 input_index = 1 [(buf.validate.field).int32.gte = 0];
+  bool succeeded = 2;
+  // Set when succeeded=true: the persisted event_id.
+  string event_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  // Set when succeeded=false.
+  string failure_code = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string failure_message = 5 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+}
+
+message QueryWideEventsRequest {
+  string team_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string agent_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string surface = 3 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string event_type = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string model = 5 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string provider = 6 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string metadata_key = 7 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string metadata_value = 8 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  google.protobuf.Timestamp start_time = 9;
+  google.protobuf.Timestamp end_time = 10;
+  int32 limit = 11;
+  int32 offset = 12;
+}
+
+message QueryWideEventsResponse {
+  repeated WideEvent events = 1;
+  int32 total = 2;
+  bool has_more = 3;
+}
+
+message GetEventDashboardRequest {
+  string team_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string agent_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string surface = 3 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string event_type = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string model = 5 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string provider = 6 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string metadata_key = 7 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string metadata_value = 8 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  google.protobuf.Timestamp start_time = 9;
+  google.protobuf.Timestamp end_time = 10;
+  int32 top_n = 11;
+}
+
+message EventDashboardBucket {
+  string key = 1 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  int64 count = 2;
+  double total_cost_usd = 3;
+}
+
+message GetEventDashboardResponse {
+  int64 total_events = 1;
+  int64 total_input_tokens = 2;
+  int64 total_output_tokens = 3;
+  int64 total_cache_read_tokens = 4;
+  int64 total_cache_write_tokens = 5;
+  double total_cost_usd = 6;
+  repeated EventDashboardBucket by_event_type = 7;
+  repeated EventDashboardBucket by_surface = 8;
+  repeated EventDashboardBucket by_model = 9;
+  repeated EventDashboardBucket by_provider = 10;
+}
+
+// Prepaid credits are USD amounts in integer millionths of a dollar.
+// Meter owns funding, reservations, settlement, and the available balance.
+message PrepaidCreditBalance {
+  // Enrolled development programs cannot consume paid credits or trigger paid refill.
+  bool development_credit_only = 12;
+  // Non-cash development funding, kept separate from purchased credits.
+  int64 granted_micros = 8 [(buf.validate.field).int64.gte = 0];
+  int64 expired_grant_micros = 9 [(buf.validate.field).int64.gte = 0];
+  int64 grant_spent_micros = 10 [(buf.validate.field).int64.gte = 0];
+  int64 grant_reserved_micros = 11 [(buf.validate.field).int64.gte = 0];
+  bool admission_suspended = 7;
+  int64 reversed_micros = 5 [(buf.validate.field).int64.gte = 0];
+  int64 debt_micros = 6 [(buf.validate.field).int64.gte = 0];
+  int64 purchased_micros = 1 [(buf.validate.field).int64.gte = 0];
+  int64 spent_micros = 2 [(buf.validate.field).int64.gte = 0];
+  int64 reserved_micros = 3 [(buf.validate.field).int64.gte = 0];
+  int64 available_micros = 4 [(buf.validate.field).int64.gte = 0];
+}
+message GetPrepaidCreditBalanceRequest {
+  string run_id = 2 [
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+}
+message GetPrepaidCreditBalanceResponse {
+  PrepaidCreditBalance balance = 1;
+  // Absent when no account exists or an older Meter serves this response.
+  PrepaidCreditReconciliation reconciliation = 2;
+  // Absent for missing attribution or older servers, never an inferred zero.
+  PrepaidRunBalance run_balance = 3;
+  // Immutable owner enrollment limits; absent for legacy or unenrolled programs.
+  DevelopmentCreditProgramPolicy development_program_policy = 4;
+  string development_program_id = 5 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+message PrepaidRunBalance {
+  string run_id = 1;
+  int64 settled_cost_micros = 2;
+  int64 reserved_micros = 3;
+  int64 pending_request_count = 4;
+  int64 settled_request_count = 5;
+  google.protobuf.Timestamp oldest_pending_at = 6;
+}
+message PrepaidCreditReconciliation {
+  int64 granted_difference_micros = 10;
+  int64 invalid_grant_allocation_count = 11 [(buf.validate.field).int64.gte = 0];
+  // A comparison of materialized counters with source rows in one snapshot.
+  bool balanced = 1;
+  int64 purchased_difference_micros = 2;
+  int64 reversed_difference_micros = 3;
+  int64 spent_difference_micros = 4;
+  int64 reserved_difference_micros = 5;
+  int64 dispute_count_difference = 6;
+  int64 pending_reservation_count = 7 [(buf.validate.field).int64.gte = 0];
+  google.protobuf.Timestamp oldest_pending_at = 8;
+  int64 unfunded_payment_count = 9 [(buf.validate.field).int64.gte = 0];
+}
+
+// Immutable sponsored program limits. Enrollment is accepted atomically with its
+// first grant and requires meter:credits:enroll-development in addition to issuance.
+message DevelopmentCreditProgramPolicy {
+  int64 max_grant_micros = 1 [(buf.validate.field).int64.gt = 0];
+  int64 program_budget_micros = 2 [(buf.validate.field).int64.gt = 0];
+  int64 daily_budget_micros = 3 [(buf.validate.field).int64.gt = 0];
+  int64 max_lifetime_seconds = 4 [(buf.validate.field).int64.gt = 0];
+  string alert_recipient_id = 5 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+
+// Grant identities and provenance are immutable across retries. Expiry requires microsecond precision.
+message GrantDevelopmentCreditsRequest {
+  string organization_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string workspace_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string program_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string grant_id = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 credit_micros = 5 [(buf.validate.field).int64.gt = 0];
+  google.protobuf.Timestamp expires_at = 6 [(buf.validate.field).required = true];
+  string reason = 7 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT
+  ];
+  string provenance = 8 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT
+  ];
+  // Optional first enrollment; immutable exact retries only. Omit on later grants.
+  DevelopmentCreditProgramPolicy enrollment_policy = 9;
+}
+
+// Billing's accepted immutable grant receipt. The authenticated issuer is server-derived.
+message DevelopmentCreditGrant {
+  string organization_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string workspace_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string program_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string grant_id = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  int64 credit_micros = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  string reason = 7 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  string provenance = 8 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  string actor_subject = 9 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  google.protobuf.Timestamp created_at = 10;
+  // Server-configured organization-wide daily spend ceiling, including outstanding holds.
+  int64 daily_budget_micros = 11 [(buf.validate.field).int64.gt = 0];
+  // Server-configured Identity user receiving operational alerts, independent of the grant issuer.
+  string alert_recipient_id = 12 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+message GrantDevelopmentCreditsResponse {
+  DevelopmentCreditGrant grant = 1;
+}
+message FundPrepaidCreditsRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string payment_intent_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string checkout_session_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 credit_micros = 4 [(buf.validate.field).int64.gt = 0];
+}
+message FundPrepaidCreditsResponse {
+  PrepaidCreditBalance balance = 1;
+}
+message ReservePrepaidCreditsRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string gateway_request_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 amount_micros = 3 [(buf.validate.field).int64.gt = 0];
+  // Issued only by the authenticated Gateway after managed scope verification.
+  string run_id = 4 [
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+}
+message ReservePrepaidCreditsResponse {
+  int64 reserved_micros = 1 [(buf.validate.field).int64.gte = 0];
+  // A completed reservation cannot authorize a second upstream request.
+  bool settled = 2;
+  // True only for the atomic first reservation; false never authorizes execution.
+  bool created = 3;
+}
+message SettlePrepaidCreditsRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string gateway_request_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 actual_cost_micros = 3 [(buf.validate.field).int64.gte = 0];
+}
+message SettlePrepaidCreditsResponse {
+  int64 actual_cost_micros = 1 [(buf.validate.field).int64.gte = 0];
+}
+
+// Cumulative verified payment reversal; event retries never restore funds.
+message ReversePrepaidCreditsRequest {
+  int64 original_credit_micros = 5 [(buf.validate.field).int64.gt = 0];
+  string checkout_session_id = 6 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string payment_intent_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string reversal_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 reversed_credit_micros = 4 [(buf.validate.field).int64.gte = 0];
+}
+message ReversePrepaidCreditsResponse {
+  PrepaidCreditBalance balance = 1;
+}
+
+enum PrepaidPaymentDisputeState {
+  PREPAID_PAYMENT_DISPUTE_STATE_UNSPECIFIED = 0;
+  PREPAID_PAYMENT_DISPUTE_STATE_OPEN = 1;
+  PREPAID_PAYMENT_DISPUTE_STATE_WON = 2;
+  PREPAID_PAYMENT_DISPUTE_STATE_LOST = 3;
+}
+message ApplyPrepaidPaymentDisputeRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string payment_intent_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string checkout_session_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 original_credit_micros = 4 [(buf.validate.field).int64.gt = 0];
+  string dispute_id = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  PrepaidPaymentDisputeState state = 6;
+  int64 reversed_credit_micros = 7 [(buf.validate.field).int64.gte = 0];
+}
+message ApplyPrepaidPaymentDisputeResponse {
+  PrepaidCreditBalance balance = 1;
+}
+
+// Platform's immutable, replay-safe admission of managed inference for a Work.
+message AuthorizeWorkSpendRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string authority_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string work_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 max_charge_micros = 4 [(buf.validate.field).int64.gt = 0];
+  string price_book_version = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_SAFE
+  ];
+  google.protobuf.Timestamp valid_until = 6 [(buf.validate.field).required = true];
+}
+message AuthorizeWorkSpendResponse {
+  string authority_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+message ReserveWorkCreditsRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string authority_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string work_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string price_book_version = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_SAFE
+  ];
+  string gateway_request_id = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string run_id = 6 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  int64 amount_micros = 7 [(buf.validate.field).int64.gt = 0];
+}
+
+message ReserveWorkCreditsResponse {
+  int64 reserved_micros = 1 [(buf.validate.field).int64.gte = 0];
+  // A completed reservation cannot authorize a second upstream request.
+  bool settled = 2;
+  // True only for the atomic first reservation; false never authorizes execution.
+  bool created = 3;
+}

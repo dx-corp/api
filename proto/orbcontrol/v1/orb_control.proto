@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package orbcontrol.v1;
+
+import "buf/validate/validate.proto";
+import "common/v1/authz.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/evalops/platform/gen/go/orbcontrol/v1;orbcontrolv1";
+
+// OrbControlOwnerService is the narrow Platform-to-Orb runtime-owner boundary.
+// Commands are idempotent and generation-fenced; completion is established by
+// observed state and ordered events rather than by submission acknowledgement.
+service OrbControlOwnerService {
+  // SubmitOrbCommand accepts or replays one exact lifecycle command.
+  rpc SubmitOrbCommand(SubmitOrbCommandRequest) returns (SubmitOrbCommandResponse) {
+    option (common.v1.required_scopes) = "orb:control:owner";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // GetOrbObservedState returns the runtime owner's current fenced projection.
+  rpc GetOrbObservedState(GetOrbObservedStateRequest) returns (GetOrbObservedStateResponse) {
+    option (common.v1.required_scopes) = "orb:control:owner";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // StreamOrbEvents returns a bounded page from the tenant-wide durable cursor.
+  rpc StreamOrbEvents(StreamOrbEventsRequest) returns (StreamOrbEventsResponse) {
+    option (common.v1.required_scopes) = "orb:control:owner";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+}
+
+// OrbCommandKind is the first supported Platform-owned lifecycle command set.
+enum OrbCommandKind {
+  ORB_COMMAND_KIND_UNSPECIFIED = 0;
+  ORB_COMMAND_KIND_WAKE = 1;
+  ORB_COMMAND_KIND_STOP = 2;
+}
+
+// OrbObservedLifecycle is the runtime owner's customer-safe lifecycle state.
+enum OrbObservedLifecycle {
+  ORB_OBSERVED_LIFECYCLE_UNSPECIFIED = 0;
+  ORB_OBSERVED_LIFECYCLE_SLEEPING = 1;
+  ORB_OBSERVED_LIFECYCLE_WAKING = 2;
+  ORB_OBSERVED_LIFECYCLE_READY = 3;
+  ORB_OBSERVED_LIFECYCLE_WORKING = 4;
+  ORB_OBSERVED_LIFECYCLE_WAITING_FOR_YOU = 5;
+  ORB_OBSERVED_LIFECYCLE_RECOVERING = 6;
+  ORB_OBSERVED_LIFECYCLE_OFFLINE = 7;
+}
+
+// OrbCommandAcceptance distinguishes a new acceptance from an exact replay.
+enum OrbCommandAcceptance {
+  ORB_COMMAND_ACCEPTANCE_UNSPECIFIED = 0;
+  ORB_COMMAND_ACCEPTANCE_ACCEPTED = 1;
+  ORB_COMMAND_ACCEPTANCE_REPLAYED = 2;
+  ORB_COMMAND_ACCEPTANCE_REJECTED = 3;
+}
+
+// OrbControlEventKind identifies durable owner observations.
+enum OrbControlEventKind {
+  ORB_CONTROL_EVENT_KIND_UNSPECIFIED = 0;
+  ORB_CONTROL_EVENT_KIND_SNAPSHOT = 1;
+  ORB_CONTROL_EVENT_KIND_COMMAND_ACCEPTED = 2;
+  ORB_CONTROL_EVENT_KIND_LIFECYCLE_CHANGED = 3;
+  ORB_CONTROL_EVENT_KIND_COMMAND_COMPLETED = 4;
+  ORB_CONTROL_EVENT_KIND_COMMAND_FAILED = 5;
+}
+
+// OrbCommand is the normalized mutation payload persisted by both planes.
+message OrbCommand {
+  OrbCommandKind kind = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: 0
+  }];
+}
+
+// SubmitOrbCommandRequest carries one exact tenant-scoped owner command.
+message SubmitOrbCommandRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string target_id = 3 [(buf.validate.field).string.min_len = 1];
+  string idempotency_key = 4 [(buf.validate.field).string.min_len = 1];
+  string lineage_id = 5 [(buf.validate.field).string.min_len = 1];
+  string operation_id = 6 [(buf.validate.field).string.min_len = 1];
+  uint64 expected_generation = 7;
+  OrbCommand command = 8 [(buf.validate.field).required = true];
+}
+
+// SubmitOrbCommandResponse acknowledges ownership without claiming completion.
+message SubmitOrbCommandResponse {
+  OrbCommandAcceptance acceptance = 1 [(buf.validate.field).enum.defined_only = true];
+  string command_id = 2;
+  string operation_id = 3;
+  string idempotency_key = 4;
+  uint64 accepted_generation = 5;
+  uint64 observed_revision = 6;
+  uint64 event_sequence = 7;
+  string reason_code = 8;
+}
+
+// GetOrbObservedStateRequest selects one tenant-scoped runtime target.
+message GetOrbObservedStateRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string target_id = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+// OrbObservedState is the authoritative runtime projection for one target.
+message OrbObservedState {
+  string target_id = 1;
+  string display_name = 2;
+  OrbObservedLifecycle lifecycle = 3 [(buf.validate.field).enum.defined_only = true];
+  uint64 generation = 4;
+  uint64 observed_revision = 5;
+  uint64 last_event_sequence = 6;
+  string resident_agent = 7;
+  string provisioner = 8;
+  string active_operation_id = 9;
+  google.protobuf.Timestamp observed_at = 10;
+}
+
+// GetOrbObservedStateResponse returns one authoritative runtime projection.
+message GetOrbObservedStateResponse {
+  OrbObservedState state = 1 [(buf.validate.field).required = true];
+}
+
+// OrbControlEvent is one workspace-ordered observed-state transition.
+message OrbControlEvent {
+  uint64 sequence = 1;
+  string event_id = 2;
+  string target_id = 3;
+  uint64 generation = 4;
+  uint64 observed_revision = 5;
+  OrbControlEventKind kind = 6 [(buf.validate.field).enum.defined_only = true];
+  OrbObservedState state = 7;
+  string operation_id = 8;
+  string command_id = 9;
+  string reason_code = 10;
+  google.protobuf.Timestamp occurred_at = 11;
+}
+
+// StreamOrbEventsRequest resumes a tenant-wide cursor after one sequence.
+message StreamOrbEventsRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  uint64 after_sequence = 3;
+  uint32 limit = 4 [(buf.validate.field).uint32.lte = 500];
+}
+
+// StreamOrbEventsResponse is a bounded durable cursor page.
+message StreamOrbEventsResponse {
+  repeated OrbControlEvent events = 1 [(buf.validate.field).repeated.max_items = 500];
+  uint64 next_sequence = 2;
+  bool has_more = 3;
+}
