@@ -2710,7 +2710,9 @@ message DexComputerCorrectionEpisode {
   repeated string evidence_digests_sha256 = 8 [(buf.validate.field).repeated = {
     min_items: 1
     max_items: 64
-    items: {string: {len: 64}}
+    items: {
+      string: {len: 64}
+    }
   }];
   OperatingCorrectionReviewState review_state = 9 [(buf.validate.field).enum.defined_only = true];
   bool production_learning = 10;
@@ -5191,6 +5193,11 @@ message ListIntegrationTilesRequest {
 message ListIntegrationTilesResponse {
   repeated IntegrationTile tiles = 1;
   int32 total = 2 [(buf.validate.field).int32.gte = 0];
+  optional int32 installed_total = 3 [(buf.validate.field).int32.gte = 0];
+  optional int32 preview_total = 4 [(buf.validate.field).int32.gte = 0];
+  int32 ready_total = 5 [(buf.validate.field).int32.gte = 0];
+  int32 configured_total = 6 [(buf.validate.field).int32.gte = 0];
+  bool preview_inventory_unavailable = 7;
 }
 
 message ListPinnedSourcesRequest {
@@ -7166,6 +7173,23 @@ message IntegrationTile {
   bool oauth_supported = 28;
   repeated IntegrationCredentialField credential_fields = 29;
   connectors.v1.ConnectorCatalogProvenance catalog_provenance = 30;
+  // catalog_tier is the connector catalog owner's shape-derived tier. Console
+  // carries it verbatim and never promotes a provider's readiness.
+  string catalog_tier = 31;
+  // provider_actions names the typed runtime actions exposed by the published
+  // provider. Together with resource_families this distinguishes sync,
+  // action-only, and combined providers without inferring support from labels.
+  repeated string provider_actions = 32;
+  // catalog_status is either ready (published and connectable) or
+  // qualification_pending (installed preview, not connectable).
+  string catalog_status = 33;
+  bool setup_allowed = 34;
+  bool configured = 35;
+  int32 provider_action_count = 36 [(buf.validate.field).int32.gte = 0];
+  int32 resource_family_count = 37 [(buf.validate.field).int32.gte = 0];
+  int32 required_family_count = 38 [(buf.validate.field).int32.gte = 0];
+  int32 qualified_family_count = 39 [(buf.validate.field).int32.gte = 0];
+  string rollout_kind = 40;
 }
 
 message OnboardingTask {
@@ -9116,7 +9140,9 @@ message CaptureFormSelectSpec {
 message CaptureFormUploadSpec {
   repeated string accepted_content_types = 1 [(buf.validate.field).repeated = {
     max_items: 32
-    items: {string: {max_len: 128}}
+    items: {
+      string: {max_len: 128}
+    }
   }];
   int64 max_size_bytes = 2 [(buf.validate.field).int64 = {
     gt: 0
@@ -9295,7 +9321,9 @@ message CaptureFormPublicationInput {
   string custom_domain_id = 2 [(buf.validate.field).string.max_len = 255];
   repeated string allowed_origins = 3 [(buf.validate.field).repeated = {
     max_items: 32
-    items: {string: {max_len: 2048}}
+    items: {
+      string: {max_len: 2048}
+    }
   }];
   bool embed_enabled = 4;
   google.protobuf.Timestamp expires_at = 5;
