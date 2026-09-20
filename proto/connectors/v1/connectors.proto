@@ -62,6 +62,15 @@ service ConnectorService {
 
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
   }
+  // Lists catalog providers that are installed in the active revision but
+  // remain hidden from ListProviders until their generated-canary family
+  // proofs are complete. This surface intentionally omits setup, auth, and
+  // runtime details so callers cannot register an unqualified provider.
+  rpc ListProviderPreviews(ListProviderPreviewsRequest) returns (ListProviderPreviewsResponse) {
+    option (common.v1.required_scopes) = "connectors:read";
+
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   rpc PreviewCustomConnector(PreviewCustomConnectorRequest) returns (PreviewCustomConnectorResponse) {
     option (common.v1.required_scopes) = "connectors:write";
     option (common.v1.organization_scope_field) = "organization_id";
@@ -710,6 +719,15 @@ message ConnectorProvider {
   repeated string aliases = 14;
   ConnectorCatalogProvenance provenance = 15;
   repeated ConnectorAuthBinding auth_bindings = 16;
+  // tier is derived by the catalog compiler from the executable runtime
+  // shape. It is not an authored readiness or verification claim.
+  string tier = 17;
+  // rollout_kind controls durable catalog exposure. Machine imports use
+  // generated_canary until every required family has visible proof.
+  string rollout_kind = 18;
+  // Immutable source/import cohort used to bind generated-canary proof.
+  // Empty for built-in and tenant-owned custom providers.
+  string canary_cohort_sha256 = 19;
 }
 
 // CustomConnectorActionMetadata is the tenant-editable presentation and
@@ -922,6 +940,49 @@ message ListProvidersResponse {
   repeated ConnectorProvider providers = 1;
   int32 total = 2 [(buf.validate.field).int32.gte = 0];
   string catalog_version = 3;
+  // Changes whenever qualification visibility changes inside one catalog
+  // revision. Clients compare this across pages and preview/ready reads and
+  // restart the read when it differs.
+  string visibility_snapshot = 4;
+}
+
+enum ProviderQualificationState {
+  PROVIDER_QUALIFICATION_STATE_UNSPECIFIED = 0;
+  PROVIDER_QUALIFICATION_STATE_PENDING = 1;
+  PROVIDER_QUALIFICATION_STATE_QUALIFIED = 2;
+}
+
+message ListProviderPreviewsRequest {
+  string query = 1;
+  int32 limit = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 200
+  }];
+  int32 offset = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+// ConnectorProviderPreview is safe discovery metadata for an installed
+// provider that is not yet customer-visible. It deliberately excludes auth,
+// endpoint, credential, action, and request-planning fields.
+message ConnectorProviderPreview {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+  string display_name = 2;
+  repeated string catalog_categories = 3;
+  string tier = 4;
+  string rollout_kind = 5;
+  ProviderQualificationState qualification_state = 6 [(buf.validate.field).enum.defined_only = true];
+  int32 resource_family_count = 7 [(buf.validate.field).int32.gte = 0];
+  int32 provider_action_count = 8 [(buf.validate.field).int32.gte = 0];
+  int32 required_family_count = 9 [(buf.validate.field).int32.gte = 0];
+  int32 qualified_family_count = 10 [(buf.validate.field).int32.gte = 0];
+  bool customer_visible = 11;
+}
+
+message ListProviderPreviewsResponse {
+  repeated ConnectorProviderPreview previews = 1;
+  int32 total = 2 [(buf.validate.field).int32.gte = 0];
+  string catalog_version = 3;
+  string visibility_snapshot = 4;
 }
 
 message RefreshConnectionRequest {
