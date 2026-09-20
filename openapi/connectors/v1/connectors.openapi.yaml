@@ -508,6 +508,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/connectors.v1.ResolveProviderInstallationResponse'
+  /connectors.v1.ConnectorService/EnrollSurfaceTarget:
+    post:
+      tags:
+        - connectors.v1.ConnectorService
+      summary: EnrollSurfaceTarget
+      description: |-
+        EnrollSurfaceTarget selects one exact provider object for background
+         observation. Provider-specific adapters verify current read access before
+         a durable target is created; this call never grants connector authority.
+      operationId: connectors.v1.ConnectorService.EnrollSurfaceTarget
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/connectors.v1.EnrollSurfaceTargetRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connectors.v1.EnrollSurfaceTargetResponse'
   /connectors.v1.ConnectorService/VerifyConnectionActive:
     post:
       tags:
@@ -1309,6 +1348,13 @@ components:
         - HEALTH_STATUS_UNHEALTHY
         - HEALTH_STATUS_UNKNOWN
       description: HealthStatus describes the health state of a connection.
+    connectors.v1.OAuthActorMode:
+      type: string
+      title: OAuthActorMode
+      enum:
+        - O_AUTH_ACTOR_MODE_UNSPECIFIED
+        - O_AUTH_ACTOR_MODE_USER
+        - O_AUTH_ACTOR_MODE_APP
     connectors.v1.ProviderContentTrust:
       type: string
       title: ProviderContentTrust
@@ -1753,6 +1799,12 @@ components:
           title: governed
           description: Catalog-owned tool metadata. Presence does not grant execution authority.
           $ref: '#/components/schemas/connectors.v1.ConnectorGovernedAction'
+        surfaceProjection:
+          type: boolean
+          title: surface_projection
+          description: |-
+            This action may be emitted by a registered object-surface projector.
+             Presence is descriptive only; installation authority is still required.
       title: ConnectorActionDefinition
       additionalProperties: false
       description: ConnectorActionDefinition declares one provider-native operation.
@@ -2510,6 +2562,16 @@ components:
             ConnectorService, the catalog owner, publishes its authoritative action
              inventory here. Named `provider_actions` instead of connectors-rs's
              `actions` -- see the naming-debt note at the top of this file.
+        credentialDestinationHostSuffixes:
+          type: array
+          items:
+            type: string
+          title: credential_destination_host_suffixes
+          description: |-
+            Optional DNS suffix constraints for credential-bearing destinations whose
+             hostname is supplied by connection configuration. Hosts must equal a
+             suffix or be its dot-delimited subdomain; ports, IP literals, userinfo,
+             trailing dots, and encoded lookalikes are rejected before auth resolves.
       title: ConnectorRuntime
       additionalProperties: false
       description: |-
@@ -2725,6 +2787,73 @@ components:
           type: string
           title: status
       title: DeleteCustomConnectorResponse
+      additionalProperties: false
+    connectors.v1.EnrollSurfaceTargetRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          maxLength: 256
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 256
+          minLength: 1
+        connectionId:
+          type: string
+          title: connection_id
+          maxLength: 256
+          minLength: 1
+        providerId:
+          type: string
+          title: provider_id
+          maxLength: 128
+          minLength: 1
+        targetKind:
+          type: string
+          title: target_kind
+          maxLength: 64
+          minLength: 1
+        externalId:
+          type: string
+          title: external_id
+          maxLength: 1024
+          minLength: 1
+        canonicalUrl:
+          type: string
+          title: canonical_url
+          maxLength: 4096
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          maxLength: 256
+          minLength: 1
+      title: EnrollSurfaceTargetRequest
+      additionalProperties: false
+    connectors.v1.EnrollSurfaceTargetResponse:
+      type: object
+      properties:
+        connectionId:
+          type: string
+          title: connection_id
+        providerId:
+          type: string
+          title: provider_id
+        targetKind:
+          type: string
+          title: target_kind
+        externalId:
+          type: string
+          title: external_id
+        state:
+          type: string
+          title: state
+        idempotentReplay:
+          type: boolean
+          title: idempotent_replay
+      title: EnrollSurfaceTargetResponse
       additionalProperties: false
     connectors.v1.ExecuteConnectorActionRequest:
       type: object
@@ -3152,6 +3281,12 @@ components:
           description: |-
             Optional GitHub organization or username with this App already installed.
              Selects user OAuth instead of new installation; never grants tenant access.
+        actorMode:
+          title: actor_mode
+          description: |-
+            Selects the provider identity represented by the resulting token. The
+             app actor is currently supported only by Linear agent installations.
+          $ref: '#/components/schemas/connectors.v1.OAuthActorMode'
       title: InitiateOAuthFlowRequest
       additionalProperties: false
     connectors.v1.InitiateOAuthFlowResponse:
