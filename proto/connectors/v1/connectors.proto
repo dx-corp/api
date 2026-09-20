@@ -618,6 +618,25 @@ message ConnectorResourceFamily {
   ConnectorIncrementalBinding incremental = 18;
   bool synthetic_primary_key = 19;
   ConnectorCostProjection cost = 20;
+  // Customer-facing label supplied by the catalog source. Empty means the
+  // catalog has no authoritative label; consumers must not infer one from id.
+  string display_name = 21;
+  // Exact coverage taxonomy declared by the source catalog. This is source
+  // metadata, not a Mono canonical resource type.
+  repeated string source_coverage_types = 22;
+  // Projection template declared by the source catalog. It records upstream
+  // intent and does not claim that Mono executes that domain projection.
+  string source_projection_template = 23;
+}
+
+// Safe discovery metadata for one provider resource family. Endpoint, auth,
+// request-planning, and response-schema details are intentionally excluded.
+message ConnectorResourceFamilySummary {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+  string display_name = 2;
+  repeated string source_coverage_types = 3;
+  string source_projection_template = 4;
+  string event_kind = 5 [(buf.validate.field).string.min_len = 1];
 }
 
 message ConnectorCostProjection {
@@ -728,6 +747,9 @@ message ConnectorProvider {
   // Immutable source/import cohort used to bind generated-canary proof.
   // Empty for built-in and tenant-owned custom providers.
   string canary_cohort_sha256 = 19;
+  // Customer-facing source description. Empty means the catalog has no
+  // authoritative description.
+  string description = 20;
 }
 
 // CustomConnectorActionMetadata is the tenant-editable presentation and
@@ -976,6 +998,13 @@ message ConnectorProviderPreview {
   int32 required_family_count = 9 [(buf.validate.field).int32.gte = 0];
   int32 qualified_family_count = 10 [(buf.validate.field).int32.gte = 0];
   bool customer_visible = 11;
+  // Customer-facing source description. Empty means unknown.
+  string description = 12;
+  // Safe family metadata for discovery. These summaries carry no endpoint,
+  // auth, credential, or request-planning data.
+  repeated ConnectorResourceFamilySummary resource_families = 13;
+  // Stable action identifiers are kept separate from readable resource types.
+  repeated string provider_action_ids = 14;
 }
 
 message ListProviderPreviewsResponse {

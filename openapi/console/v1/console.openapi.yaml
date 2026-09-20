@@ -19953,6 +19953,32 @@ components:
         IntegrationCredentialField describes the credential reference slots Console
          can ask a workspace admin to provide for an integration. Values submitted for
          these fields must be secret references, not raw credential material.
+    console.v1.IntegrationResourceType:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        displayName:
+          type: string
+          title: display_name
+        sourceCoverageTypes:
+          type: array
+          items:
+            type: string
+          title: source_coverage_types
+        sourceProjectionTemplate:
+          type: string
+          title: source_projection_template
+        eventKind:
+          type: string
+          title: event_kind
+      title: IntegrationResourceType
+      additionalProperties: false
+      description: |-
+        IntegrationResourceType is safe catalog discovery metadata for one provider
+         resource family. source_* fields preserve the imported source taxonomy and
+         projection intent; they do not claim a canonical or implemented Mono mapping.
     console.v1.IntegrationTile:
       type: object
       properties:
@@ -20114,6 +20140,14 @@ components:
         rolloutKind:
           type: string
           title: rollout_kind
+        resourceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/console.v1.IntegrationResourceType'
+          title: resource_types
+        providerDescription:
+          type: string
+          title: provider_description
       title: IntegrationTile
       additionalProperties: false
     console.v1.InterruptOperatingThreadRequest:

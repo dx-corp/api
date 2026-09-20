@@ -2213,6 +2213,12 @@ components:
           description: |-
             Immutable source/import cohort used to bind generated-canary proof.
              Empty for built-in and tenant-owned custom providers.
+        description:
+          type: string
+          title: description
+          description: |-
+            Customer-facing source description. Empty means the catalog has no
+             authoritative description.
       title: ConnectorProvider
       additionalProperties: false
       description: |-
@@ -2261,6 +2267,24 @@ components:
         customerVisible:
           type: boolean
           title: customer_visible
+        description:
+          type: string
+          title: description
+          description: Customer-facing source description. Empty means unknown.
+        resourceFamilies:
+          type: array
+          items:
+            $ref: '#/components/schemas/connectors.v1.ConnectorResourceFamilySummary'
+          title: resource_families
+          description: |-
+            Safe family metadata for discovery. These summaries carry no endpoint,
+             auth, credential, or request-planning data.
+        providerActionIds:
+          type: array
+          items:
+            type: string
+          title: provider_action_ids
+          description: Stable action identifiers are kept separate from readable resource types.
       title: ConnectorProviderPreview
       additionalProperties: false
       description: |-
@@ -2363,11 +2387,58 @@ components:
         cost:
           title: cost
           $ref: '#/components/schemas/connectors.v1.ConnectorCostProjection'
+        displayName:
+          type: string
+          title: display_name
+          description: |-
+            Customer-facing label supplied by the catalog source. Empty means the
+             catalog has no authoritative label; consumers must not infer one from id.
+        sourceCoverageTypes:
+          type: array
+          items:
+            type: string
+          title: source_coverage_types
+          description: |-
+            Exact coverage taxonomy declared by the source catalog. This is source
+             metadata, not a Mono canonical resource type.
+        sourceProjectionTemplate:
+          type: string
+          title: source_projection_template
+          description: |-
+            Projection template declared by the source catalog. It records upstream
+             intent and does not claim that Mono executes that domain projection.
       title: ConnectorResourceFamily
       additionalProperties: false
       description: |-
         ConnectorResourceFamily names one upstream resource collection the runtime
          can read.
+    connectors.v1.ConnectorResourceFamilySummary:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+        displayName:
+          type: string
+          title: display_name
+        sourceCoverageTypes:
+          type: array
+          items:
+            type: string
+          title: source_coverage_types
+        sourceProjectionTemplate:
+          type: string
+          title: source_projection_template
+        eventKind:
+          type: string
+          title: event_kind
+          minLength: 1
+      title: ConnectorResourceFamilySummary
+      additionalProperties: false
+      description: |-
+        Safe discovery metadata for one provider resource family. Endpoint, auth,
+         request-planning, and response-schema details are intentionally excluded.
     connectors.v1.ConnectorRuntime:
       type: object
       properties:

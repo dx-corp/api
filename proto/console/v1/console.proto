@@ -7139,6 +7139,17 @@ message IntegrationCredentialField {
   string credential_type = 6;
 }
 
+// IntegrationResourceType is safe catalog discovery metadata for one provider
+// resource family. source_* fields preserve the imported source taxonomy and
+// projection intent; they do not claim a canonical or implemented Mono mapping.
+message IntegrationResourceType {
+  string id = 1;
+  string display_name = 2;
+  repeated string source_coverage_types = 3;
+  string source_projection_template = 4;
+  string event_kind = 5;
+}
+
 message IntegrationTile {
   string id = 1;
   string name = 2;
@@ -7190,6 +7201,8 @@ message IntegrationTile {
   int32 required_family_count = 38 [(buf.validate.field).int32.gte = 0];
   int32 qualified_family_count = 39 [(buf.validate.field).int32.gte = 0];
   string rollout_kind = 40;
+  repeated IntegrationResourceType resource_types = 41;
+  string provider_description = 42;
 }
 
 message OnboardingTask {
