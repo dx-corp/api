@@ -8749,6 +8749,24 @@ paths:
                 $ref: '#/components/schemas/console.v1.ManagedSetup'
 components:
   schemas:
+    agentruntime.v1.RuntimeWorkEnvelopeKind:
+      type: string
+      title: RuntimeWorkEnvelopeKind
+      enum:
+        - RUNTIME_WORK_ENVELOPE_KIND_UNSPECIFIED
+        - RUNTIME_WORK_ENVELOPE_KIND_CONVERSATION_THREAD
+        - RUNTIME_WORK_ENVELOPE_KIND_DIRECT_CONVERSATION
+        - RUNTIME_WORK_ENVELOPE_KIND_TICKET
+        - RUNTIME_WORK_ENVELOPE_KIND_CALENDAR_EVENT
+        - RUNTIME_WORK_ENVELOPE_KIND_PULL_REQUEST
+        - RUNTIME_WORK_ENVELOPE_KIND_INCIDENT
+        - RUNTIME_WORK_ENVELOPE_KIND_REPOSITORY
+        - RUNTIME_WORK_ENVELOPE_KIND_DOCUMENT
+        - RUNTIME_WORK_ENVELOPE_KIND_RECORD
+      description: |-
+        RuntimeWorkEnvelopeKind classifies the durable human/work object a trigger
+         belongs to. Envelopes group retries and follow-up messages across channels
+         without making the runtime depend on Slack-specific string labels.
     common.v1.RiskLevel:
       type: string
       title: RiskLevel
@@ -10055,6 +10073,46 @@ components:
         - TRACE_ANNOTATION_STATUS_RESOLVED
         - TRACE_ANNOTATION_STATUS_DISMISSED
         - TRACE_ANNOTATION_STATUS_ARCHIVED
+    agentruntime.v1.RuntimeWorkEnvelope:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+        kind:
+          title: kind
+          $ref: '#/components/schemas/agentruntime.v1.RuntimeWorkEnvelopeKind'
+        rootId:
+          type: string
+          title: root_id
+        parentId:
+          type: string
+          title: parent_id
+        attributes:
+          type: object
+          title: attributes
+          additionalProperties:
+            type: string
+            title: value
+      title: RuntimeWorkEnvelope
+      additionalProperties: false
+      description: |-
+        RuntimeWorkEnvelope identifies the durable work object that groups related
+         normalized triggers. For Slack this is usually a conversation thread; future
+         adapters can map email threads, Jira tickets, calendar events, and Teams
+         threads into the same runtime primitive.
+    agentruntime.v1.RuntimeWorkEnvelope.AttributesEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: AttributesEntry
+      additionalProperties: false
     connectors.v1.ConnectorCatalogProvenance:
       type: object
       properties:
@@ -23973,6 +24031,20 @@ components:
           title: actor_id
           minLength: 1
           description: Authenticated actor whose tenant-scoped task binding admitted this dispatch.
+        workEnvelope:
+          title: work_envelope
+          description: |-
+            Provider-neutral object identity retained from the admitted surface. It
+             groups retries and follow-ups by durable provider object without granting
+             any tool or connector authority.
+          $ref: '#/components/schemas/agentruntime.v1.RuntimeWorkEnvelope'
+        surfaceContext:
+          title: surface_context
+          description: |-
+            Bounded, edge-authenticated provider context retained with the dispatch
+             and sent to Maestro on every replay. It contains provenance-bearing
+             surface snapshots, never provider credentials.
+          $ref: '#/components/schemas/google.protobuf.Struct'
       title: OperatingRunDispatch
       required:
         - enqueuedAt

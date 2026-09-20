@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package console.v1;
 
+import "agentruntime/v1/runtime.proto";
 import "buf/validate/validate.proto";
 import "common/v1/authz.proto";
 import "common/v1/classification.proto";
@@ -3846,6 +3847,14 @@ message OperatingRunDispatch {
   OperatingTaskEnvironmentBinding task_environment = 27;
   // Authenticated actor whose tenant-scoped task binding admitted this dispatch.
   string actor_id = 28 [(buf.validate.field).string.min_len = 1];
+  // Provider-neutral object identity retained from the admitted surface. It
+  // groups retries and follow-ups by durable provider object without granting
+  // any tool or connector authority.
+  agentruntime.v1.RuntimeWorkEnvelope work_envelope = 29;
+  // Bounded, edge-authenticated provider context retained with the dispatch
+  // and sent to Maestro on every replay. It contains provenance-bearing
+  // surface snapshots, never provider credentials.
+  google.protobuf.Struct surface_context = 30;
 }
 
 // Immutable task identity admitted from authenticated actor and tenant/channel scope.

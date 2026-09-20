@@ -1,0 +1,1384 @@
+openapi: 3.1.0
+info:
+  title: objectives.v1
+paths:
+  /objectives.v1.ObjectiveService/Create:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: Create
+      operationId: objectives.v1.ObjectiveService.Create
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.CreateRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.CreateResponse'
+  /objectives.v1.ObjectiveService/Get:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: Get
+      operationId: objectives.v1.ObjectiveService.Get
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.GetRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.GetResponse'
+  /objectives.v1.ObjectiveService/Transition:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: Transition
+      operationId: objectives.v1.ObjectiveService.Transition
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.TransitionRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.TransitionResponse'
+  /objectives.v1.ObjectiveService/Wake:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: Wake
+      operationId: objectives.v1.ObjectiveService.Wake
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.WakeRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.WakeResponse'
+  /objectives.v1.ObjectiveService/ScheduleWake:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: ScheduleWake
+      operationId: objectives.v1.ObjectiveService.ScheduleWake
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.ScheduleWakeRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.ScheduleWakeResponse'
+  /objectives.v1.ObjectiveService/Query:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: Query
+      operationId: objectives.v1.ObjectiveService.Query
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.QueryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.QueryResponse'
+  /objectives.v1.ObjectiveService/RecordProvenance:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: RecordProvenance
+      operationId: objectives.v1.ObjectiveService.RecordProvenance
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.RecordProvenanceRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.RecordProvenanceResponse'
+  /objectives.v1.ObjectiveService/RecordMutation:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: RecordMutation
+      operationId: objectives.v1.ObjectiveService.RecordMutation
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.RecordMutationRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.RecordMutationResponse'
+  /objectives.v1.ObjectiveService/GetGovernanceEvaluation:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: GetGovernanceEvaluation
+      operationId: objectives.v1.ObjectiveService.GetGovernanceEvaluation
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.GetGovernanceEvaluationRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.GetGovernanceEvaluationResponse'
+  /objectives.v1.ObjectiveService/Cancel:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: Cancel
+      operationId: objectives.v1.ObjectiveService.Cancel
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.CancelRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.CancelResponse'
+  /objectives.v1.ObjectiveService/AppendTurn:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: AppendTurn
+      operationId: objectives.v1.ObjectiveService.AppendTurn
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.AppendTurnRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.AppendTurnResponse'
+  /objectives.v1.ObjectiveService/RunStep:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: RunStep
+      operationId: objectives.v1.ObjectiveService.RunStep
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.RunStepRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.RunStepResponse'
+  /objectives.v1.ObjectiveService/WaitForEvent:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: WaitForEvent
+      operationId: objectives.v1.ObjectiveService.WaitForEvent
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.WaitForEventRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.WaitForEventResponse'
+  /objectives.v1.ObjectiveService/ListTurns:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: ListTurns
+      operationId: objectives.v1.ObjectiveService.ListTurns
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.ListTurnsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.ListTurnsResponse'
+  /objectives.v1.ObjectiveService/QueryTurns:
+    post:
+      tags:
+        - objectives.v1.ObjectiveService
+      summary: QueryTurns
+      operationId: objectives.v1.ObjectiveService.QueryTurns
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/objectives.v1.QueryTurnsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/objectives.v1.QueryTurnsResponse'
+components:
+  schemas:
+    common.v1.Surface:
+      type: string
+      title: Surface
+      enum:
+        - SURFACE_UNSPECIFIED
+        - SURFACE_ENSEMBLE
+        - SURFACE_CHAT
+        - SURFACE_MAESTRO
+        - SURFACE_CONDUCTOR
+        - SURFACE_SLACK
+        - SURFACE_EXTERNAL_AGENT
+      description: |-
+        Surface identifies the product or channel surface that originated a platform
+         action. It is shared by runtime, audit, and product-facing services so
+         callers do not invent drift-prone string labels.
+    objectives.v1.MutationStatus:
+      type: string
+      title: MutationStatus
+      enum:
+        - MUTATION_STATUS_UNSPECIFIED
+        - MUTATION_STATUS_PENDING
+        - MUTATION_STATUS_APPROVED
+        - MUTATION_STATUS_DENIED
+        - MUTATION_STATUS_EXECUTED
+        - MUTATION_STATUS_ROLLED_BACK
+      description: MutationStatus describes the status of a mutation operation.
+    objectives.v1.ObjectiveState:
+      type: string
+      title: ObjectiveState
+      enum:
+        - OBJECTIVE_STATE_UNSPECIFIED
+        - OBJECTIVE_STATE_PENDING
+        - OBJECTIVE_STATE_RUNNING
+        - OBJECTIVE_STATE_BLOCKED
+        - OBJECTIVE_STATE_DEGRADED
+        - OBJECTIVE_STATE_AWAITING_APPROVAL
+        - OBJECTIVE_STATE_QUEUED
+        - OBJECTIVE_STATE_COMPLETED
+        - OBJECTIVE_STATE_FAILED
+        - OBJECTIVE_STATE_CANCELLED
+      description: ObjectiveState describes the lifecycle state of an objective.
+    objectives.v1.TurnKind:
+      type: string
+      title: TurnKind
+      enum:
+        - TURN_KIND_UNSPECIFIED
+        - TURN_KIND_USER_MESSAGE
+        - TURN_KIND_LLM_CALL
+        - TURN_KIND_TOOL_CALL
+        - TURN_KIND_APPROVAL_WAIT
+        - TURN_KIND_SLEEP
+        - TURN_KIND_EVENT_WAIT
+      description: TurnKind identifies the durable work represented by an objective turn.
+    objectives.v1.TurnStatus:
+      type: string
+      title: TurnStatus
+      enum:
+        - TURN_STATUS_UNSPECIFIED
+        - TURN_STATUS_PENDING
+        - TURN_STATUS_RUNNING
+        - TURN_STATUS_COMPLETED
+        - TURN_STATUS_FAILED
+        - TURN_STATUS_REPLAY
+      description: TurnStatus describes replayable execution state for a journaled turn.
+    google.protobuf.Any:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+          format: binary
+        debug:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+    google.protobuf.Timestamp:
+      type: string
+      examples:
+        - 1s
+        - 1.000340012s
+      format: date-time
+      description: |-
+        A Timestamp represents a point in time independent of any time zone or local
+         calendar, encoded as a count of seconds and fractions of seconds at
+         nanosecond resolution. The count is relative to an epoch at UTC midnight on
+         January 1, 1970, in the proleptic Gregorian calendar which extends the
+         Gregorian calendar backwards to year one.
+
+         All minutes are 60 seconds long. Leap seconds are "smeared" so that no leap
+         second table is needed for interpretation, using a [24-hour linear
+         smear](https://developers.google.com/time/smear).
+
+         The range is from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999999999Z. By
+         restricting to that range, we ensure that we can convert to and from [RFC
+         3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
+
+         # Examples
+
+         Example 1: Compute Timestamp from POSIX `time()`.
+
+             Timestamp timestamp;
+             timestamp.set_seconds(time(NULL));
+             timestamp.set_nanos(0);
+
+         Example 2: Compute Timestamp from POSIX `gettimeofday()`.
+
+             struct timeval tv;
+             gettimeofday(&tv, NULL);
+
+             Timestamp timestamp;
+             timestamp.set_seconds(tv.tv_sec);
+             timestamp.set_nanos(tv.tv_usec * 1000);
+
+         Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
+
+             FILETIME ft;
+             GetSystemTimeAsFileTime(&ft);
+             UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+
+             // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
+             // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
+             Timestamp timestamp;
+             timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));
+             timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
+
+         Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
+
+             long millis = System.currentTimeMillis();
+
+             Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
+                 .setNanos((int) ((millis % 1000) * 1000000)).build();
+
+         Example 5: Compute Timestamp from Java `Instant.now()`.
+
+             Instant now = Instant.now();
+
+             Timestamp timestamp =
+                 Timestamp.newBuilder().setSeconds(now.getEpochSecond())
+                     .setNanos(now.getNano()).build();
+
+         Example 6: Compute Timestamp from current time in Python.
+
+             timestamp = Timestamp()
+             timestamp.GetCurrentTime()
+
+         # JSON Mapping
+
+         In JSON format, the Timestamp type is encoded as a string in the
+         [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
+         format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
+         where {year} is always expressed using four digits while {month}, {day},
+         {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional
+         seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),
+         are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone
+         is required. A proto3 JSON serializer should always use UTC (as indicated by
+         "Z") when printing the Timestamp type and a proto3 JSON parser should be
+         able to accept both UTC and other timezones (as indicated by an offset).
+
+         For example, "2017-01-15T01:30:15.01Z" encodes 15.01 seconds past
+         01:30 UTC on January 15, 2017.
+
+         In JavaScript, one can convert a Date object to this format using the
+         standard
+         [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
+         method. In Python, a standard `datetime.datetime` object can be converted
+         to this format using
+         [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
+         the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use
+         the Joda Time's [`ISODateTimeFormat.dateTime()`](
+         http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
+         ) to obtain a formatter capable of generating timestamps in this format.
+    objectives.v1.AppendTurnRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+        kind:
+          not:
+            enum:
+              - 0
+          title: kind
+          $ref: '#/components/schemas/objectives.v1.TurnKind'
+        payload:
+          title: payload
+          $ref: '#/components/schemas/google.protobuf.Any'
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        sequence:
+          type: integer
+          title: sequence
+          format: int32
+        result:
+          title: result
+          $ref: '#/components/schemas/google.protobuf.Any'
+        status:
+          title: status
+          $ref: '#/components/schemas/objectives.v1.TurnStatus'
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+      title: AppendTurnRequest
+      additionalProperties: false
+    objectives.v1.AppendTurnResponse:
+      type: object
+      properties:
+        turn:
+          title: turn
+          $ref: '#/components/schemas/objectives.v1.Turn'
+        replayed:
+          type: boolean
+          title: replayed
+      title: AppendTurnResponse
+      additionalProperties: false
+    objectives.v1.CancelRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+        reason:
+          type: string
+          title: reason
+      title: CancelRequest
+      additionalProperties: false
+    objectives.v1.CancelResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: CancelResponse
+      additionalProperties: false
+    objectives.v1.CreateRequest:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        agentId:
+          type: string
+          title: agent_id
+        surface:
+          type: string
+          title: surface
+        title:
+          type: string
+          title: title
+          minLength: 1
+        description:
+          type: string
+          title: description
+        surfaceType:
+          title: surface_type
+          $ref: '#/components/schemas/common.v1.Surface'
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        provenance:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectives.v1.ProvenanceRecord'
+          title: provenance
+        organizationId:
+          type: string
+          title: organization_id
+      title: CreateRequest
+      additionalProperties: false
+    objectives.v1.CreateResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: CreateResponse
+      additionalProperties: false
+    objectives.v1.GetGovernanceEvaluationRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+      title: GetGovernanceEvaluationRequest
+      additionalProperties: false
+    objectives.v1.GetGovernanceEvaluationResponse:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+        compliant:
+          type: boolean
+          title: compliant
+        violations:
+          type: array
+          items:
+            type: string
+          title: violations
+      title: GetGovernanceEvaluationResponse
+      additionalProperties: false
+    objectives.v1.GetRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+      title: GetRequest
+      additionalProperties: false
+    objectives.v1.GetResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: GetResponse
+      additionalProperties: false
+    objectives.v1.ListTurnsRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+        limit:
+          type: integer
+          title: limit
+          maximum: 200
+          format: int32
+        offset:
+          type: integer
+          title: offset
+          format: int32
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+      title: ListTurnsRequest
+      additionalProperties: false
+    objectives.v1.ListTurnsResponse:
+      type: object
+      properties:
+        turns:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectives.v1.Turn'
+          title: turns
+        total:
+          type: integer
+          title: total
+          format: int32
+      title: ListTurnsResponse
+      additionalProperties: false
+    objectives.v1.MutationRecord:
+      type: object
+      properties:
+        targetIntegration:
+          type: string
+          title: target_integration
+        operation:
+          type: string
+          title: operation
+        status:
+          title: status
+          $ref: '#/components/schemas/objectives.v1.MutationStatus'
+        approvalId:
+          type: string
+          title: approval_id
+      title: MutationRecord
+      additionalProperties: false
+      description: MutationRecord tracks a write operation performed by an objective.
+    objectives.v1.Objective:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        workspaceId:
+          type: string
+          title: workspace_id
+        agentId:
+          type: string
+          title: agent_id
+        surface:
+          type: string
+          title: surface
+        title:
+          type: string
+          title: title
+        description:
+          type: string
+          title: description
+        state:
+          title: state
+          $ref: '#/components/schemas/objectives.v1.ObjectiveState'
+        provenance:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectives.v1.ProvenanceRecord'
+          title: provenance
+        mutations:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectives.v1.MutationRecord'
+          title: mutations
+        wakeSchedule:
+          title: wake_schedule
+          $ref: '#/components/schemas/objectives.v1.WakeSchedule'
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        surfaceType:
+          title: surface_type
+          $ref: '#/components/schemas/common.v1.Surface'
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        organizationId:
+          type: string
+          title: organization_id
+      title: Objective
+      additionalProperties: false
+      description: Objective is the canonical agent objective record.
+    objectives.v1.ObjectiveTurn:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+        turn:
+          title: turn
+          $ref: '#/components/schemas/objectives.v1.Turn'
+      title: ObjectiveTurn
+      additionalProperties: false
+    objectives.v1.ProvenanceRecord:
+      type: object
+      properties:
+        sourceIntegration:
+          type: string
+          title: source_integration
+        sourceId:
+          type: string
+          title: source_id
+        freshnessSeconds:
+          type: integer
+          title: freshness_seconds
+          format: int32
+        confidence:
+          type: number
+          title: confidence
+          format: float
+      title: ProvenanceRecord
+      additionalProperties: false
+      description: ProvenanceRecord tracks where data came from.
+    objectives.v1.QueryRequest:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        agentId:
+          type: string
+          title: agent_id
+        state:
+          title: state
+          $ref: '#/components/schemas/objectives.v1.ObjectiveState'
+        limit:
+          type: integer
+          title: limit
+          maximum: 200
+          format: int32
+        offset:
+          type: integer
+          title: offset
+          format: int32
+        organizationId:
+          type: string
+          title: organization_id
+      title: QueryRequest
+      additionalProperties: false
+    objectives.v1.QueryResponse:
+      type: object
+      properties:
+        objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectives.v1.Objective'
+          title: objectives
+        total:
+          type: integer
+          title: total
+          format: int32
+      title: QueryResponse
+      additionalProperties: false
+    objectives.v1.QueryTurnsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        agentId:
+          type: string
+          title: agent_id
+        limit:
+          type: integer
+          title: limit
+          maximum: 200
+          format: int32
+        offset:
+          type: integer
+          title: offset
+          format: int32
+        payloadChannelId:
+          type: string
+          title: payload_channel_id
+        omitTotal:
+          type: boolean
+          title: omit_total
+      title: QueryTurnsRequest
+      additionalProperties: false
+    objectives.v1.QueryTurnsResponse:
+      type: object
+      properties:
+        turns:
+          type: array
+          items:
+            $ref: '#/components/schemas/objectives.v1.ObjectiveTurn'
+          title: turns
+        total:
+          type: integer
+          title: total
+          format: int32
+      title: QueryTurnsResponse
+      additionalProperties: false
+    objectives.v1.RecordMutationRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+        mutation:
+          title: mutation
+          $ref: '#/components/schemas/objectives.v1.MutationRecord'
+      title: RecordMutationRequest
+      required:
+        - mutation
+      additionalProperties: false
+    objectives.v1.RecordMutationResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: RecordMutationResponse
+      additionalProperties: false
+    objectives.v1.RecordProvenanceRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+        provenance:
+          title: provenance
+          $ref: '#/components/schemas/objectives.v1.ProvenanceRecord'
+      title: RecordProvenanceRequest
+      required:
+        - provenance
+      additionalProperties: false
+    objectives.v1.RecordProvenanceResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: RecordProvenanceResponse
+      additionalProperties: false
+    objectives.v1.RunStepRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        kind:
+          not:
+            enum:
+              - 0
+          title: kind
+          $ref: '#/components/schemas/objectives.v1.TurnKind'
+        payload:
+          title: payload
+          $ref: '#/components/schemas/google.protobuf.Any'
+        result:
+          title: result
+          $ref: '#/components/schemas/google.protobuf.Any'
+      title: RunStepRequest
+      additionalProperties: false
+    objectives.v1.RunStepResponse:
+      type: object
+      properties:
+        turn:
+          title: turn
+          $ref: '#/components/schemas/objectives.v1.Turn'
+        replayed:
+          type: boolean
+          title: replayed
+      title: RunStepResponse
+      additionalProperties: false
+    objectives.v1.ScheduleWakeRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+        wakeSchedule:
+          title: wake_schedule
+          $ref: '#/components/schemas/objectives.v1.WakeSchedule'
+        state:
+          title: state
+          description: State to hold until wake_at is due. If unspecified, the service uses BLOCKED.
+          $ref: '#/components/schemas/objectives.v1.ObjectiveState'
+      title: ScheduleWakeRequest
+      required:
+        - wakeSchedule
+      additionalProperties: false
+    objectives.v1.ScheduleWakeResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: ScheduleWakeResponse
+      additionalProperties: false
+    objectives.v1.TransitionRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+        state:
+          not:
+            enum:
+              - 0
+          title: state
+          $ref: '#/components/schemas/objectives.v1.ObjectiveState'
+        reason:
+          type: string
+          title: reason
+      title: TransitionRequest
+      additionalProperties: false
+    objectives.v1.TransitionResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: TransitionResponse
+      additionalProperties: false
+    objectives.v1.Turn:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        objectiveId:
+          type: string
+          title: objective_id
+        sequence:
+          type: integer
+          title: sequence
+          format: int32
+        kind:
+          title: kind
+          $ref: '#/components/schemas/objectives.v1.TurnKind'
+        payload:
+          title: payload
+          $ref: '#/components/schemas/google.protobuf.Any'
+        result:
+          title: result
+          $ref: '#/components/schemas/google.protobuf.Any'
+        status:
+          title: status
+          $ref: '#/components/schemas/objectives.v1.TurnStatus'
+        startedAt:
+          title: started_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        completedAt:
+          title: completed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+      title: Turn
+      additionalProperties: false
+      description: Turn is the per-objective replay journal used by agent sessions.
+    objectives.v1.WaitForEventPayload:
+      type: object
+      properties:
+        eventSubject:
+          type: string
+          title: event_subject
+        payload:
+          title: payload
+          $ref: '#/components/schemas/google.protobuf.Any'
+      title: WaitForEventPayload
+      additionalProperties: false
+    objectives.v1.WaitForEventRequest:
+      type: object
+      properties:
+        objectiveId:
+          type: string
+          title: objective_id
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        eventSubject:
+          type: string
+          title: event_subject
+          minLength: 1
+        payload:
+          title: payload
+          $ref: '#/components/schemas/google.protobuf.Any'
+      title: WaitForEventRequest
+      additionalProperties: false
+    objectives.v1.WaitForEventResponse:
+      type: object
+      properties:
+        turn:
+          title: turn
+          $ref: '#/components/schemas/objectives.v1.Turn'
+        replayed:
+          type: boolean
+          title: replayed
+      title: WaitForEventResponse
+      additionalProperties: false
+    objectives.v1.WakeRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          minLength: 1
+      title: WakeRequest
+      additionalProperties: false
+    objectives.v1.WakeResponse:
+      type: object
+      properties:
+        objective:
+          title: objective
+          $ref: '#/components/schemas/objectives.v1.Objective'
+      title: WakeResponse
+      additionalProperties: false
+    objectives.v1.WakeSchedule:
+      type: object
+      properties:
+        wakeAt:
+          title: wake_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        reason:
+          type: string
+          title: reason
+        retryCount:
+          type: integer
+          title: retry_count
+          format: int32
+        maxRetries:
+          type: integer
+          title: max_retries
+          format: int32
+        backoffSeconds:
+          type: integer
+          title: backoff_seconds
+          format: int32
+      title: WakeSchedule
+      additionalProperties: false
+      description: WakeSchedule defines when and how an objective should be reactivated.
+    connect-protocol-version:
+      type: number
+      title: Connect-Protocol-Version
+      enum:
+        - 1
+      description: Define the version of the Connect protocol
+      const: 1
+    connect-timeout-header:
+      type: number
+      title: Connect-Timeout-Ms
+      description: Define the timeout, in ms
+    connect.error:
+      type: object
+      properties:
+        code:
+          type: string
+          examples:
+            - not_found
+          enum:
+            - canceled
+            - unknown
+            - invalid_argument
+            - deadline_exceeded
+            - not_found
+            - already_exists
+            - permission_denied
+            - resource_exhausted
+            - failed_precondition
+            - aborted
+            - out_of_range
+            - unimplemented
+            - internal
+            - unavailable
+            - data_loss
+            - unauthenticated
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+        message:
+          type: string
+          description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+        detail:
+          $ref: '#/components/schemas/google.protobuf.Any'
+      title: Connect Error
+      additionalProperties: true
+      description: 'Error type returned by Connect: https://connectrpc.com/docs/go/errors/#http-representation'
+security: []
+tags:
+  - name: objectives.v1.ObjectiveService
+    description: ObjectiveService manages agent objectives and their lifecycle.

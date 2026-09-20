@@ -113,6 +113,15 @@ service ConnectorService {
 
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
   }
+  // EnrollSurfaceTarget selects one exact provider object for background
+  // observation. Provider-specific adapters verify current read access before
+  // a durable target is created; this call never grants connector authority.
+  rpc EnrollSurfaceTarget(EnrollSurfaceTargetRequest) returns (EnrollSurfaceTargetResponse) {
+    option (common.v1.required_scopes) = "connectors:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
   rpc VerifyConnectionActive(VerifyConnectionActiveRequest) returns (VerifyConnectionActiveResponse) {
     option (common.v1.required_scopes) = "connectors:connection-active:verify";
     option (common.v1.organization_scope_field) = "organization_id";
@@ -391,6 +400,47 @@ message ResolveProviderInstallationResponse {
   ProviderInstallation installation = 2;
 }
 
+message EnrollSurfaceTargetRequest {
+  string organization_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+  string workspace_id = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+  string connection_id = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+  string provider_id = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  string target_kind = 5 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 64
+  }];
+  string external_id = 6 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 1024
+  }];
+  string canonical_url = 7 [(buf.validate.field).string.max_len = 4096];
+  string idempotency_key = 8 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+}
+
+message EnrollSurfaceTargetResponse {
+  string connection_id = 1;
+  string provider_id = 2;
+  string target_kind = 3;
+  string external_id = 4;
+  string state = 5;
+  bool idempotent_replay = 6;
+}
+
 message VerifyConnectionActiveRequest {
   string organization_id = 1 [(buf.validate.field).string.min_len = 1];
   string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
@@ -501,6 +551,11 @@ message ConnectorRuntime {
   // inventory here. Named `provider_actions` instead of connectors-rs's
   // `actions` -- see the naming-debt note at the top of this file.
   repeated ConnectorActionDefinition provider_actions = 10;
+  // Optional DNS suffix constraints for credential-bearing destinations whose
+  // hostname is supplied by connection configuration. Hosts must equal a
+  // suffix or be its dot-delimited subdomain; ports, IP literals, userinfo,
+  // trailing dots, and encoded lookalikes are rejected before auth resolves.
+  repeated string credential_destination_host_suffixes = 11;
 }
 
 // ConnectorActionDefinition declares one provider-native operation.
@@ -524,6 +579,9 @@ message ConnectorActionDefinition {
   string effect = 13;
   // Catalog-owned tool metadata. Presence does not grant execution authority.
   ConnectorGovernedAction governed = 14;
+  // This action may be emitted by a registered object-surface projector.
+  // Presence is descriptive only; installation authority is still required.
+  bool surface_projection = 15;
 }
 
 // ConnectorGovernedAction preserves published tool descriptions, schemas, and
@@ -1091,6 +1149,15 @@ message InitiateOAuthFlowRequest {
   // Optional GitHub organization or username with this App already installed.
   // Selects user OAuth instead of new installation; never grants tenant access.
   string github_existing_account = 6;
+  // Selects the provider identity represented by the resulting token. The
+  // app actor is currently supported only by Linear agent installations.
+  OAuthActorMode actor_mode = 7;
+}
+
+enum OAuthActorMode {
+  O_AUTH_ACTOR_MODE_UNSPECIFIED = 0;
+  O_AUTH_ACTOR_MODE_USER = 1;
+  O_AUTH_ACTOR_MODE_APP = 2;
 }
 
 message InitiateOAuthFlowResponse {

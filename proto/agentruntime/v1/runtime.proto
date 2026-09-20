@@ -1,0 +1,2948 @@
+syntax = "proto3";
+
+package agentruntime.v1;
+
+import "agents/v1/agents.proto";
+import "buf/validate/validate.proto";
+import "codex/v1/codex.proto";
+import "common/v1/authz.proto";
+import "common/v1/risk.proto";
+import "common/v1/surface.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "objectives/v1/objectives.proto";
+
+option go_package = "github.com/evalops/platform/gen/go/agentruntime/v1;agentruntimev1";
+
+// AgentRuntimeService accepts normalized triggers and manages durable
+// AgentRun execution attempts. Workers claim runs by lease, checkpoint their
+// progress, release compute while waiting for human/input/event gates, and
+// resume from checkpoints rather than replaying LLM or tool calls.
+service AgentRuntimeService {
+  // HandleTrigger receives a normalized product or integration trigger,
+  // resolves agent/objective context, records an AgentRun, and dispatches it.
+  rpc HandleTrigger(HandleTriggerRequest) returns (HandleTriggerResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.organization_scope_field) = "trigger.organization_id";
+    option (common.v1.workspace_scope_field) = "trigger.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // AdmitOperatingChannelEvent accepts provider-issued coordinates from a
+  // channel edge that cannot know tenant ownership. Platform resolves the
+  // installation and external actor before durably admitting the event.
+  rpc AdmitOperatingChannelEvent(AdmitOperatingChannelEventRequest) returns (AdmitOperatingChannelEventResponse) {
+    option (common.v1.required_scopes) = "channel-edge:admit";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // AdmitSurfaceInvocation accepts a provider-neutral invocation from a
+  // verified surface adapter. Platform resolves installation ownership and
+  // the external actor before binding the provider object to an operating
+  // thread and durably admitting work.
+  rpc AdmitSurfaceInvocation(AdmitSurfaceInvocationRequest) returns (AdmitSurfaceInvocationResponse) {
+    option (common.v1.required_scopes) = "surface-edge:admit";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // Identity reconciles one approved organization and its active default workspace.
+  // Caller scope is service-only; this request cannot select provider credentials.
+  rpc EnsureOrganizationEmail(EnsureOrganizationEmailRequest) returns (EnsureOrganizationEmailResponse) {
+    option (common.v1.required_scopes) = "organization-email:provision";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // ClaimNextRun atomically leases the next queued or retry-ready run for a
+  // worker. A claim transitions the run to RUNNING and increments attempt.
+  rpc ClaimNextRun(ClaimNextRunRequest) returns (ClaimNextRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // HeartbeatRun extends an active worker lease. Expired leases are eligible
+  // to be reclaimed by another worker from the last checkpoint.
+  rpc HeartbeatRun(HeartbeatRunRequest) returns (HeartbeatRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // RenewRunLease recovers a still-owned worker lease after it has expired but
+  // before the run has been parked, completed, or otherwise taken over.
+  rpc RenewRunLease(RenewRunLeaseRequest) returns (RenewRunLeaseResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // RecordRunStep upserts the durable record for one execution step.
+  rpc RecordRunStep(RecordRunStepRequest) returns (RecordRunStepResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunCheckpoint stores an opaque resume snapshot. Checkpoints are the
+  // source of truth for resuming work; deterministic replay is not required.
+  rpc RecordRunCheckpoint(RecordRunCheckpointRequest) returns (RecordRunCheckpointResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunArtifact links a produced artifact to the run and optional step.
+  rpc RecordRunArtifact(RecordRunArtifactRequest) returns (RecordRunArtifactResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunCost links metering/cost data to the run and optional step.
+  rpc RecordRunCost(RecordRunCostRequest) returns (RecordRunCostResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunStreamCursor stores a consumer cursor into the run event stream.
+  rpc RecordRunStreamCursor(RecordRunStreamCursorRequest) returns (RecordRunStreamCursorResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunEvent appends an adapter-observed lifecycle event to an existing
+  // AgentRun without requiring a worker lease. Channel adapters use this to
+  // attach Slack/Teams/email delivery, approval, model, and tool milestones
+  // while Platform remains the durable source of truth for the run timeline.
+  rpc RecordRunEvent(RecordRunEventRequest) returns (RecordRunEventResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // ControlRun records a human, channel, scheduler, or system control against
+  // the active autonomous run/session. Controls are durable steering input; the
+  // Slack adapter is not responsible for keeping the agent alive turn by turn.
+  rpc ControlRun(ControlRunRequest) returns (ControlRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunWorkItem creates or replaces one node in the autonomous work graph.
+  // Work items, not VFS projections, are the canonical state for long-horizon
+  // goals, child runs, waits, tool activity, blockers, and completion gates.
+  rpc RecordRunWorkItem(RecordRunWorkItemRequest) returns (RecordRunWorkItemResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // UpdateRunWorkItem patches progress for one autonomous work graph node.
+  rpc UpdateRunWorkItem(UpdateRunWorkItemRequest) returns (UpdateRunWorkItemResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // ListRunWorkItems returns the typed work graph for one run or work envelope.
+  rpc ListRunWorkItems(ListRunWorkItemsRequest) returns (ListRunWorkItemsResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // YieldRun ends the current leased run step while keeping the autonomous
+  // session alive. Inline yields enqueue a successor AgentRun immediately;
+  // end-session yields close the run without enqueueing more autonomous work.
+  // Timer, approval, input, and event blocking use WaitRun/ResumeRun.
+  rpc YieldRun(YieldRunRequest) returns (YieldRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // WaitRun parks the run on an approval, input, timer, or event wait and
+  // clears the worker lease so no compute is held while blocked.
+  rpc WaitRun(WaitRunRequest) returns (WaitRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // ResumeRun resolves a wait and requeues the run from its latest checkpoint.
+  rpc ResumeRun(ResumeRunRequest) returns (ResumeRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // CompleteRun marks the run successful and releases any active lease.
+  rpc CompleteRun(CompleteRunRequest) returns (CompleteRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // FailRun records a failed attempt. Retryable failures can move to RETRYING;
+  // exhausted attempts stay FAILED until they are moved to the dead letter set.
+  rpc FailRun(FailRunRequest) returns (FailRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // CancelRun cancels a run before it reaches a terminal success/failure.
+  rpc CancelRun(CancelRunRequest) returns (CancelRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RetryRun explicitly schedules a failed run for another attempt.
+  rpc RetryRun(RetryRunRequest) returns (RetryRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // DeadLetterRun moves an exhausted or poison run out of normal scheduling.
+  rpc DeadLetterRun(DeadLetterRunRequest) returns (DeadLetterRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // GetRun retrieves an AgentRun by ID.
+  rpc GetRun(GetRunRequest) returns (GetRunResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // GetTeammateWorkLedger retrieves the durable teammate work projection for
+  // one run. It joins run state, waits, memory citations, connector grants,
+  // VFS state, proactive policy, and channel-visible status into the compact
+  // read model workers and operator consoles use for long-horizon handoff.
+  rpc GetTeammateWorkLedger(GetTeammateWorkLedgerRequest) returns (GetTeammateWorkLedgerResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListRunsByWorkEnvelope retrieves newest runs that belong to one durable
+  // channel work envelope, such as a Slack thread or future email/Jira/Teams object.
+  rpc ListRunsByWorkEnvelope(ListRunsByWorkEnvelopeRequest) returns (ListRunsByWorkEnvelopeResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // GetChannelThreadAdoption resolves whether a channel thread has been
+  // explicitly adopted by an agent and can receive no-mention continuations.
+  rpc GetChannelThreadAdoption(GetChannelThreadAdoptionRequest) returns (GetChannelThreadAdoptionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // RecordChannelThreadAdoption durably records an adapter-observed channel
+  // thread adoption without requiring the adapter to create a new AgentRun.
+  rpc RecordChannelThreadAdoption(RecordChannelThreadAdoptionRequest) returns (RecordChannelThreadAdoptionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // ListChannelThreadAdoptions returns the durable adoption projection for
+  // operator/debug surfaces and channel-adapter reconciliation.
+  rpc ListChannelThreadAdoptions(ListChannelThreadAdoptionsRequest) returns (ListChannelThreadAdoptionsResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListRunWaits returns a pending-work projection over parked AgentRun waits
+  // without requiring clients to replay runtime events or read full run
+  // snapshots.
+  rpc ListRunWaits(ListRunWaitsRequest) returns (ListRunWaitsResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // RecordChannelActionReceipt durably records an interactive channel action,
+  // such as a Slack approval button or slash command, before any side effects
+  // resume runtime work.
+  rpc RecordChannelActionReceipt(RecordChannelActionReceiptRequest) returns (RecordChannelActionReceiptResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // GetChannelActionReceipt retrieves one recorded channel action receipt.
+  rpc GetChannelActionReceipt(GetChannelActionReceiptRequest) returns (GetChannelActionReceiptResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListChannelActionReceipts returns durable channel action receipts for
+  // audit, idempotency, and channel adapter reconciliation.
+  rpc ListChannelActionReceipts(ListChannelActionReceiptsRequest) returns (ListChannelActionReceiptsResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListRunEvents returns the append-only event log for an AgentRun.
+  rpc ListRunEvents(ListRunEventsRequest) returns (ListRunEventsResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ListRunVirtualFiles lists the durable read model of a run's virtual
+  // filesystem, including context files and agent-authored proposal files.
+  rpc ListRunVirtualFiles(ListRunVirtualFilesRequest) returns (ListRunVirtualFilesResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ReadRunVirtualFile reads a bounded slice of one run virtual file. Workers
+  // should use this instead of loading every virtual file into model context.
+  rpc ReadRunVirtualFile(ReadRunVirtualFileRequest) returns (ReadRunVirtualFileResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // StatRunVirtualFile returns the typed, content-free VFS projection for one
+  // run virtual file by path.
+  rpc StatRunVirtualFile(StatRunVirtualFileRequest) returns (StatRunVirtualFileResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // WatchRunVirtualFiles streams a resumable VFS timeline for local agent
+  // development and inspectors without polling the full VFS projection.
+  rpc WatchRunVirtualFiles(WatchRunVirtualFilesRequest) returns (stream WatchRunVirtualFilesResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // BatchReadRunVirtualFiles reads multiple bounded VFS slices in one request
+  // while making per-file and total-budget truncation explicit.
+  rpc BatchReadRunVirtualFiles(BatchReadRunVirtualFilesRequest) returns (BatchReadRunVirtualFilesResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // BuildRunVirtualFileContextPack returns an ordered, cited set of VFS
+  // snippets for a task or query so workers can hydrate model context without
+  // hand-rolling list/search/read loops.
+  rpc BuildRunVirtualFileContextPack(BuildRunVirtualFileContextPackRequest) returns (BuildRunVirtualFileContextPackResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // SearchRunVirtualFiles performs bounded literal or regex search over text
+  // virtual files projected for an AgentRun.
+  rpc SearchRunVirtualFiles(SearchRunVirtualFilesRequest) returns (SearchRunVirtualFilesResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // RecordRunVirtualFileProposal writes an agent-authored file into the
+  // proposal/workspace side of the VFS. Source mounts such as /context remain
+  // read-only; promotion to real side effects happens through reviewers or
+  // downstream services.
+  rpc RecordRunVirtualFileProposal(RecordRunVirtualFileProposalRequest) returns (RecordRunVirtualFileProposalResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // RecordRunVirtualFileTransaction atomically stages a multi-file VFS change
+  // set as durable proposal artifacts with shared revision and review metadata.
+  rpc RecordRunVirtualFileTransaction(RecordRunVirtualFileTransactionRequest) returns (RecordRunVirtualFileTransactionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // PromoteRunVirtualFileTransaction records a reviewed transaction as the
+  // accepted workspace view. Promotion is idempotent by transaction and keeps
+  // proposal artifacts intact for audit.
+  rpc PromoteRunVirtualFileTransaction(PromoteRunVirtualFileTransactionRequest) returns (PromoteRunVirtualFileTransactionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // DiffRunVirtualFileTransaction previews a staged VFS transaction as
+  // per-file stats, hunks, conflicts, and unified diff text.
+  rpc DiffRunVirtualFileTransaction(DiffRunVirtualFileTransactionRequest) returns (DiffRunVirtualFileTransactionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+
+  // ApplyRunVirtualFileTransaction applies a transaction when the diff is
+  // clean, and otherwise returns structured conflicts without mutating state.
+  rpc ApplyRunVirtualFileTransaction(ApplyRunVirtualFileTransactionRequest) returns (ApplyRunVirtualFileTransactionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+
+  // RebaseRunVirtualFileTransaction restages a clean transaction on top of the
+  // latest accepted VFS revisions while preserving proposed content metadata.
+  rpc RebaseRunVirtualFileTransaction(RebaseRunVirtualFileTransactionRequest) returns (RebaseRunVirtualFileTransactionResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // HydrateRunVirtualFileMount resolves a lazy connector mount into bounded
+  // run-scoped VFS files without exposing credentials to the worker.
+  rpc HydrateRunVirtualFileMount(HydrateRunVirtualFileMountRequest) returns (HydrateRunVirtualFileMountResponse) {
+    option (common.v1.required_scopes) = "agentruntime:write";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
+  // InspectRunVirtualFiles returns a debug projection over mounts,
+  // transactions, content addresses, and Cerebro indexing readiness.
+  rpc InspectRunVirtualFiles(InspectRunVirtualFilesRequest) returns (InspectRunVirtualFilesResponse) {
+    option (common.v1.required_scopes) = "agentruntime:read";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+}
+
+// AgentRunState describes the runtime lifecycle of one durable attempt.
+enum AgentRunState {
+  AGENT_RUN_STATE_UNSPECIFIED = 0;
+  AGENT_RUN_STATE_ACCEPTED = 1;
+  AGENT_RUN_STATE_QUEUED = 2;
+  AGENT_RUN_STATE_RUNNING = 3;
+  AGENT_RUN_STATE_WAITING = 4;
+  AGENT_RUN_STATE_SUCCEEDED = 5;
+  AGENT_RUN_STATE_FAILED = 6;
+  AGENT_RUN_STATE_CANCELLED = 7;
+  AGENT_RUN_STATE_RETRYING = 8;
+  AGENT_RUN_STATE_DEAD_LETTERED = 9;
+}
+
+// AgentRunStepState describes progress for a single durable step record.
+enum AgentRunStepState {
+  AGENT_RUN_STEP_STATE_UNSPECIFIED = 0;
+  AGENT_RUN_STEP_STATE_PENDING = 1;
+  AGENT_RUN_STEP_STATE_RUNNING = 2;
+  AGENT_RUN_STEP_STATE_WAITING = 3;
+  AGENT_RUN_STEP_STATE_SUCCEEDED = 4;
+  AGENT_RUN_STEP_STATE_FAILED = 5;
+  AGENT_RUN_STEP_STATE_CANCELLED = 6;
+  AGENT_RUN_STEP_STATE_SKIPPED = 7;
+}
+
+// AgentRunStepKind classifies the durable work represented by a run step.
+enum AgentRunStepKind {
+  AGENT_RUN_STEP_KIND_UNSPECIFIED = 0;
+  AGENT_RUN_STEP_KIND_MODEL_CALL = 1;
+  AGENT_RUN_STEP_KIND_TOOL_CALL_INTENT = 2;
+  AGENT_RUN_STEP_KIND_TOOL_RESULT = 3;
+  AGENT_RUN_STEP_KIND_APPROVAL_WAIT = 4;
+  AGENT_RUN_STEP_KIND_ERROR = 5;
+  AGENT_RUN_STEP_KIND_SYSTEM = 6;
+  AGENT_RUN_STEP_KIND_CONTEXT_ENRICHMENT = 7;
+  AGENT_RUN_STEP_KIND_PLAN = 8;
+  AGENT_RUN_STEP_KIND_PATCH = 9;
+  AGENT_RUN_STEP_KIND_TEST = 10;
+  AGENT_RUN_STEP_KIND_PULL_REQUEST_SYNC = 11;
+  AGENT_RUN_STEP_KIND_REVIEW_SYNC = 12;
+}
+
+// AgentRunWaitType describes why a run released its worker lease.
+enum AgentRunWaitType {
+  AGENT_RUN_WAIT_TYPE_UNSPECIFIED = 0;
+  AGENT_RUN_WAIT_TYPE_APPROVAL = 1;
+  AGENT_RUN_WAIT_TYPE_INPUT = 2;
+  AGENT_RUN_WAIT_TYPE_EVENT = 3;
+  AGENT_RUN_WAIT_TYPE_TIMER = 4;
+}
+
+// AgentRunWaitState describes the read-model state of a parked wait.
+enum AgentRunWaitState {
+  AGENT_RUN_WAIT_STATE_UNSPECIFIED = 0;
+  AGENT_RUN_WAIT_STATE_PENDING = 1;
+  AGENT_RUN_WAIT_STATE_RESOLVED = 2;
+  AGENT_RUN_WAIT_STATE_EXPIRED = 3;
+  AGENT_RUN_WAIT_STATE_CANCELLED = 4;
+}
+
+// AgentRunArtifactKind classifies durable output produced by a run or step.
+enum AgentRunArtifactKind {
+  AGENT_RUN_ARTIFACT_KIND_UNSPECIFIED = 0;
+  AGENT_RUN_ARTIFACT_KIND_TOOL_RESULT = 1;
+  AGENT_RUN_ARTIFACT_KIND_CHART = 2;
+  AGENT_RUN_ARTIFACT_KIND_REPORT = 3;
+  AGENT_RUN_ARTIFACT_KIND_FILE = 4;
+  AGENT_RUN_ARTIFACT_KIND_TRANSCRIPT = 5;
+  AGENT_RUN_ARTIFACT_KIND_APPROVAL_PLAN = 6;
+  AGENT_RUN_ARTIFACT_KIND_SYSTEM = 7;
+  AGENT_RUN_ARTIFACT_KIND_PATCH = 8;
+  AGENT_RUN_ARTIFACT_KIND_PULL_REQUEST = 9;
+  AGENT_RUN_ARTIFACT_KIND_PULL_REQUEST_COMMENT = 10;
+  AGENT_RUN_ARTIFACT_KIND_CI_STATUS = 11;
+  AGENT_RUN_ARTIFACT_KIND_RUN_PANEL = 12;
+  AGENT_RUN_ARTIFACT_KIND_EVALUATION_EXAMPLE = 13;
+}
+
+// RuntimeEventType classifies append-only AgentRun events.
+enum RuntimeEventType {
+  RUNTIME_EVENT_TYPE_UNSPECIFIED = 0;
+  RUNTIME_EVENT_TYPE_TRIGGER_ACCEPTED = 1;
+  RUNTIME_EVENT_TYPE_AGENT_CONFIG_RESOLVED = 2;
+  RUNTIME_EVENT_TYPE_OBJECTIVE_RESOLVED = 3;
+  RUNTIME_EVENT_TYPE_CONTEXT_BUILT = 4;
+  RUNTIME_EVENT_TYPE_WORKER_DISPATCHED = 5;
+  RUNTIME_EVENT_TYPE_RUN_FAILED = 6;
+  RUNTIME_EVENT_TYPE_RUN_QUEUED = 7;
+  RUNTIME_EVENT_TYPE_RUN_CLAIMED = 8;
+  RUNTIME_EVENT_TYPE_LEASE_HEARTBEAT = 9;
+  RUNTIME_EVENT_TYPE_STEP_RECORDED = 10;
+  RUNTIME_EVENT_TYPE_CHECKPOINT_RECORDED = 11;
+  RUNTIME_EVENT_TYPE_ARTIFACT_RECORDED = 12;
+  RUNTIME_EVENT_TYPE_COST_RECORDED = 13;
+  RUNTIME_EVENT_TYPE_RUN_WAITING = 14;
+  RUNTIME_EVENT_TYPE_RUN_RESUMED = 15;
+  RUNTIME_EVENT_TYPE_RUN_SUCCEEDED = 16;
+  RUNTIME_EVENT_TYPE_RUN_CANCELLED = 17;
+  RUNTIME_EVENT_TYPE_RUN_RETRY_SCHEDULED = 18;
+  RUNTIME_EVENT_TYPE_RUN_DEAD_LETTERED = 19;
+  RUNTIME_EVENT_TYPE_STREAM_CURSOR_RECORDED = 20;
+  RUNTIME_EVENT_TYPE_CODEX_INTERACTION_REQUESTED = 21;
+  RUNTIME_EVENT_TYPE_CODEX_INTERACTION_RESOLVED = 22;
+  RUNTIME_EVENT_TYPE_CODEX_PROGRESS_RECORDED = 23;
+  RUNTIME_EVENT_TYPE_CODEX_OUTPUT_SYNCED = 24;
+  RUNTIME_EVENT_TYPE_CODEX_OUTCOME_OBSERVED = 25;
+  RUNTIME_EVENT_TYPE_CHANNEL_MESSAGE_RECORDED = 26;
+  RUNTIME_EVENT_TYPE_MODEL_RESPONSE_RECORDED = 27;
+  RUNTIME_EVENT_TYPE_TOOL_CALL_RECORDED = 28;
+  RUNTIME_EVENT_TYPE_TOOL_RESULT_RECORDED = 29;
+  RUNTIME_EVENT_TYPE_APPROVAL_REQUESTED = 30;
+  RUNTIME_EVENT_TYPE_APPROVAL_RESOLVED = 31;
+  RUNTIME_EVENT_TYPE_AGENT_PROGRESS_RECORDED = 32;
+  RUNTIME_EVENT_TYPE_RUN_CONTROL_RECORDED = 33;
+  RUNTIME_EVENT_TYPE_WORK_ITEM_RECORDED = 34;
+  RUNTIME_EVENT_TYPE_WORK_ITEM_UPDATED = 35;
+  RUNTIME_EVENT_TYPE_PROCESSING_PRESENCE_RECORDED = 36;
+  RUNTIME_EVENT_TYPE_AUTONOMY_SESSION_RECORDED = 37;
+  RUNTIME_EVENT_TYPE_RUN_YIELDED = 38;
+}
+
+// RuntimeEvidenceState records whether Platform merely observed a native event
+// or has joined it to a resolver/proof source.
+enum RuntimeEvidenceState {
+  RUNTIME_EVIDENCE_STATE_UNSPECIFIED = 0;
+  RUNTIME_EVIDENCE_STATE_NATIVE_OBSERVED = 1;
+  RUNTIME_EVIDENCE_STATE_PLATFORM_PROVEN = 2;
+  RUNTIME_EVIDENCE_STATE_MISSING = 3;
+  RUNTIME_EVIDENCE_STATE_UNVERIFIED = 4;
+}
+
+// NativeAgentEventSource identifies the native Agent Workforce emitter that
+// produced an observed event. Platform does not infer authority from this
+// source; proof states below remain missing/unverified until joined to a
+// Platform resolver, credential, or meter authority.
+enum NativeAgentEventSource {
+  NATIVE_AGENT_EVENT_SOURCE_UNSPECIFIED = 0;
+  NATIVE_AGENT_EVENT_SOURCE_MAESTRO = 1;
+  NATIVE_AGENT_EVENT_SOURCE_CODEX = 2;
+  // NATIVE_AGENT_EVENT_SOURCE_CLAUDE_CODE and
+  // NATIVE_AGENT_EVENT_SOURCE_OTHER mirror sessions.v1.AgentKind so a native
+  // event observed from Claude Code, or from an emitter that is none of the
+  // above, carries an honest source instead of being misattributed to
+  // Maestro or Codex. Proof states remain missing/unverified for these
+  // sources the same as for the existing ones until joined to a Platform
+  // resolver, credential, or meter authority.
+  NATIVE_AGENT_EVENT_SOURCE_CLAUDE_CODE = 3;
+  NATIVE_AGENT_EVENT_SOURCE_OTHER = 4;
+}
+
+// RuntimeEvidenceGapReason identifies the missing proof that prevents a
+// runtime action from being considered approval-ready.
+enum RuntimeEvidenceGapReason {
+  RUNTIME_EVIDENCE_GAP_REASON_UNSPECIFIED = 0;
+  RUNTIME_EVIDENCE_GAP_REASON_CREDENTIAL_UNVERIFIED = 1;
+  RUNTIME_EVIDENCE_GAP_REASON_PRINCIPAL_UNRESOLVED = 2;
+  RUNTIME_EVIDENCE_GAP_REASON_COST_UNRECORDED = 3;
+}
+
+// RunControlMode describes durable input applied to an autonomous run/session.
+// Steering and followups are optional controls; they are not the worker loop.
+enum RunControlMode {
+  RUN_CONTROL_MODE_UNSPECIFIED = 0;
+  RUN_CONTROL_MODE_STEER = 1;
+  RUN_CONTROL_MODE_FOLLOWUP = 2;
+  RUN_CONTROL_MODE_COLLECT = 3;
+  RUN_CONTROL_MODE_INTERRUPT = 4;
+  RUN_CONTROL_MODE_CANCEL = 5;
+  RUN_CONTROL_MODE_SYSTEM_WAKE = 6;
+}
+
+// AutonomyProcessingState is the channel-safe processing presence for a
+// long-lived autonomous teammate. Adapters update the same visible Slack
+// message from this state instead of posting one reply per runtime turn.
+enum AutonomyProcessingState {
+  AUTONOMY_PROCESSING_STATE_UNSPECIFIED = 0;
+  AUTONOMY_PROCESSING_STATE_QUEUED = 1;
+  AUTONOMY_PROCESSING_STATE_ORIENTING = 2;
+  AUTONOMY_PROCESSING_STATE_THINKING = 3;
+  AUTONOMY_PROCESSING_STATE_USING_TOOL = 4;
+  AUTONOMY_PROCESSING_STATE_SPAWNING_CHILDREN = 5;
+  AUTONOMY_PROCESSING_STATE_WAITING_ON_APPROVAL = 6;
+  AUTONOMY_PROCESSING_STATE_WAITING_ON_EVENT = 7;
+  AUTONOMY_PROCESSING_STATE_SYNTHESIZING = 8;
+  AUTONOMY_PROCESSING_STATE_COMPLETING = 9;
+  AUTONOMY_PROCESSING_STATE_IDLE = 10;
+  AUTONOMY_PROCESSING_STATE_FAILED = 11;
+}
+
+// AgentWorkItemKind classifies nodes in the autonomous work graph.
+enum AgentWorkItemKind {
+  AGENT_WORK_ITEM_KIND_UNSPECIFIED = 0;
+  AGENT_WORK_ITEM_KIND_ROOT = 1;
+  AGENT_WORK_ITEM_KIND_MODEL_CALL = 2;
+  AGENT_WORK_ITEM_KIND_TOOL_CALL = 3;
+  AGENT_WORK_ITEM_KIND_CHILD_RUN = 4;
+  AGENT_WORK_ITEM_KIND_WAIT = 5;
+  AGENT_WORK_ITEM_KIND_MEMORY = 6;
+  AGENT_WORK_ITEM_KIND_USER_INPUT = 7;
+  AGENT_WORK_ITEM_KIND_FOLLOWUP = 8;
+  AGENT_WORK_ITEM_KIND_RECOVERY = 9;
+}
+
+// AgentWorkItemState describes durable progress for a work graph node.
+enum AgentWorkItemState {
+  AGENT_WORK_ITEM_STATE_UNSPECIFIED = 0;
+  AGENT_WORK_ITEM_STATE_PENDING = 1;
+  AGENT_WORK_ITEM_STATE_RUNNING = 2;
+  AGENT_WORK_ITEM_STATE_WAITING = 3;
+  AGENT_WORK_ITEM_STATE_BLOCKED = 4;
+  AGENT_WORK_ITEM_STATE_SUCCEEDED = 5;
+  AGENT_WORK_ITEM_STATE_FAILED = 6;
+  AGENT_WORK_ITEM_STATE_CANCELLED = 7;
+}
+
+// AutonomySessionState is the coarse lifecycle for the long-lived teammate
+// session attached to a work envelope.
+enum AutonomySessionState {
+  AUTONOMY_SESSION_STATE_UNSPECIFIED = 0;
+  AUTONOMY_SESSION_STATE_ACTIVE = 1;
+  AUTONOMY_SESSION_STATE_IDLE = 2;
+  AUTONOMY_SESSION_STATE_WAITING = 3;
+  AUTONOMY_SESSION_STATE_FAILED = 4;
+  AUTONOMY_SESSION_STATE_CANCELLED = 5;
+}
+
+// YieldContinuation describes how Platform should continue an autonomous
+// session after the current run releases its lease.
+enum YieldContinuation {
+  YIELD_CONTINUATION_UNSPECIFIED = 0;
+  YIELD_CONTINUATION_INLINE_NEXT_STEP = 1;
+  YIELD_CONTINUATION_SCHEDULED = 2;
+  YIELD_CONTINUATION_WAIT = 3;
+  YIELD_CONTINUATION_END_SESSION = 4;
+}
+
+// RuntimeDependencyStatus describes the readiness of a platform boundary that
+// contributed context to an AgentRun.
+enum RuntimeDependencyStatus {
+  RUNTIME_DEPENDENCY_STATUS_UNSPECIFIED = 0;
+  RUNTIME_DEPENDENCY_STATUS_RESOLVED = 1;
+  RUNTIME_DEPENDENCY_STATUS_NOT_FOUND = 2;
+  RUNTIME_DEPENDENCY_STATUS_NOT_CONFIGURED = 3;
+  RUNTIME_DEPENDENCY_STATUS_LOADED = 4;
+}
+
+// RuntimeWorkEnvelopeKind classifies the durable human/work object a trigger
+// belongs to. Envelopes group retries and follow-up messages across channels
+// without making the runtime depend on Slack-specific string labels.
+enum RuntimeWorkEnvelopeKind {
+  RUNTIME_WORK_ENVELOPE_KIND_UNSPECIFIED = 0;
+  RUNTIME_WORK_ENVELOPE_KIND_CONVERSATION_THREAD = 1;
+  RUNTIME_WORK_ENVELOPE_KIND_DIRECT_CONVERSATION = 2;
+  RUNTIME_WORK_ENVELOPE_KIND_TICKET = 3;
+  RUNTIME_WORK_ENVELOPE_KIND_CALENDAR_EVENT = 4;
+  RUNTIME_WORK_ENVELOPE_KIND_PULL_REQUEST = 5;
+  RUNTIME_WORK_ENVELOPE_KIND_INCIDENT = 6;
+  RUNTIME_WORK_ENVELOPE_KIND_REPOSITORY = 7;
+  RUNTIME_WORK_ENVELOPE_KIND_DOCUMENT = 8;
+  RUNTIME_WORK_ENVELOPE_KIND_RECORD = 9;
+}
+
+// SurfaceTargetKind classifies the provider object that owns interaction
+// context. It is deliberately independent of conversation channel shape.
+enum SurfaceTargetKind {
+  SURFACE_TARGET_KIND_UNSPECIFIED = 0;
+  SURFACE_TARGET_KIND_CONVERSATION = 1;
+  SURFACE_TARGET_KIND_TICKET = 2;
+  SURFACE_TARGET_KIND_PULL_REQUEST = 3;
+  SURFACE_TARGET_KIND_INCIDENT = 4;
+  SURFACE_TARGET_KIND_REPOSITORY = 5;
+  SURFACE_TARGET_KIND_DOCUMENT = 6;
+  SURFACE_TARGET_KIND_RECORD = 7;
+}
+
+// RuntimeChannelKind classifies the inbound or outbound channel adapter that
+// owns the human conversation surface for a run.
+enum RuntimeChannelKind {
+  RUNTIME_CHANNEL_KIND_UNSPECIFIED = 0;
+  RUNTIME_CHANNEL_KIND_SLACK = 1;
+  RUNTIME_CHANNEL_KIND_WEB = 2;
+  RUNTIME_CHANNEL_KIND_API = 3;
+  RUNTIME_CHANNEL_KIND_EMAIL = 4;
+  RUNTIME_CHANNEL_KIND_GITHUB = 5;
+  RUNTIME_CHANNEL_KIND_LINEAR = 6;
+  RUNTIME_CHANNEL_KIND_JIRA = 7;
+  RUNTIME_CHANNEL_KIND_IDE = 8;
+  RUNTIME_CHANNEL_KIND_MONITORING = 9;
+  RUNTIME_CHANNEL_KIND_BROWSER_EXTENSION = 10;
+  RUNTIME_CHANNEL_KIND_DESKTOP_HELPER = 11;
+  RUNTIME_CHANNEL_KIND_CALENDAR = 12;
+  RUNTIME_CHANNEL_KIND_TEAMS = 13;
+  RUNTIME_CHANNEL_KIND_WHATSAPP = 14;
+  RUNTIME_CHANNEL_KIND_APPLE_MESSAGES = 15;
+}
+
+// RuntimeTriggerKind classifies the normalized source event that started or
+// resumed a run. The legacy string source_event_type remains for compatibility
+// with early producers and arbitrary integration event names.
+enum RuntimeTriggerKind {
+  RUNTIME_TRIGGER_KIND_UNSPECIFIED = 0;
+  RUNTIME_TRIGGER_KIND_SLACK_APP_MENTION = 1;
+  RUNTIME_TRIGGER_KIND_SLACK_DIRECT_MESSAGE = 2;
+  RUNTIME_TRIGGER_KIND_SLACK_SLASH_COMMAND = 3;
+  RUNTIME_TRIGGER_KIND_SLACK_ACTION = 4;
+  RUNTIME_TRIGGER_KIND_SLACK_THREAD_CONTINUATION = 5;
+  RUNTIME_TRIGGER_KIND_SLACK_EVENT = 6;
+  RUNTIME_TRIGGER_KIND_ENSEMBLE_WEB_MESSAGE = 7;
+  RUNTIME_TRIGGER_KIND_ENSEMBLE_WEBHOOK_EVENT = 8;
+  RUNTIME_TRIGGER_KIND_SCHEDULE = 9;
+  RUNTIME_TRIGGER_KIND_EMAIL = 10;
+  RUNTIME_TRIGGER_KIND_API = 11;
+  RUNTIME_TRIGGER_KIND_WEB = 12;
+  RUNTIME_TRIGGER_KIND_GITHUB_ISSUE_COMMENT = 13;
+  RUNTIME_TRIGGER_KIND_GITHUB_PULL_REQUEST_COMMENT = 14;
+  RUNTIME_TRIGGER_KIND_LINEAR_ACTION = 15;
+  RUNTIME_TRIGGER_KIND_IDE_COMMAND = 16;
+  RUNTIME_TRIGGER_KIND_MONITORING_ALERT = 17;
+  RUNTIME_TRIGGER_KIND_PROACTIVE_PATTERN = 18;
+  RUNTIME_TRIGGER_KIND_SLACK_ASSISTANT_THREAD_STARTED = 19;
+  RUNTIME_TRIGGER_KIND_SLACK_ASSISTANT_THREAD_CONTEXT_CHANGED = 20;
+  RUNTIME_TRIGGER_KIND_CALENDAR_EVENT_CREATED = 21;
+  RUNTIME_TRIGGER_KIND_CALENDAR_EVENT_UPDATED = 22;
+  RUNTIME_TRIGGER_KIND_CALENDAR_EVENT_CANCELLED = 23;
+  RUNTIME_TRIGGER_KIND_TEAMS_MESSAGE = 24;
+  RUNTIME_TRIGGER_KIND_TEAMS_CHANNEL_MENTION = 25;
+  RUNTIME_TRIGGER_KIND_WHATSAPP_DIRECT_MESSAGE = 26;
+  RUNTIME_TRIGGER_KIND_WHATSAPP_GROUP_MESSAGE = 27;
+  RUNTIME_TRIGGER_KIND_WHATSAPP_BUTTON_REPLY = 28;
+}
+
+// RuntimeVisibilityLevel declares whether runtime state can be projected to
+// humans or should remain internal/audit-only. Unspecified values are treated
+// conservatively as agent-only by service helpers and consumers.
+enum RuntimeVisibilityLevel {
+  RUNTIME_VISIBILITY_LEVEL_UNSPECIFIED = 0;
+  RUNTIME_VISIBILITY_LEVEL_AGENT_ONLY = 1;
+  RUNTIME_VISIBILITY_LEVEL_USER_VISIBLE = 2;
+  RUNTIME_VISIBILITY_LEVEL_CHANNEL_VISIBLE = 3;
+  RUNTIME_VISIBILITY_LEVEL_ADMIN_VISIBLE = 4;
+  RUNTIME_VISIBILITY_LEVEL_AUDIT_ONLY = 5;
+}
+
+// RuntimeAudience identifies the audience allowed to see a runtime event or
+// wait projection. Audience is separate from visibility so clients can render a
+// channel-safe summary while keeping admin/audit detail available elsewhere.
+enum RuntimeAudience {
+  RUNTIME_AUDIENCE_UNSPECIFIED = 0;
+  RUNTIME_AUDIENCE_AGENT = 1;
+  RUNTIME_AUDIENCE_TRIGGER_ACTOR = 2;
+  RUNTIME_AUDIENCE_CHANNEL = 3;
+  RUNTIME_AUDIENCE_WORKSPACE_ADMINS = 4;
+  RUNTIME_AUDIENCE_AUDIT = 5;
+  RUNTIME_AUDIENCE_SYSTEM = 6;
+}
+
+// ChannelActionKind classifies the user or integration action submitted from a
+// durable channel surface.
+enum ChannelActionKind {
+  CHANNEL_ACTION_KIND_UNSPECIFIED = 0;
+  CHANNEL_ACTION_KIND_APPROVAL_DECISION = 1;
+  CHANNEL_ACTION_KIND_WAIT_RESUME = 2;
+  CHANNEL_ACTION_KIND_OBJECTIVE_CONTROL = 3;
+  CHANNEL_ACTION_KIND_MEMORY_DECISION = 4;
+  CHANNEL_ACTION_KIND_OPS_COMMAND = 5;
+  CHANNEL_ACTION_KIND_GENERIC = 6;
+  CHANNEL_ACTION_KIND_CODEX_INTERACTION = 7;
+  CHANNEL_ACTION_KIND_BROWSER_CONTROL = 8;
+  CHANNEL_ACTION_KIND_DESKTOP_CONTROL = 9;
+}
+
+// ChannelActionTargetKind identifies the platform object controlled by a
+// channel action.
+enum ChannelActionTargetKind {
+  CHANNEL_ACTION_TARGET_KIND_UNSPECIFIED = 0;
+  CHANNEL_ACTION_TARGET_KIND_RUN = 1;
+  CHANNEL_ACTION_TARGET_KIND_WAIT = 2;
+  CHANNEL_ACTION_TARGET_KIND_APPROVAL = 3;
+  CHANNEL_ACTION_TARGET_KIND_OBJECTIVE = 4;
+  CHANNEL_ACTION_TARGET_KIND_ARTIFACT = 5;
+  CHANNEL_ACTION_TARGET_KIND_MEMORY_CANDIDATE = 6;
+  CHANNEL_ACTION_TARGET_KIND_TOOL_EXECUTION = 7;
+  CHANNEL_ACTION_TARGET_KIND_CODEX_SESSION = 8;
+  CHANNEL_ACTION_TARGET_KIND_PATCH = 9;
+  CHANNEL_ACTION_TARGET_KIND_PULL_REQUEST = 10;
+  CHANNEL_ACTION_TARGET_KIND_BROWSER_SESSION = 11;
+  CHANNEL_ACTION_TARGET_KIND_BROWSER_TAB = 12;
+  CHANNEL_ACTION_TARGET_KIND_BROWSER_NATIVE_HOST = 13;
+  CHANNEL_ACTION_TARGET_KIND_DESKTOP_SESSION = 14;
+}
+
+// ChannelActionAuthorizationOutcome records the actor-resolution and policy
+// decision for a channel action.
+enum ChannelActionAuthorizationOutcome {
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_UNSPECIFIED = 0;
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_ALLOWED = 1;
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_DENIED = 2;
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_UNMAPPED_ACTOR = 3;
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_WRONG_APPROVER = 4;
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_EXPIRED = 5;
+  CHANNEL_ACTION_AUTHORIZATION_OUTCOME_STALE = 6;
+}
+
+// ChannelActionExecutionOutcome records the durable side-effect result for a
+// channel action.
+enum ChannelActionExecutionOutcome {
+  CHANNEL_ACTION_EXECUTION_OUTCOME_UNSPECIFIED = 0;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_PENDING = 1;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_SUCCEEDED = 2;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_FAILED = 3;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_DUPLICATE = 4;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_TARGET_NOT_FOUND = 5;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_ALREADY_RESOLVED = 6;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_UNAUTHORIZED = 7;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_EXPIRED = 8;
+  CHANNEL_ACTION_EXECUTION_OUTCOME_STALE = 9;
+}
+
+// ChannelActionDeliveryOutcome records whether the channel message/update was
+// reconciled after handling an action.
+enum ChannelActionDeliveryOutcome {
+  CHANNEL_ACTION_DELIVERY_OUTCOME_UNSPECIFIED = 0;
+  CHANNEL_ACTION_DELIVERY_OUTCOME_NOT_ATTEMPTED = 1;
+  CHANNEL_ACTION_DELIVERY_OUTCOME_UPDATED = 2;
+  CHANNEL_ACTION_DELIVERY_OUTCOME_FAILED = 3;
+  CHANNEL_ACTION_DELIVERY_OUTCOME_SKIPPED = 4;
+}
+
+// RuntimeSensitivity classifies how carefully runtime payloads must be handled
+// before projection outside Platform.
+enum RuntimeSensitivity {
+  RUNTIME_SENSITIVITY_UNSPECIFIED = 0;
+  RUNTIME_SENSITIVITY_PUBLIC = 1;
+  RUNTIME_SENSITIVITY_INTERNAL = 2;
+  RUNTIME_SENSITIVITY_CONFIDENTIAL = 3;
+  RUNTIME_SENSITIVITY_RESTRICTED = 4;
+}
+
+// RuntimeRedactionKind identifies data categories that were removed or must be
+// removed before channel/user rendering.
+enum RuntimeRedactionKind {
+  RUNTIME_REDACTION_KIND_UNSPECIFIED = 0;
+  RUNTIME_REDACTION_KIND_PII = 1;
+  RUNTIME_REDACTION_KIND_CREDENTIAL = 2;
+  RUNTIME_REDACTION_KIND_TOOL_ARGS = 3;
+  RUNTIME_REDACTION_KIND_POLICY_DETAIL = 4;
+  RUNTIME_REDACTION_KIND_INTERNAL_CONTEXT = 5;
+}
+
+// RuntimeVirtualFileRedactionState mirrors the workspace VFS byte plane's
+// redaction contract so Runtime VFS callers can discover whether content is
+// safe to read, preview-only, already redacted, or denied.
+enum RuntimeVirtualFileRedactionState {
+  RUNTIME_VIRTUAL_FILE_REDACTION_STATE_UNSPECIFIED = 0;
+  RUNTIME_VIRTUAL_FILE_REDACTION_STATE_RAW = 1;
+  RUNTIME_VIRTUAL_FILE_REDACTION_STATE_REDACTED = 2;
+  RUNTIME_VIRTUAL_FILE_REDACTION_STATE_PREVIEW_ONLY = 3;
+  RUNTIME_VIRTUAL_FILE_REDACTION_STATE_DENIED = 4;
+}
+
+// RuntimeWebConversationCoordinates identifies a Platform-owned web thread.
+message RuntimeWebConversationCoordinates {
+  string conversation_id = 1 [(buf.validate.field).string.min_len = 1];
+  string message_id = 2;
+}
+
+// RuntimeSlackThreadCoordinates identifies one Slack conversation thread.
+message RuntimeSlackThreadCoordinates {
+  string provider_workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string channel_id = 2 [(buf.validate.field).string.min_len = 1];
+  string thread_id = 3 [(buf.validate.field).string.min_len = 1];
+  string message_id = 4;
+}
+
+// RuntimeEmailThreadCoordinates identifies one provider mailbox thread.
+message RuntimeEmailThreadCoordinates {
+  string connection_id = 1 [(buf.validate.field).string.min_len = 1];
+  string mailbox_id = 2 [(buf.validate.field).string.min_len = 1];
+  string thread_id = 3 [(buf.validate.field).string.min_len = 1];
+  string message_id = 4;
+  string provider_revision = 5;
+}
+
+// RuntimeCalendarEventCoordinates identifies one event or recurring instance.
+message RuntimeCalendarEventCoordinates {
+  string connection_id = 1 [(buf.validate.field).string.min_len = 1];
+  string calendar_id = 2 [(buf.validate.field).string.min_len = 1];
+  string event_id = 3 [(buf.validate.field).string.min_len = 1];
+  string recurring_series_id = 4;
+  string recurring_instance_id = 5;
+  string provider_revision = 6;
+}
+
+// RuntimeTeamsThreadCoordinates identifies one Microsoft Teams chat or channel
+// thread. tenant_id is the Microsoft tenant, conversation_id is the channel or
+// chat, and thread_id is the reply-chain root (the message itself when there is
+// no thread).
+message RuntimeTeamsThreadCoordinates {
+  string tenant_id = 1 [(buf.validate.field).string.min_len = 1];
+  string conversation_id = 2 [(buf.validate.field).string.min_len = 1];
+  string thread_id = 3 [(buf.validate.field).string.min_len = 1];
+  string message_id = 4;
+}
+
+// RuntimeWhatsAppConversationCoordinates identifies one WhatsApp Business
+// conversation. chat_id is the peer wa_id for a 1:1 chat or the group id.
+message RuntimeWhatsAppConversationCoordinates {
+  string waba_id = 1 [(buf.validate.field).string.min_len = 1];
+  string phone_number_id = 2 [(buf.validate.field).string.min_len = 1];
+  string chat_id = 3 [(buf.validate.field).string.min_len = 1];
+  string message_id = 4;
+}
+
+// RuntimeChannelContext carries stable channel coordinates for channel
+// adapters. Slack teammates use provider_workspace_id for team_id, channel_id
+// for the conversation, thread_id for the Slack thread_ts, and message_id for
+// the triggering message/event timestamp.
+message RuntimeChannelContext {
+  RuntimeChannelKind channel_kind = 1 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 2;
+  string channel_id = 3;
+  string thread_id = 4;
+  string message_id = 5;
+  // Deprecated overloaded actor field. New Slack and channel adapters should
+  // set actor_channel_id for the provider-local respondent, actor_entity_id for
+  // the resolved canonical entity, and principal_id for the authenticated
+  // platform principal when available.
+  string actor_id = 6;
+  string permalink = 7;
+  map<string, string> attributes = 8;
+  string actor_channel_id = 9;
+  string actor_entity_id = 10;
+  string principal_id = 11;
+  // coordinates is the canonical provider-specific identity for new channel
+  // adapters. Flat fields 2 through 5 remain for wire-compatible migration.
+  oneof coordinates {
+    RuntimeWebConversationCoordinates web = 12;
+    RuntimeSlackThreadCoordinates slack = 13;
+    RuntimeEmailThreadCoordinates email = 14;
+    RuntimeCalendarEventCoordinates calendar = 15;
+    RuntimeTeamsThreadCoordinates teams = 16;
+    RuntimeWhatsAppConversationCoordinates whatsapp = 17;
+  }
+}
+
+// RuntimeWorkEnvelope identifies the durable work object that groups related
+// normalized triggers. For Slack this is usually a conversation thread; future
+// adapters can map email threads, Jira tickets, calendar events, and Teams
+// threads into the same runtime primitive.
+message RuntimeWorkEnvelope {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+  RuntimeWorkEnvelopeKind kind = 2 [(buf.validate.field).enum.defined_only = true];
+  string root_id = 3;
+  string parent_id = 4;
+  map<string, string> attributes = 5;
+}
+
+// RuntimeProactiveSourceEvent identifies the upstream event that caused a
+// proactive trigger candidate without copying the full source payload into the
+// runtime record.
+message RuntimeProactiveSourceEvent {
+  string stream = 1;
+  string subject = 2;
+  uint64 sequence = 3;
+  string event_id = 4;
+  string event_family = 5;
+  string event_type = 6;
+  string provider_object_id = 7;
+  string provider_id = 8;
+  string connection_id = 9;
+  string provider_revision = 10;
+}
+
+// RuntimeProactivePolicy carries teammate/channel wake controls in the same
+// trigger contract that AgentRuntime admission evaluates.
+message RuntimeProactivePolicy {
+  optional bool wake_enabled = 1;
+  repeated string trigger_kinds = 2;
+  bool allow_customer_facing = 3;
+  bool post_run_started = 4;
+}
+
+// RuntimeSourceHealthSummary is the compact source-health projection used by
+// proactive runtime context. Cerebro remains the source of truth for detailed
+// health records.
+message RuntimeSourceHealthSummary {
+  string status = 1;
+  repeated string checked_sources = 2;
+  repeated string stale_sources = 3;
+  string summary = 4;
+}
+
+// RuntimeCerebroFactsContext carries the identifiers and retrieval counts that
+// let AgentRuntime, Ensemble, and operators trace a proactive run back to
+// Cerebro without parsing payload maps.
+message RuntimeCerebroFactsContext {
+  string provider = 1;
+  string workspace_id = 2;
+  string query = 3;
+  repeated string thing_ids = 4;
+  repeated string fact_ids = 5;
+  repeated string event_ids = 6;
+  RuntimeSourceHealthSummary source_health_summary = 7;
+  string belief_debug_summary = 8;
+  string rollout_id = 9;
+  string rollout_summary = 10;
+  string rollout_result = 11;
+  map<string, int64> retrieval_counts = 12 [(buf.validate.field).map.values.int64.gte = 0];
+}
+
+// RuntimeProactiveContext is the first-class proactive trigger envelope. It
+// keeps event identity, policy hints, risk hints, and Cerebro context out of
+// ad hoc trigger payload conventions.
+message RuntimeProactiveContext {
+  bool proactive_runtime = 1;
+  string proactive_ingest = 2;
+  RuntimeProactiveSourceEvent source_event = 3;
+  repeated string thing_ids = 4;
+  string action_class = 5;
+  string risk_level = 6;
+  bool external_side_effect = 7;
+  RuntimeCerebroFactsContext facts_context = 8;
+  RuntimeProactivePolicy policy = 9;
+}
+
+// RuntimeRedaction records one projected field or payload category that has
+// been redacted for channel/user display.
+message RuntimeRedaction {
+  RuntimeRedactionKind kind = 1 [(buf.validate.field).enum.defined_only = true];
+  string field_path = 2;
+  string replacement = 3;
+  string reason = 4;
+}
+
+// RuntimeVisibilityMetadata carries the projection policy for runtime events
+// and waits. Safe summaries are required when visibility is user/channel
+// visible so clients never need to render raw internal payloads.
+message RuntimeVisibilityMetadata {
+  RuntimeVisibilityLevel level = 1 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeAudience audiences = 2 [(buf.validate.field).repeated.items.enum.defined_only = true];
+  RuntimeSensitivity sensitivity = 3 [(buf.validate.field).enum.defined_only = true];
+  string safe_summary = 4;
+  repeated RuntimeRedaction redactions = 5;
+  map<string, string> attributes = 6;
+}
+
+// ChannelActionActor captures the channel coordinates and resolved platform
+// identity for the actor who submitted an action.
+message ChannelActionActor {
+  RuntimeChannelKind channel_kind = 1 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 2;
+  string channel_id = 3;
+  string thread_id = 4;
+  string message_id = 5;
+  string action_id = 6;
+  string callback_id = 7;
+  string actor_channel_id = 8;
+  string actor_entity_id = 9;
+  string principal_id = 10;
+  map<string, string> attributes = 11;
+}
+
+// ChannelActionReceipt is the durable audit and idempotency record for a
+// user-visible action submitted through a channel adapter.
+message ChannelActionReceipt {
+  string id = 1;
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string idempotency_key = 3 [(buf.validate.field).string.min_len = 1];
+  string request_hash = 4;
+  common.v1.Surface surface_type = 5 [(buf.validate.field).enum.defined_only = true];
+  ChannelActionKind action_kind = 6 [(buf.validate.field).enum.defined_only = true];
+  ChannelActionTargetKind target_kind = 7 [(buf.validate.field).enum.defined_only = true];
+  string target_id = 8;
+  string run_id = 9;
+  string wait_id = 10;
+  string approval_request_id = 11;
+  string objective_id = 12;
+  ChannelActionActor actor = 13;
+  google.protobuf.Struct payload = 14;
+  ChannelActionAuthorizationOutcome authorization_outcome = 15 [(buf.validate.field).enum.defined_only = true];
+  ChannelActionExecutionOutcome execution_outcome = 16 [(buf.validate.field).enum.defined_only = true];
+  ChannelActionDeliveryOutcome delivery_outcome = 17 [(buf.validate.field).enum.defined_only = true];
+  string reason = 18;
+  string error_reason = 19;
+  google.protobuf.Timestamp created_at = 20;
+  google.protobuf.Timestamp updated_at = 21;
+  codex.v1.CodexInteractionDecision codex_interaction_decision = 22;
+}
+
+// NormalizedTrigger is the source-neutral trigger contract. Surface is an enum
+// so product callers share one durable taxonomy across Slack, Ensemble, Chat,
+// Maestro, and Conductor. The legacy string field remains for wire-compatible
+// migration of early callers.
+message NormalizedTrigger {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 2 [(buf.validate.field).string.min_len = 1];
+  string surface = 3 [deprecated = true];
+  // Deprecated flat channel field. New callers should send channel_context;
+  // the runtime normalizes this field for legacy consumers and idempotency
+  // joins.
+  string channel_id = 4;
+  string idempotency_key = 5 [(buf.validate.field).string.min_len = 1];
+  string source_event_id = 6;
+  string source_event_type = 7 [deprecated = true];
+  string actor_id = 8;
+  string correlation_id = 9;
+  google.protobuf.Struct payload = 10;
+  google.protobuf.Timestamp received_at = 11;
+  common.v1.Surface surface_type = 12 [(buf.validate.field).enum.defined_only = true];
+  RuntimeChannelContext channel_context = 13;
+  RuntimeTriggerKind trigger_kind = 14 [(buf.validate.field).enum.defined_only = true];
+  RuntimeWorkEnvelope work_envelope = 15;
+  codex.v1.CodexWorkRequest codex_work = 16;
+  RuntimeProactiveContext proactive_context = 17;
+  // objective_id binds a trigger to an already-created Objective. Console and
+  // other product surfaces use this when the user message first creates the
+  // Objective, so AgentRuntime does not have to rediscover the active goal.
+  string objective_id = 18;
+  string organization_id = 19 [(buf.validate.field).string.min_len = 1];
+}
+
+// RuntimeContext captures the boundary decisions used to construct a run.
+message RuntimeContext {
+  repeated RuntimeDependency dependencies = 1;
+  map<string, string> attributes = 2;
+  repeated RuntimeVirtualFile virtual_files = 3;
+  // Typed profile for persistent teammate runtime capabilities. Workers and
+  // channel renderers should use this field as the source of truth; any VFS
+  // JSON projection is only a compatibility/read surface.
+  TeammateCapabilityProfile teammate_capability_profile = 4;
+}
+
+// TeammateCapabilityProfile describes the runtime capability and isolation
+// contract Platform grants to a persistent teammate run.
+message TeammateCapabilityProfile {
+  string schema_version = 1;
+  string run_id = 2;
+  string workspace_id = 3;
+  string agent_id = 4;
+  string work_envelope_id = 5;
+  string work_envelope_kind = 6;
+  string surface = 7;
+  string channel_kind = 8;
+  string execution_owner = 9;
+  string channel_ingress_owner = 10;
+  string channel_renderer = 11;
+  string scheduler_owner = 12;
+  string memory_owner = 13;
+  string evidence_owner = 14;
+  string privilege_model = 15;
+  bool always_on = 16;
+  bool ambient = 17;
+  repeated TeammateCapability capabilities = 18;
+  repeated TeammateExecutionStep execution_path = 19;
+  repeated string isolation_boundaries = 20;
+  repeated string context_paths = 21;
+  repeated string guardrails = 22;
+}
+
+// TeammateCapability is one Platform-owned capability made available to a run.
+message TeammateCapability {
+  string id = 1;
+  string owner = 2;
+  repeated string contract_paths = 3;
+  repeated string rpcs = 4;
+  string isolation = 5;
+  bool slack_visible = 6;
+  bool requires_lease = 7;
+  bool proposal_only = 8;
+  bool evidence_backed = 9;
+}
+
+// TeammateExecutionStep is the concise ownership path for capability use.
+message TeammateExecutionStep {
+  string id = 1;
+  string owner = 2;
+  repeated string reads = 3;
+  repeated string writes = 4;
+  repeated string rpcs = 5;
+  string isolation = 6;
+  string slack_behavior = 7;
+}
+
+// RuntimeVirtualFile is a read-only file projected into an agent run from
+// platform services. It lets workers consume rich context through a stable VFS
+// instead of parsing flat runtime attributes.
+message RuntimeVirtualFile {
+  string path = 1 [(buf.validate.field).string.min_len = 1];
+  string media_type = 2;
+  string content = 3;
+  string source_service = 4;
+  string source_reference_id = 5;
+  map<string, string> metadata = 6;
+  RuntimeVirtualFileProvenance provenance = 7;
+  RuntimeSensitivity sensitivity = 8 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileRedactionState redaction_state = 9 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeRedaction redactions = 10;
+}
+
+// RuntimeVirtualFileProvenance is the typed causal projection for a VFS
+// revision. Producers still preserve legacy metadata keys, but workers should
+// prefer this shape when explaining, citing, promoting, or rebasing files.
+message RuntimeVirtualFileProvenance {
+  string producer_service = 1;
+  string producer_kind = 2;
+  string source_reference_id = 3;
+  string runtime_event_id = 4;
+  string artifact_id = 5;
+  string step_id = 6;
+  string tool_execution_id = 7;
+  string hydration_id = 8;
+  string transaction_id = 9;
+  string promotion_id = 10;
+  string evidence_handle = 11;
+  string trace_id = 12;
+  string span_id = 13;
+  repeated string parent_revision_ids = 14;
+  string provider_id = 15;
+  string connection_id = 16;
+}
+
+// RuntimeVirtualFileEntry is an ls/stat-friendly projection of one virtual
+// file. It intentionally omits content so callers can discover before reading.
+message RuntimeVirtualFileEntry {
+  string path = 1;
+  string media_type = 2;
+  string source_service = 3;
+  string source_reference_id = 4;
+  map<string, string> metadata = 5;
+  int64 size_bytes = 6 [(buf.validate.field).int64.gte = 0];
+  string content_sha256 = 7;
+  bool content_truncated = 8;
+  string mount = 9;
+  string kind = 10;
+  string permissions = 11;
+  string view = 12;
+  string revision_id = 13;
+  string parent_revision_id = 14;
+  string provider_id = 15;
+  string connection_id = 16;
+  string cache_policy = 17;
+  string policy = 18;
+  bool lazy = 19;
+  int32 secret_ref_count = 20 [(buf.validate.field).int32.gte = 0];
+  string cerebro_index = 21;
+  string content_address = 22;
+  RuntimeVirtualFileProvenance provenance = 23;
+  RuntimeSensitivity sensitivity = 24 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileRedactionState redaction_state = 25 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeRedaction redactions = 26;
+  RuntimeVirtualFileOperation operation = 27 [(buf.validate.field).enum.defined_only = true];
+  bool tombstone = 28;
+  string rename_from = 29;
+  string rename_to = 30;
+  repeated string capabilities = 31;
+  bool writable = 32;
+  bool read_only = 33;
+  bool generated = 34;
+  bool evidence_backed = 35;
+  bool externally_indexed = 36;
+}
+
+enum RuntimeVirtualFileOperation {
+  RUNTIME_VIRTUAL_FILE_OPERATION_UNSPECIFIED = 0;
+  RUNTIME_VIRTUAL_FILE_OPERATION_WRITE = 1;
+  RUNTIME_VIRTUAL_FILE_OPERATION_DELETE = 2;
+  RUNTIME_VIRTUAL_FILE_OPERATION_RENAME = 3;
+}
+
+// RuntimeVirtualFileReasonCode is a stable, machine-readable reason taxonomy
+// for VFS skips and precondition failures. Human strings may evolve; clients
+// should branch on this enum.
+enum RuntimeVirtualFileReasonCode {
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_UNSPECIFIED = 0;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_NOT_FOUND = 1;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_FILTERED_OUT = 2;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_TOTAL_BUDGET_EXHAUSTED = 3;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_PATH_INVALID = 4;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_CAPABILITY_DENIED = 5;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_REVISION_CONFLICT = 6;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_CURSOR_LAGGED = 7;
+  RUNTIME_VIRTUAL_FILE_REASON_CODE_TEMPORARILY_UNAVAILABLE = 8;
+}
+
+// RuntimeVirtualFileMatch is one bounded search match in a virtual file.
+message RuntimeVirtualFileMatch {
+  string path = 1;
+  int32 line_number = 2 [(buf.validate.field).int32.gte = 0];
+  string snippet = 3;
+  string mount = 4;
+  string source_service = 5;
+  repeated string before_context = 6;
+  repeated string after_context = 7;
+  int32 score = 8 [(buf.validate.field).int32.gte = 0];
+  repeated string match_reasons = 9;
+  string view = 10;
+  string kind = 11;
+  string transaction_id = 12;
+}
+
+// RuntimeDependency names one platform service boundary the runtime depends on.
+message RuntimeDependency {
+  string service = 1 [(buf.validate.field).string.min_len = 1];
+  string purpose = 2;
+  bool required = 3;
+  string status = 4 [deprecated = true];
+  string reference_id = 5;
+  RuntimeDependencyStatus status_type = 6 [(buf.validate.field).enum.defined_only = true];
+}
+
+// AgentRunLinkage carries the shared identifiers every durable run record uses
+// for partitioning, authorization, and audit joins.
+message AgentRunLinkage {
+  string run_id = 1;
+  string workspace_id = 2;
+  string agent_id = 3;
+  string objective_id = 4;
+}
+
+// RuntimeTraceContext captures the W3C trace context that causally owns a
+// durable AgentRun lifecycle record. It is persisted with runs, events, and
+// steps so retries, worker claims, and parked waits can resume the same
+// distributed trace instead of starting unrelated service-local traces.
+message RuntimeTraceContext {
+  string trace_id = 1;
+  string span_id = 2;
+  string parent_span_id = 3;
+  string traceparent = 4;
+  string tracestate = 5;
+}
+
+// AgentRun is the canonical agent runtime execution record. It owns the
+// durable child records needed to resume from checkpoints and audit each
+// attempt without replaying model/tool side effects.
+message AgentRun {
+  string id = 1;
+  NormalizedTrigger trigger = 2;
+  AgentRunState state = 3;
+  agents.v1.Agent agent = 4;
+  agents.v1.AgentConfig agent_config = 5;
+  objectives.v1.Objective objective = 6;
+  RuntimeContext context = 7;
+  string worker_queue = 8;
+  string error_message = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+
+  AgentRunLinkage linkage = 12;
+  int32 attempt = 15;
+  int32 max_attempts = 16;
+  AgentRunLease lease = 17;
+  AgentRunCheckpoint latest_checkpoint = 18;
+  repeated AgentRunStep steps = 19;
+  repeated AgentRunWait waits = 20;
+  repeated AgentRunArtifact artifacts = 21;
+  repeated AgentRunCost costs = 22;
+  repeated AgentRunStreamCursor stream_cursors = 23;
+  google.protobuf.Timestamp queued_at = 24;
+  google.protobuf.Timestamp started_at = 25;
+  google.protobuf.Timestamp waiting_at = 26;
+  google.protobuf.Timestamp completed_at = 27;
+  google.protobuf.Timestamp cancelled_at = 28;
+  google.protobuf.Timestamp next_retry_at = 29;
+  google.protobuf.Timestamp dead_lettered_at = 30;
+  string cancellation_reason = 31;
+  string dead_letter_reason = 32;
+  repeated AgentRunCheckpoint checkpoints = 33;
+  RuntimeTraceContext trace_context = 34;
+  string autonomy_session_id = 35;
+}
+
+// AgentRunLease is the claim token a worker must present while mutating a run.
+message AgentRunLease {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string worker_id = 6;
+  string token = 7;
+  string worker_queue = 8;
+  int32 attempt = 9;
+  google.protobuf.Timestamp claimed_at = 10;
+  google.protobuf.Timestamp heartbeat_at = 11;
+  google.protobuf.Timestamp expires_at = 12;
+}
+
+// AgentRunStep is one durable unit of work within a run.
+message AgentRunStep {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string name = 6;
+  string kind = 7 [deprecated = true];
+  AgentRunStepState state = 8;
+  int32 attempt = 9;
+  google.protobuf.Struct input = 10;
+  google.protobuf.Struct output = 11;
+  string error_message = 12;
+  string checkpoint_id = 13;
+  google.protobuf.Timestamp started_at = 14;
+  google.protobuf.Timestamp ended_at = 15;
+  AgentRunStepKind step_kind = 16 [(buf.validate.field).enum.defined_only = true];
+  codex.v1.CodexRunProgress codex_progress = 17;
+  RuntimeTraceContext trace_context = 18;
+}
+
+// AgentRunCheckpoint is an opaque resume snapshot. Workers can deserialize the
+// payload they own, restore local state, and continue from the next step.
+message AgentRunCheckpoint {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string step_id = 6;
+  int64 sequence = 7;
+  string resume_token = 8;
+  google.protobuf.Struct payload = 9;
+  google.protobuf.Timestamp created_at = 10;
+}
+
+// AgentRunWait records a parked run. While active, the run has no lease and no
+// worker compute should be held.
+message AgentRunWait {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string step_id = 6;
+  AgentRunWaitType type = 7;
+  string external_ref = 8;
+  string reason = 9;
+  google.protobuf.Struct payload = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp resume_after = 12;
+  google.protobuf.Timestamp expires_at = 13;
+  google.protobuf.Timestamp resolved_at = 14;
+  string resolved_by_event_id = 15;
+  RuntimeVisibilityMetadata visibility = 16;
+  codex.v1.CodexInteractionRequest codex_interaction = 17;
+}
+
+// AgentRunArtifact records durable output produced by a run or step.
+message AgentRunArtifact {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string step_id = 6;
+  string artifact_type = 7 [deprecated = true];
+  string uri = 8;
+  string content_type = 9;
+  string digest = 10;
+  google.protobuf.Struct metadata = 11;
+  google.protobuf.Timestamp created_at = 12;
+  AgentRunArtifactKind artifact_kind = 16 [(buf.validate.field).enum.defined_only = true];
+  codex.v1.CodexOutputTarget codex_output = 17;
+}
+
+// AgentRunCost records metering information associated with a run or step.
+message AgentRunCost {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string step_id = 6;
+  string meter_ref = 7;
+  string provider = 8;
+  string model = 9;
+  int64 input_tokens = 10;
+  int64 output_tokens = 11;
+  int64 total_tokens = 12;
+  string currency = 13;
+  int64 estimated_cost_micros = 14;
+  google.protobuf.Timestamp recorded_at = 15;
+}
+
+// AgentRunStreamCursor stores a consumer cursor into the append-only event log.
+message AgentRunStreamCursor {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string consumer = 4;
+  int64 next_sequence = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+// RuntimeEvent is appended, never mutated, for AgentRun state transitions and
+// runtime orchestration decisions.
+message RuntimeEvent {
+  string id = 1;
+  string run_id = 2;
+  int64 sequence = 3;
+  RuntimeEventType type = 4;
+  string message = 5;
+  google.protobuf.Struct attributes = 6;
+  google.protobuf.Timestamp occurred_at = 7;
+  string step_id = 11;
+  string checkpoint_id = 12;
+  string artifact_id = 13;
+  string cost_id = 14;
+  string wait_id = 15;
+  AgentRunLinkage linkage = 16;
+  RuntimeVisibilityMetadata visibility = 17;
+  codex.v1.CodexRunProgress codex_progress = 18;
+  codex.v1.CodexInteractionRequest codex_interaction = 19;
+  codex.v1.CodexOutcomeSignal codex_outcome = 20;
+  RuntimeTraceContext trace_context = 21;
+  NativeToolAttemptEvidence native_tool_attempt = 22;
+  NativeAgentEventEvidence native_agent_event = 23;
+}
+
+// RuntimeEvidenceGap records a typed, safe reason why a runtime observation is
+// not yet approval-ready. It carries only proof-state metadata and debug refs;
+// raw credentials, grants, prompts, and tool arguments must not be copied here.
+message RuntimeEvidenceGap {
+  RuntimeEvidenceGapReason reason = 1 [(buf.validate.field).enum.defined_only = true];
+  RuntimeEvidenceState evidence_state = 2 [(buf.validate.field).enum.defined_only = true];
+  string message = 3;
+  string source = 4;
+  string source_event_id = 5;
+  string runtime_event_id = 6;
+  string trace_id = 7;
+  bool approval_blocking = 8;
+}
+
+// NativeToolAttemptEvidence is the typed Platform primitive for answering
+// "What did the agent try to do?" from a native Maestro/Codex tool-attempt
+// event. It intentionally carries only redaction-safe identifiers, summaries,
+// and digest references; raw prompts, tool arguments, and credential grants
+// must not be copied here.
+message NativeToolAttemptEvidence {
+  RuntimeEvidenceState evidence_state = 1 [(buf.validate.field).enum.defined_only = true];
+  RuntimeEvidenceState credential_evidence_state = 2 [(buf.validate.field).enum.defined_only = true];
+  string native_kind = 3 [(buf.validate.field).string.min_len = 1];
+  string source_event_id = 4 [(buf.validate.field).string.min_len = 1];
+  string source_event_type = 5;
+  string source_event_source = 6;
+  string source_event_subject = 7;
+  string tenant_id = 8;
+  string organization_id = 9;
+  string workspace_id = 10 [(buf.validate.field).string.min_len = 1];
+  string session_id = 11;
+  string agent_run_id = 12 [(buf.validate.field).string.min_len = 1];
+  string agent_run_step_id = 13;
+  string agent_id = 14;
+  string actor_id = 15;
+  string principal_id = 16;
+  string trace_id = 17;
+  string request_id = 18;
+  string response_id = 19;
+  string parent_event_id = 20;
+  string tool_call_id = 21 [(buf.validate.field).string.min_len = 1];
+  string tool_execution_id = 22;
+  string tool_namespace = 23;
+  string tool_name = 24 [(buf.validate.field).string.min_len = 1];
+  string tool_version = 25;
+  string capability = 26;
+  string connector_id = 27;
+  bool mutates_resource = 28;
+  common.v1.RiskLevel risk_level = 29 [(buf.validate.field).enum.defined_only = true];
+  bool arguments_redacted = 30;
+  string safe_arguments_ref = 31;
+  string safe_arguments_sha256 = 32;
+  int32 safe_arguments_key_count = 33 [(buf.validate.field).int32.gte = 0];
+  int32 redaction_count = 34 [(buf.validate.field).int32.gte = 0];
+  repeated string redactions = 35;
+  repeated RuntimeEvidenceGap evidence_gaps = 36;
+  google.protobuf.Timestamp source_event_time = 37;
+  RuntimeEvidenceState principal_evidence_state = 38 [(buf.validate.field).enum.defined_only = true];
+  RuntimeEvidenceState cost_evidence_state = 39 [(buf.validate.field).enum.defined_only = true];
+}
+
+// NativeAgentEventEvidence is the typed receipt primitive for safe native
+// Agent Workforce events from Maestro and Codex. It carries source/correlation
+// identifiers, redaction metadata, and safe refs only; raw prompts, tool
+// arguments, shell output, MCP result bodies, image bytes, transcripts, token
+// values, provider response bodies, and credential grants must not be copied
+// here.
+message NativeAgentEventEvidence {
+  RuntimeEvidenceState evidence_state = 1 [(buf.validate.field).enum.defined_only = true];
+  RuntimeEvidenceState principal_evidence_state = 2 [(buf.validate.field).enum.defined_only = true];
+  RuntimeEvidenceState credential_evidence_state = 3 [(buf.validate.field).enum.defined_only = true];
+  RuntimeEvidenceState cost_evidence_state = 4 [(buf.validate.field).enum.defined_only = true];
+  NativeAgentEventSource native_source = 5 [(buf.validate.field).enum.defined_only = true];
+  string native_kind = 6 [(buf.validate.field).string.min_len = 1];
+  string source_event_id = 7 [(buf.validate.field).string.min_len = 1];
+  string source_event_type = 8 [(buf.validate.field).string.min_len = 1];
+  google.protobuf.Timestamp source_event_time = 9 [(buf.validate.field).required = true];
+  string tenant_id = 10;
+  string organization_id = 11;
+  string workspace_id = 12 [(buf.validate.field).string.min_len = 1];
+  string session_id = 13;
+  string agent_run_id = 14 [(buf.validate.field).string.min_len = 1];
+  string agent_run_step_id = 15;
+  string agent_id = 16;
+  string actor_id = 17;
+  string principal_id = 18;
+  string thread_id = 19;
+  string turn_id = 20;
+  string trace_id = 21;
+  string request_id = 22;
+  string response_id = 23;
+  string parent_event_id = 24;
+  string tool_call_id = 25;
+  string tool_execution_id = 26;
+  string action_id = 27;
+  string tool_namespace = 28;
+  string tool_name = 29;
+  string tool_version = 30;
+  string capability = 31;
+  string connector_id = 32;
+  bool mutates_resource = 33;
+  common.v1.RiskLevel risk_level = 34 [(buf.validate.field).enum.defined_only = true];
+  bool arguments_redacted = 35;
+  bool output_redacted = 36;
+  string safe_arguments_ref = 37;
+  string safe_arguments_sha256 = 38;
+  int32 safe_arguments_key_count = 39 [(buf.validate.field).int32.gte = 0];
+  string safe_output_ref = 40;
+  string safe_output_sha256 = 41;
+  int32 safe_output_key_count = 42 [(buf.validate.field).int32.gte = 0];
+  int32 redaction_count = 43 [(buf.validate.field).int32.gte = 0];
+  repeated string redactions = 44;
+  repeated RuntimeEvidenceGap evidence_gaps = 45;
+  string schema = 46 [(buf.validate.field).string.min_len = 1];
+}
+
+// AgentAutonomySession is the durable teammate session projected over one
+// objective/work envelope. Platform owns this identity so Slack can wake,
+// steer, or inspect the same autonomous worker without becoming the run loop.
+message AgentAutonomySession {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string work_envelope_id = 3;
+  RuntimeWorkEnvelopeKind work_envelope_kind = 4 [(buf.validate.field).enum.defined_only = true];
+  RuntimeChannelContext channel_context = 5;
+  AutonomySessionState state = 6 [(buf.validate.field).enum.defined_only = true];
+  AutonomyProcessingState processing_state = 7 [(buf.validate.field).enum.defined_only = true];
+  string processing_summary = 8;
+  string root_run_id = 9;
+  string active_run_id = 10;
+  string current_goal = 11;
+  string next_action = 12;
+  string blocker = 13;
+  string processing_message_ts = 14;
+  string assistant_stream_ts = 15;
+  string last_presence_event_id = 16;
+  google.protobuf.Timestamp last_presence_update_at = 17;
+  bool final_response_pending = 18;
+  google.protobuf.Timestamp created_at = 19;
+  google.protobuf.Timestamp updated_at = 20;
+}
+
+// AgentWorkItem is one node in the autonomous work graph. Workers and
+// reconcilers mutate this typed record directly; VFS ledgers are projections.
+message AgentWorkItem {
+  string id = 1;
+  AgentRunLinkage linkage = 2;
+  string autonomy_session_id = 3;
+  string run_id = 4;
+  string work_envelope_id = 5;
+  string parent_work_item_id = 6;
+  string owner_child_run_id = 7;
+  AgentWorkItemKind kind = 8 [(buf.validate.field).enum.defined_only = true];
+  AgentWorkItemState state = 9 [(buf.validate.field).enum.defined_only = true];
+  string title = 10;
+  string goal = 11;
+  string next_action = 12;
+  string blocker = 13;
+  string wait_id = 14;
+  string tool_execution_id = 15;
+  repeated string evidence_refs = 16;
+  string completion_gate = 17;
+  google.protobuf.Struct payload = 18;
+  google.protobuf.Timestamp created_at = 19;
+  google.protobuf.Timestamp updated_at = 20;
+  google.protobuf.Timestamp started_at = 21;
+  google.protobuf.Timestamp completed_at = 22;
+  google.protobuf.Timestamp failed_at = 23;
+  google.protobuf.Timestamp cancelled_at = 24;
+}
+
+message HandleTriggerRequest {
+  NormalizedTrigger trigger = 1 [(buf.validate.field).required = true];
+}
+
+message HandleTriggerResponse {
+  AgentRun run = 1;
+  repeated RuntimeEvent events = 2;
+  bool idempotent_replay = 3;
+}
+
+// Safe attachment metadata accepted from a channel edge. Provider download
+// URLs, credentials, and raw attachment bodies are intentionally excluded.
+message OperatingChannelAttachmentMetadata {
+  string provider_attachment_id = 1 [(buf.validate.field).string.min_len = 1];
+  string kind = 2;
+  string media_type = 3;
+  string name = 4;
+  int64 size_bytes = 5 [(buf.validate.field).int64.gte = 0];
+}
+
+// A bounded interactive action submitted by a signed channel edge. The token
+// is opaque to the edge and must be validated by Platform before it resolves
+// any canonical receipt, question, or session control.
+message OperatingChannelInteraction {
+  string action_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  string action_token = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 4096
+  }];
+  string action_timestamp = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 64
+  }];
+}
+
+// Email reply coordinates authenticated by the email edge and validated against
+// the resolved mailbox installation before persistence. Never model authority.
+message OperatingChannelEmailMetadata {
+  string mailbox = 1 [(buf.validate.field).string.max_len = 254];
+  string sender = 2 [(buf.validate.field).string.max_len = 254];
+  string subject = 3 [(buf.validate.field).string.max_len = 512];
+}
+
+// Provider-coordinate admission deliberately has no organization_id or
+// workspace_id fields. Those authority-bearing coordinates are resolved by
+// Platform through ConnectorService before any durable tenant write occurs.
+message AdmitOperatingChannelEventRequest {
+  string provider_id = 1 [(buf.validate.field).string.min_len = 1];
+  string provider_app_id = 2 [(buf.validate.field).string.min_len = 1];
+  string provider_workspace_id = 3 [(buf.validate.field).string.min_len = 1];
+  string provider_enterprise_id = 4;
+  string source_event_id = 5 [(buf.validate.field).string.min_len = 1];
+  string source_event_type = 6 [(buf.validate.field).string.min_len = 1];
+  string provider_channel_id = 7 [(buf.validate.field).string.min_len = 1];
+  string provider_root_thread_id = 8 [(buf.validate.field).string.min_len = 1];
+  string provider_message_id = 9 [(buf.validate.field).string.min_len = 1];
+  string actor_subject = 10 [(buf.validate.field).string.min_len = 1];
+  string normalized_text = 11;
+  repeated OperatingChannelAttachmentMetadata attachments = 12;
+  string traceparent = 13;
+  string tracestate = 14;
+  bool direct_conversation = 15;
+  bool explicit_mention = 16;
+  OperatingChannelInteraction interaction = 17;
+  // Short-lived Slack RTS authority from the triggering message/app_mention.
+  // Server-owned execution context; never forwarded to the model or receipts.
+  string slack_rts_action_token = 18;
+  repeated OperatingChannelContextEntity context_entities = 19 [(buf.validate.field).repeated.max_items = 20];
+  // Authenticated provider callback endpoint used only for outbound transport.
+  // Platform validates and persists this outside model-visible context.
+  string provider_delivery_endpoint = 20 [(buf.validate.field).string.max_len = 2048];
+  OperatingChannelEmailMetadata email = 21;
+}
+
+message AdmitOperatingChannelEventResponse {
+  bool accepted = 1;
+  bool duplicate = 2;
+  string ignored_reason = 3;
+  string conversation_id = 4;
+  string turn_id = 5;
+}
+
+message SurfaceInvocationActor {
+  string external_id = 1 [(buf.validate.field).string.min_len = 1];
+  string display_name = 2 [(buf.validate.field).string.max_len = 512];
+}
+
+message SurfaceInvocationTarget {
+  SurfaceTargetKind kind = 1 [(buf.validate.field).enum.defined_only = true];
+  string external_id = 2 [(buf.validate.field).string.min_len = 1];
+  string parent_external_id = 3 [(buf.validate.field).string.max_len = 512];
+  string revision = 4 [(buf.validate.field).string.max_len = 512];
+  string canonical_url = 5 [(buf.validate.field).string.max_len = 2048];
+}
+
+message SurfaceInvocationTrigger {
+  string kind = 1 [(buf.validate.field).string.min_len = 1];
+  string external_id = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message SurfaceInvocationAttachmentRef {
+  string external_id = 1 [(buf.validate.field).string.min_len = 1];
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+  string content_type = 3 [(buf.validate.field).string.max_len = 255];
+  string canonical_url = 4 [(buf.validate.field).string.max_len = 2048];
+}
+
+message SurfaceInvocationContextRef {
+  string kind = 1 [(buf.validate.field).string.min_len = 1];
+  string external_id = 2 [(buf.validate.field).string.min_len = 1];
+  string canonical_url = 3 [(buf.validate.field).string.max_len = 2048];
+}
+
+// A bounded provider-native context snapshot captured by the authenticated
+// edge. `content` is model-visible context, while the remaining fields bind it
+// to the provider read or signed delivery that produced it. Snapshots confer
+// no tenant or mutation authority.
+message SurfaceInvocationContextSnapshot {
+  string source_kind = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  string source_external_id = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+  string source_revision = 3 [(buf.validate.field).string.max_len = 512];
+  // Digest of the complete authenticated provider payload or governed read
+  // response from which `content` was selected.
+  string source_payload_sha256 = 4 [(buf.validate.field).string.pattern = "^[0-9a-f]{64}$"];
+  google.protobuf.Timestamp observed_at = 5;
+  google.protobuf.Struct content = 6;
+}
+
+enum SurfaceInvocationControl {
+  SURFACE_INVOCATION_CONTROL_UNSPECIFIED = 0;
+  SURFACE_INVOCATION_CONTROL_WORK = 1;
+  SURFACE_INVOCATION_CONTROL_CANCEL = 2;
+}
+
+// The adapter, not this request, verifies the provider-native webhook. A
+// surface-edge service can normalize Slack, Linear, Jira, Salesforce,
+// documents, incidents, and future providers into this one typed contract.
+// Tenant scope is absent by design and is resolved through ConnectorService.
+message AdmitSurfaceInvocationRequest {
+  string provider_id = 1 [(buf.validate.field).string.min_len = 1];
+  string connection_id = 2 [(buf.validate.field).string.max_len = 512];
+  string provider_app_id = 3 [(buf.validate.field).string.min_len = 1];
+  string provider_workspace_id = 4 [(buf.validate.field).string.min_len = 1];
+  string provider_enterprise_id = 5 [(buf.validate.field).string.max_len = 512];
+  SurfaceInvocationActor actor = 6;
+  SurfaceInvocationTarget target = 7;
+  SurfaceInvocationTrigger trigger = 8;
+  string text = 9 [(buf.validate.field).string.max_len = 32768];
+  repeated SurfaceInvocationAttachmentRef attachments = 10 [(buf.validate.field).repeated.max_items = 20];
+  repeated SurfaceInvocationContextRef context_refs = 11 [(buf.validate.field).repeated.max_items = 20];
+  google.protobuf.Struct projection_context = 12;
+  string idempotency_key = 13 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+  string traceparent = 14 [(buf.validate.field).string.max_len = 512];
+  string tracestate = 15 [(buf.validate.field).string.max_len = 512];
+  repeated SurfaceInvocationContextSnapshot context_snapshots = 16 [(buf.validate.field).repeated.max_items = 20];
+  SurfaceInvocationControl control = 17 [(buf.validate.field).enum.defined_only = true];
+  // Providers with a native agent/session UI may request a fast, governed
+  // acknowledgement projection while ordinary work continues.
+  bool acknowledgement_requested = 18;
+}
+
+message AdmitSurfaceInvocationResponse {
+  bool accepted = 1;
+  bool duplicate = 2;
+  string ignored_reason = 3;
+  string conversation_id = 4;
+  string turn_id = 5;
+}
+
+message ClaimNextRunRequest {
+  string worker_id = 1 [(buf.validate.field).string.min_len = 1];
+  string worker_queue = 2;
+  int32 lease_seconds = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+message ClaimNextRunResponse {
+  AgentRun run = 1;
+  AgentRunLease lease = 2;
+  repeated RuntimeEvent events = 3;
+}
+
+message HeartbeatRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  int32 extend_seconds = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+message HeartbeatRunResponse {
+  AgentRun run = 1;
+  AgentRunLease lease = 2;
+  RuntimeEvent event = 3;
+}
+
+message RenewRunLeaseRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  int32 extend_seconds = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+message RenewRunLeaseResponse {
+  AgentRun run = 1;
+  AgentRunLease lease = 2;
+  RuntimeEvent event = 3;
+  bool renewed_after_expiry = 4;
+}
+
+message RecordRunStepRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  AgentRunStep step = 3 [(buf.validate.field).required = true];
+}
+
+message RecordRunStepResponse {
+  AgentRun run = 1;
+  AgentRunStep step = 2;
+  RuntimeEvent event = 3;
+}
+
+message RecordRunCheckpointRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  AgentRunCheckpoint checkpoint = 3 [(buf.validate.field).required = true];
+}
+
+message RecordRunCheckpointResponse {
+  AgentRun run = 1;
+  AgentRunCheckpoint checkpoint = 2;
+  RuntimeEvent event = 3;
+}
+
+message RecordRunArtifactRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  AgentRunArtifact artifact = 3 [(buf.validate.field).required = true];
+}
+
+message RecordRunArtifactResponse {
+  AgentRun run = 1;
+  AgentRunArtifact artifact = 2;
+  RuntimeEvent event = 3;
+}
+
+message RecordRunCostRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  AgentRunCost cost = 3 [(buf.validate.field).required = true];
+}
+
+message RecordRunCostResponse {
+  AgentRun run = 1;
+  AgentRunCost cost = 2;
+  RuntimeEvent event = 3;
+}
+
+message RecordRunStreamCursorRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  AgentRunStreamCursor cursor = 2 [(buf.validate.field).required = true];
+}
+
+message RecordRunStreamCursorResponse {
+  AgentRun run = 1;
+  AgentRunStreamCursor cursor = 2;
+  RuntimeEvent event = 3;
+}
+
+message RecordRunEventRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  RuntimeEventType type = 2 [(buf.validate.field).enum.defined_only = true];
+  string message = 3 [(buf.validate.field).string.min_len = 1];
+  google.protobuf.Struct attributes = 4;
+  string step_id = 5;
+  string checkpoint_id = 6;
+  string artifact_id = 7;
+  string cost_id = 8;
+  string wait_id = 9;
+  RuntimeVisibilityMetadata visibility = 10;
+  NativeToolAttemptEvidence native_tool_attempt = 11;
+  NativeAgentEventEvidence native_agent_event = 12;
+}
+
+message RecordRunEventResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+}
+
+message ControlRunRequest {
+  string run_id = 1;
+  string workspace_id = 2;
+  string agent_id = 3;
+  string work_envelope_id = 4;
+  string autonomy_session_id = 5;
+  RunControlMode mode = 6 [(buf.validate.field).enum.defined_only = true];
+  string message = 7;
+  string idempotency_key = 8;
+  RuntimeChannelContext channel_context = 9;
+  google.protobuf.Struct payload = 10;
+  RuntimeVisibilityMetadata visibility = 11;
+}
+
+message ControlRunResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+  string control_id = 3;
+  bool cancelled = 4;
+  bool queued_for_worker = 5;
+}
+
+message RecordRunWorkItemRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  AgentWorkItem work_item = 2 [(buf.validate.field).required = true];
+}
+
+message RecordRunWorkItemResponse {
+  AgentRun run = 1;
+  AgentWorkItem work_item = 2;
+  RuntimeEvent event = 3;
+}
+
+message UpdateRunWorkItemRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string work_item_id = 2 [(buf.validate.field).string.min_len = 1];
+  AgentWorkItemState state = 3 [(buf.validate.field).enum.defined_only = true];
+  optional string next_action = 4;
+  optional string blocker = 5;
+  optional string wait_id = 6;
+  optional string tool_execution_id = 7;
+  repeated string evidence_refs = 8;
+  optional string completion_gate = 9;
+  google.protobuf.Struct payload = 10;
+}
+
+message UpdateRunWorkItemResponse {
+  AgentRun run = 1;
+  AgentWorkItem work_item = 2;
+  RuntimeEvent event = 3;
+}
+
+message ListRunWorkItemsRequest {
+  string run_id = 1;
+  string workspace_id = 2;
+  string work_envelope_id = 3;
+  string autonomy_session_id = 4;
+  AgentWorkItemState state = 5 [(buf.validate.field).enum.defined_only = true];
+  int32 limit = 6 [(buf.validate.field).int32.gte = 0];
+}
+
+message ListRunWorkItemsResponse {
+  repeated AgentWorkItem work_items = 1;
+}
+
+message YieldRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  YieldContinuation continuation = 3 [(buf.validate.field).enum.defined_only = true];
+  AgentRunCheckpoint checkpoint = 4;
+  google.protobuf.Timestamp resume_after = 5;
+  AgentRunWait wait = 6;
+  string presence_status_text = 7;
+  string idempotency_key = 8;
+  int32 yield_budget = 9 [(buf.validate.field).int32.gte = 0];
+}
+
+message YieldRunResponse {
+  AgentRun run = 1;
+  AgentRun successor_run = 2;
+  AgentRunWait wait = 3;
+  AgentRunCheckpoint checkpoint = 4;
+  RuntimeEvent event = 5;
+  RuntimeEvent presence_event = 6;
+  bool session_blocked = 7;
+  int32 yield_count = 8 [(buf.validate.field).int32.gte = 0];
+}
+
+message WaitRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  AgentRunWait wait = 3 [(buf.validate.field).required = true];
+  AgentRunCheckpoint checkpoint = 4;
+}
+
+message WaitRunResponse {
+  AgentRun run = 1;
+  AgentRunWait wait = 2;
+  AgentRunCheckpoint checkpoint = 3;
+  RuntimeEvent event = 4;
+}
+
+message ResumeRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string wait_id = 2 [(buf.validate.field).string.min_len = 1];
+  string resume_event_id = 3;
+  google.protobuf.Struct payload = 4;
+  codex.v1.CodexInteractionDecision codex_interaction_decision = 5;
+}
+
+message ResumeRunResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+}
+
+message CompleteRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  google.protobuf.Struct result = 3;
+  AgentRunCheckpoint checkpoint = 4;
+}
+
+message CompleteRunResponse {
+  AgentRun run = 1;
+  AgentRunCheckpoint checkpoint = 2;
+  RuntimeEvent event = 3;
+}
+
+message FailRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string error_message = 3 [(buf.validate.field).string.min_len = 1];
+  bool retryable = 4;
+  int32 retry_delay_seconds = 5 [(buf.validate.field).int32.gte = 0];
+}
+
+message FailRunResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+}
+
+message CancelRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string reason = 2;
+}
+
+message CancelRunResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+}
+
+message RetryRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  int32 retry_delay_seconds = 2 [(buf.validate.field).int32.gte = 0];
+  string reason = 3;
+}
+
+message RetryRunResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+}
+
+message DeadLetterRunRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string reason = 2;
+}
+
+message DeadLetterRunResponse {
+  AgentRun run = 1;
+  RuntimeEvent event = 2;
+}
+
+message GetRunRequest {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetRunResponse {
+  AgentRun run = 1;
+}
+
+message GetTeammateWorkLedgerRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetTeammateWorkLedgerResponse {
+  TeammateWorkLedger ledger = 1;
+  RuntimeVirtualFile ledger_file = 2;
+}
+
+// TeammateWorkLedger is the compact, durable read model a persistent digital
+// teammate uses to resume work, explain what it has actually checked, and keep
+// Slack or other human-facing channels clean while tool-heavy work happens
+// under the hood.
+message TeammateWorkLedger {
+  string schema_version = 1;
+  string run_id = 2;
+  AgentRunLinkage linkage = 3;
+  AgentRunState state = 4;
+  string objective_title = 5;
+  string worker_queue = 6;
+  int32 attempt = 7 [(buf.validate.field).int32.gte = 0];
+  string work_envelope_id = 8;
+  string work_envelope_kind = 9;
+  string workstream_id = 10;
+  string next_action = 11;
+  repeated TeammateWorkLedgerBlocker blockers = 12;
+  repeated TeammateWorkLedgerConnectorAccess connector_access = 13;
+  repeated TeammateWorkLedgerMemoryCitation memory_citations = 14;
+  TeammateWorkLedgerVfsSummary vfs_summary = 15;
+  TeammateWorkLedgerCerebroContext cerebro_context = 16;
+  TeammateWorkLedgerProactivePolicy proactive_policy = 17;
+  TeammateWorkLedgerChannelStatus channel_status = 18;
+  repeated string evidence_paths = 19;
+  string handoff_policy = 20;
+  string resume_checkpoint_path = 21;
+  google.protobuf.Timestamp updated_at = 22;
+  int32 event_count = 23 [(buf.validate.field).int32.gte = 0];
+  repeated AgentWorkItem active_work_items = 24;
+  int32 active_work_item_count = 25 [(buf.validate.field).int32.gte = 0];
+  int32 blocked_work_item_count = 26 [(buf.validate.field).int32.gte = 0];
+}
+
+message TeammateWorkLedgerBlocker {
+  string wait_id = 1;
+  AgentRunWaitType type = 2;
+  string reason = 3;
+  string external_ref = 4;
+  google.protobuf.Timestamp resume_after = 5;
+  string visibility_summary = 6;
+  TeammateWorkLedgerWaitResumeContract resume_contract = 7;
+}
+
+// TeammateWorkLedgerWaitResumeContract makes parked-run resumption
+// machine-readable for channel adapters and workers. Slack actions can carry
+// only the compact value fields, then resolve the durable wait through
+// ListRunWaits before calling ResumeRun.
+message TeammateWorkLedgerWaitResumeContract {
+  string schema_version = 1;
+  string resume_rpc = 2;
+  string lookup_rpc = 3;
+  string lookup_external_ref_field = 4;
+  repeated string required_resume_fields = 5;
+  repeated string allowed_decisions = 6;
+  repeated string channel_action_value_fields = 7;
+  string idempotency_join_key = 8;
+  string approval_request_id = 9;
+  bool requires_safe_summary = 10;
+}
+
+message TeammateWorkLedgerConnectorAccess {
+  string mount_path = 1;
+  string provider_id = 2;
+  string connection_id = 3;
+  repeated string capabilities = 4;
+  bool grant_required = 5;
+  string lease_policy = 6;
+  string identity_mode = 7;
+  string credential_version_strategy = 8;
+  int32 secret_ref_count = 9 [(buf.validate.field).int32.gte = 0];
+  repeated string credential_ref_names = 10;
+}
+
+message TeammateWorkLedgerMemoryCitation {
+  string memory_id = 1;
+  string memory_type = 2;
+  string source = 3;
+  repeated string source_uris = 4;
+  string supersedes_memory_id = 5;
+  string superseded_by_memory_id = 6;
+  string review_status = 7;
+  repeated string entity_ids = 8;
+  string content_preview = 9;
+}
+
+message TeammateWorkLedgerVfsSummary {
+  int32 file_count = 1 [(buf.validate.field).int32.gte = 0];
+  int32 mount_count = 2 [(buf.validate.field).int32.gte = 0];
+  int32 connector_mount_count = 3 [(buf.validate.field).int32.gte = 0];
+  int32 memory_record_count = 4 [(buf.validate.field).int32.gte = 0];
+  int32 transaction_count = 5 [(buf.validate.field).int32.gte = 0];
+  int32 cerebro_index_eligible_file_count = 6 [(buf.validate.field).int32.gte = 0];
+  bool has_resume_checkpoint = 7;
+}
+
+message TeammateWorkLedgerCerebroContext {
+  string provider = 1;
+  string query = 2;
+  repeated string thing_ids = 3;
+  repeated string fact_ids = 4;
+  repeated string event_ids = 5;
+  int32 eligible_file_count = 6 [(buf.validate.field).int32.gte = 0];
+}
+
+message TeammateWorkLedgerProactivePolicy {
+  bool enabled = 1;
+  repeated string trigger_kinds = 2;
+  repeated string progress_update_triggers = 3;
+  string presence_policy = 4;
+  int32 update_budget = 5 [(buf.validate.field).int32.gte = 0];
+}
+
+message TeammateWorkLedgerChannelStatus {
+  string channel_kind = 1;
+  string channel_id = 2;
+  string thread_id = 3;
+  string last_visible_event_id = 4;
+  string last_visible_summary = 5;
+  AutonomyProcessingState processing_state = 6 [(buf.validate.field).enum.defined_only = true];
+  string processing_summary = 7;
+  string processing_message_ts = 8;
+  string assistant_stream_ts = 9;
+  string last_presence_event_id = 10;
+  google.protobuf.Timestamp last_presence_update_at = 11;
+  bool final_response_pending = 12;
+  string autonomy_session_id = 13;
+}
+
+message ListRunsByWorkEnvelopeRequest {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string work_envelope_id = 2 [(buf.validate.field).string.min_len = 1];
+  int32 limit = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+message ListRunsByWorkEnvelopeResponse {
+  repeated AgentRun runs = 1;
+}
+
+message ChannelThreadAdoption {
+  string id = 1;
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 3 [(buf.validate.field).string.min_len = 1];
+  RuntimeChannelKind channel_kind = 4 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 5;
+  string channel_id = 6 [(buf.validate.field).string.min_len = 1];
+  string thread_id = 7 [(buf.validate.field).string.min_len = 1];
+  string work_envelope_id = 8;
+  string first_adopted_run_id = 9;
+  string last_run_id = 10;
+  google.protobuf.Timestamp first_adopted_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  google.protobuf.Timestamp expires_at = 13;
+  string last_message_id = 14;
+  string last_source_event_id = 15;
+  string last_adoption_reason = 16;
+  string adoption_policy = 17;
+  google.protobuf.Struct metadata = 18;
+  RuntimeChannelContext channel_context = 19;
+  RuntimeWorkEnvelope work_envelope = 20;
+  // Tenant organization that owns this adoption row. Required for shared-runtime
+  // isolation; storage uniqueness and list filters are organization-scoped.
+  string organization_id = 21 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetChannelThreadAdoptionRequest {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 2 [(buf.validate.field).string.min_len = 1];
+  RuntimeChannelKind channel_kind = 3 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 4;
+  string channel_id = 5 [(buf.validate.field).string.min_len = 1];
+  string thread_id = 6 [(buf.validate.field).string.min_len = 1];
+  bool include_expired = 7;
+  string organization_id = 8 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetChannelThreadAdoptionResponse {
+  ChannelThreadAdoption adoption = 1;
+}
+
+message RecordChannelThreadAdoptionRequest {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 2 [(buf.validate.field).string.min_len = 1];
+  RuntimeChannelKind channel_kind = 3 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 4;
+  string channel_id = 5 [(buf.validate.field).string.min_len = 1];
+  string thread_id = 6 [(buf.validate.field).string.min_len = 1];
+  string message_id = 7;
+  string source_event_id = 8;
+  string adoption_reason = 9;
+  google.protobuf.Timestamp expires_at = 10;
+  string work_envelope_id = 11;
+  google.protobuf.Struct metadata = 12;
+  string organization_id = 13 [(buf.validate.field).string.min_len = 1];
+}
+
+message RecordChannelThreadAdoptionResponse {
+  ChannelThreadAdoption adoption = 1;
+}
+
+message ListChannelThreadAdoptionsRequest {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 2;
+  RuntimeChannelKind channel_kind = 3 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 4;
+  string channel_id = 5;
+  string thread_id = 6;
+  string work_envelope_id = 7;
+  bool include_expired = 8;
+  int32 limit = 9 [(buf.validate.field).int32.gte = 0];
+  // Organization scope for list filtering. Required so a shared Agent Runtime
+  // database cannot return another tenant's adoption projection for a reused
+  // workspace id.
+  string organization_id = 10 [(buf.validate.field).string.min_len = 1];
+}
+
+message ListChannelThreadAdoptionsResponse {
+  repeated ChannelThreadAdoption adoptions = 1;
+}
+
+message ListRunWaitsRequest {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string run_id = 2;
+  string agent_id = 3;
+  string objective_id = 4;
+  string work_envelope_id = 5;
+  AgentRunWaitState state = 6 [(buf.validate.field).enum.defined_only = true];
+  AgentRunWaitType type = 7 [(buf.validate.field).enum.defined_only = true];
+  RuntimeAudience audience = 8 [(buf.validate.field).enum.defined_only = true];
+  int32 limit = 9 [(buf.validate.field).int32.gte = 0];
+  string page_token = 10;
+  // external_ref filters waits by their external join key, such as an
+  // approvals.v1 ApprovalRequest id carried by desktop-control approval waits.
+  string external_ref = 11;
+}
+
+message AgentRunWaitSummary {
+  string run_id = 1;
+  string wait_id = 2;
+  string workspace_id = 3;
+  string agent_id = 4;
+  string objective_id = 5;
+  string step_id = 6;
+  AgentRunWaitType type = 7;
+  AgentRunWaitState state = 8;
+  string external_ref = 9;
+  string reason = 10;
+  google.protobuf.Struct payload = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp resume_after = 13;
+  google.protobuf.Timestamp expires_at = 14;
+  google.protobuf.Timestamp resolved_at = 15;
+  string resolved_by_event_id = 16;
+  RuntimeVisibilityMetadata visibility = 17;
+  RuntimeChannelContext channel_context = 18;
+  RuntimeWorkEnvelope work_envelope = 19;
+}
+
+message ListRunWaitsResponse {
+  repeated AgentRunWaitSummary waits = 1;
+  string next_page_token = 2;
+}
+
+message RecordChannelActionReceiptRequest {
+  ChannelActionReceipt receipt = 1 [(buf.validate.field).required = true];
+}
+
+message RecordChannelActionReceiptResponse {
+  ChannelActionReceipt receipt = 1;
+  bool idempotent_replay = 2;
+}
+
+message GetChannelActionReceiptRequest {
+  string id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message GetChannelActionReceiptResponse {
+  ChannelActionReceipt receipt = 1;
+}
+
+message ListChannelActionReceiptsRequest {
+  string workspace_id = 1 [(buf.validate.field).string.min_len = 1];
+  string idempotency_key = 2;
+  string actor_entity_id = 3;
+  ChannelActionTargetKind target_kind = 4 [(buf.validate.field).enum.defined_only = true];
+  string target_id = 5;
+  string run_id = 6;
+  string wait_id = 7;
+  string approval_request_id = 8;
+  string objective_id = 9;
+  RuntimeChannelKind channel_kind = 10 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 11;
+  string channel_id = 12;
+  string thread_id = 13;
+  string message_id = 14;
+  string action_id = 15;
+  int32 limit = 16 [(buf.validate.field).int32.gte = 0];
+}
+
+message ListChannelActionReceiptsResponse {
+  repeated ChannelActionReceipt receipts = 1;
+}
+
+message ListRunEventsRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  RuntimeAudience audience = 2 [(buf.validate.field).enum.defined_only = true];
+  int32 page_size = 3 [(buf.validate.field).int32.gte = 0];
+  string page_token = 4;
+}
+
+message ListRunEventsResponse {
+  repeated RuntimeEvent events = 1;
+  string next_page_token = 2;
+}
+
+message ListRunVirtualFilesRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string path_prefix = 2;
+  int32 limit = 3 [(buf.validate.field).int32.gte = 0];
+  bool include_tombstones = 4;
+}
+
+message ListRunVirtualFilesResponse {
+  repeated RuntimeVirtualFileEntry entries = 1;
+}
+
+message ReadRunVirtualFileRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string path = 2 [(buf.validate.field).string.min_len = 1];
+  int32 offset = 3 [(buf.validate.field).int32.gte = 0];
+  int32 limit = 4 [(buf.validate.field).int32.gte = 0];
+  bool include_tombstones = 5;
+}
+
+message ReadRunVirtualFileResponse {
+  RuntimeVirtualFileEntry entry = 1;
+  string content = 2;
+  int32 offset = 3;
+  int32 next_offset = 4;
+  bool eof = 5;
+  RuntimeVirtualFileRedactionState redaction_state = 6 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeRedaction redactions = 7;
+}
+
+message StatRunVirtualFileRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string path = 2 [(buf.validate.field).string.min_len = 1];
+  bool include_tombstones = 3;
+}
+
+message StatRunVirtualFileResponse {
+  RuntimeVirtualFileEntry entry = 1;
+}
+
+message WatchRunVirtualFilesRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string since_cursor = 2;
+  int32 limit = 3 [(buf.validate.field).int32.gte = 0];
+  bool follow = 4;
+  RuntimeVirtualFileSelector selector = 5;
+}
+
+message WatchRunVirtualFilesResponse {
+  RuntimeVirtualFileWatchEvent event = 1;
+}
+
+message RuntimeVirtualFileWatchEvent {
+  string cursor = 1;
+  string operation = 2;
+  string path = 3;
+  string revision_id = 4;
+  string parent_revision_id = 5;
+  string transaction_id = 6;
+  string view = 7;
+  string span_id = 8;
+  string evidence_handle = 9;
+  string runtime_event_id = 10;
+  string artifact_id = 11;
+  string trace_id = 12;
+  string hydration_id = 13;
+  string promotion_id = 14;
+  string producer_service = 15;
+  string producer_kind = 16;
+  google.protobuf.Timestamp occurred_at = 17;
+  string checkpoint_id = 18;
+  RuntimeVirtualFileEntry entry = 19;
+}
+
+message RuntimeVirtualFileSelector {
+  repeated string paths = 1;
+  string path_prefix = 2;
+  repeated string views = 3;
+  repeated string kinds = 4;
+  repeated string mounts = 5;
+  repeated string transaction_ids = 6;
+  repeated string policies = 7;
+  repeated string source_services = 8;
+  repeated string cerebro_indexes = 9;
+  bool include_tombstones = 10;
+}
+
+message RuntimeVirtualFileReadResult {
+  string path = 1;
+  RuntimeVirtualFileEntry entry = 2;
+  string content = 3;
+  int32 offset = 4 [(buf.validate.field).int32.gte = 0];
+  int32 next_offset = 5 [(buf.validate.field).int32.gte = 0];
+  bool eof = 6;
+  bool skipped = 7;
+  string skip_reason = 8;
+  string citation = 9;
+  int32 rank = 10 [(buf.validate.field).int32.gte = 0];
+  string rank_reason = 11;
+  RuntimeVirtualFileReasonCode reason_code = 12 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileRedactionState redaction_state = 13 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeRedaction redactions = 14;
+}
+
+message BatchReadRunVirtualFilesRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  RuntimeVirtualFileSelector selector = 2;
+  int32 per_file_limit = 3 [(buf.validate.field).int32.gte = 0];
+  int32 total_limit = 4 [(buf.validate.field).int32.gte = 0];
+  int32 limit = 5 [(buf.validate.field).int32.gte = 0];
+}
+
+message BatchReadRunVirtualFilesResponse {
+  repeated RuntimeVirtualFileReadResult files = 1;
+  int32 total_content_bytes = 2 [(buf.validate.field).int32.gte = 0];
+  bool budget_exhausted = 3;
+  int32 skipped_count = 4 [(buf.validate.field).int32.gte = 0];
+}
+
+message BuildRunVirtualFileContextPackRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string query = 2;
+  RuntimeVirtualFileSelector selector = 3;
+  repeated string seed_paths = 4;
+  int32 per_file_limit = 5 [(buf.validate.field).int32.gte = 0];
+  int32 total_limit = 6 [(buf.validate.field).int32.gte = 0];
+  int32 limit = 7 [(buf.validate.field).int32.gte = 0];
+}
+
+message BuildRunVirtualFileContextPackResponse {
+  repeated RuntimeVirtualFileReadResult snippets = 1;
+  int32 total_content_bytes = 2 [(buf.validate.field).int32.gte = 0];
+  bool budget_exhausted = 3;
+  int32 skipped_count = 4 [(buf.validate.field).int32.gte = 0];
+  repeated string skipped_paths = 5;
+}
+
+message SearchRunVirtualFilesRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string query = 2 [(buf.validate.field).string.min_len = 1];
+  string path_prefix = 3;
+  int32 limit = 4 [(buf.validate.field).int32.gte = 0];
+  RuntimeVirtualFileSelector selector = 5;
+  bool regex = 6;
+  int32 context_lines = 7 [(buf.validate.field).int32.gte = 0];
+  bool case_sensitive = 8;
+}
+
+message SearchRunVirtualFilesResponse {
+  repeated RuntimeVirtualFileMatch matches = 1;
+  int32 total_matches = 2 [(buf.validate.field).int32.gte = 0];
+  bool limit_exhausted = 3;
+}
+
+message RecordRunVirtualFileProposalRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string path = 3 [(buf.validate.field).string.min_len = 1];
+  string media_type = 4;
+  string content = 5;
+  string proposal_kind = 6;
+  string step_id = 7;
+  map<string, string> metadata = 8;
+  string idempotency_key = 9;
+  RuntimeSensitivity sensitivity = 10 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileRedactionState redaction_state = 11 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeRedaction redactions = 12;
+}
+
+message RecordRunVirtualFileProposalResponse {
+  AgentRun run = 1;
+  AgentRunArtifact artifact = 2;
+  RuntimeVirtualFile file = 3;
+  RuntimeEvent event = 4;
+}
+
+message RuntimeVirtualFileChange {
+  string path = 1 [(buf.validate.field).string.min_len = 1];
+  string media_type = 2;
+  string content = 3;
+  string proposal_kind = 4;
+  string step_id = 5;
+  map<string, string> metadata = 6;
+  RuntimeSensitivity sensitivity = 7 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileRedactionState redaction_state = 8 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeRedaction redactions = 9;
+  RuntimeVirtualFileOperation operation = 10 [(buf.validate.field).enum.defined_only = true];
+  string rename_from = 11;
+}
+
+message RecordRunVirtualFileTransactionRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string transaction_id = 3;
+  string parent_revision_id = 4;
+  repeated RuntimeVirtualFileChange changes = 5;
+  map<string, string> metadata = 6;
+  string idempotency_key = 7;
+}
+
+message RecordRunVirtualFileTransactionResponse {
+  AgentRun run = 1;
+  repeated AgentRunArtifact artifacts = 2;
+  repeated RuntimeVirtualFile files = 3;
+  RuntimeEvent event = 4;
+}
+
+message PromoteRunVirtualFileTransactionRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string transaction_id = 3 [(buf.validate.field).string.min_len = 1];
+  string expected_parent_revision_id = 4;
+  string approver_id = 5;
+  map<string, string> metadata = 6;
+}
+
+message PromoteRunVirtualFileTransactionResponse {
+  AgentRun run = 1;
+  repeated AgentRunArtifact artifacts = 2;
+  repeated RuntimeVirtualFile files = 3;
+  RuntimeEvent event = 4;
+}
+
+enum RuntimeVirtualFileTransactionApplyStatus {
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_APPLY_STATUS_UNSPECIFIED = 0;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_APPLY_STATUS_CLEAN = 1;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_APPLY_STATUS_IDENTICAL = 2;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_APPLY_STATUS_CONFLICT = 3;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_APPLY_STATUS_MISSING_BASE = 4;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_APPLY_STATUS_MISSING_TARGET = 5;
+}
+
+enum RuntimeVirtualFileTransactionOutcome {
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_OUTCOME_UNSPECIFIED = 0;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_OUTCOME_CLEAN = 1;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_OUTCOME_APPLIED = 2;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_OUTCOME_REBASED = 3;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_OUTCOME_CONFLICT = 4;
+  RUNTIME_VIRTUAL_FILE_TRANSACTION_OUTCOME_NOOP = 5;
+}
+
+message RuntimeVirtualFileDiffHunk {
+  int32 old_start_line = 1 [(buf.validate.field).int32.gte = 0];
+  int32 old_line_count = 2 [(buf.validate.field).int32.gte = 0];
+  int32 new_start_line = 3 [(buf.validate.field).int32.gte = 0];
+  int32 new_line_count = 4 [(buf.validate.field).int32.gte = 0];
+  string header = 5;
+  string unified_diff = 6;
+}
+
+message RuntimeVirtualFileTransactionFileDiff {
+  string path = 1;
+  RuntimeVirtualFileOperation operation = 2 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileTransactionApplyStatus apply_status = 3 [(buf.validate.field).enum.defined_only = true];
+  string parent_revision_id = 4;
+  string base_revision_id = 5;
+  string current_revision_id = 6;
+  string proposed_revision_id = 7;
+  string base_content_sha256 = 8;
+  string current_content_sha256 = 9;
+  string proposed_content_sha256 = 10;
+  int32 additions = 11 [(buf.validate.field).int32.gte = 0];
+  int32 deletions = 12 [(buf.validate.field).int32.gte = 0];
+  bool binary = 13;
+  bool tombstone = 14;
+  string rename_from = 15;
+  string rename_to = 16;
+  string unified_diff = 17;
+  repeated RuntimeVirtualFileDiffHunk hunks = 18;
+}
+
+message RuntimeVirtualFileTransactionConflict {
+  string path = 1;
+  RuntimeVirtualFileReasonCode reason_code = 2 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileTransactionApplyStatus apply_status = 3 [(buf.validate.field).enum.defined_only = true];
+  string message = 4;
+  string parent_revision_id = 5;
+  string base_revision_id = 6;
+  string current_revision_id = 7;
+  string proposed_revision_id = 8;
+  repeated RuntimeVirtualFileDiffHunk hunks = 9;
+}
+
+message RuntimeVirtualFileTransactionDiff {
+  string transaction_id = 1;
+  repeated RuntimeVirtualFileTransactionFileDiff files = 2;
+  string unified_diff = 3;
+  int32 file_count = 4 [(buf.validate.field).int32.gte = 0];
+  int32 changed_file_count = 5 [(buf.validate.field).int32.gte = 0];
+  int32 additions = 6 [(buf.validate.field).int32.gte = 0];
+  int32 deletions = 7 [(buf.validate.field).int32.gte = 0];
+  bool stale = 8;
+  RuntimeVirtualFileTransactionOutcome outcome = 9 [(buf.validate.field).enum.defined_only = true];
+  repeated RuntimeVirtualFileTransactionConflict conflicts = 10;
+}
+
+message DiffRunVirtualFileTransactionRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string transaction_id = 2 [(buf.validate.field).string.min_len = 1];
+  int32 context_lines = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+message DiffRunVirtualFileTransactionResponse {
+  RuntimeVirtualFileTransactionDiff diff = 1;
+}
+
+message ApplyRunVirtualFileTransactionRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string transaction_id = 3 [(buf.validate.field).string.min_len = 1];
+  string expected_parent_revision_id = 4;
+  string approver_id = 5;
+  map<string, string> metadata = 6;
+  int32 context_lines = 7 [(buf.validate.field).int32.gte = 0];
+}
+
+message ApplyRunVirtualFileTransactionResponse {
+  RuntimeVirtualFileTransactionOutcome outcome = 1 [(buf.validate.field).enum.defined_only = true];
+  RuntimeVirtualFileTransactionDiff diff = 2;
+  AgentRun run = 3;
+  repeated AgentRunArtifact artifacts = 4;
+  repeated RuntimeVirtualFile files = 5;
+  RuntimeEvent event = 6;
+}
+
+message RebaseRunVirtualFileTransactionRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string source_transaction_id = 3 [(buf.validate.field).string.min_len = 1];
+  string transaction_id = 4;
+  map<string, string> metadata = 5;
+  string idempotency_key = 6;
+  int32 context_lines = 7 [(buf.validate.field).int32.gte = 0];
+}
+
+message RebaseRunVirtualFileTransactionResponse {
+  RuntimeVirtualFileTransactionOutcome outcome = 1 [(buf.validate.field).enum.defined_only = true];
+  string source_transaction_id = 2;
+  string transaction_id = 3;
+  RuntimeVirtualFileTransactionDiff diff = 4;
+  AgentRun run = 5;
+  repeated AgentRunArtifact artifacts = 6;
+  repeated RuntimeVirtualFile files = 7;
+  RuntimeEvent event = 8;
+}
+
+message HydrateRunVirtualFileMountRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+  string lease_token = 2 [(buf.validate.field).string.min_len = 1];
+  string mount = 3 [(buf.validate.field).string.min_len = 1];
+  string provider_id = 4;
+  string connection_id = 5;
+  string query = 6;
+  int32 limit = 7 [(buf.validate.field).int32.gte = 0];
+  map<string, string> metadata = 8;
+  string idempotency_key = 9;
+}
+
+message HydrateRunVirtualFileMountResponse {
+  AgentRun run = 1;
+  repeated AgentRunArtifact artifacts = 2;
+  repeated RuntimeVirtualFile files = 3;
+  RuntimeEvent event = 4;
+}
+
+message InspectRunVirtualFilesRequest {
+  string run_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message RuntimeVirtualFileInspectorSummary {
+  int32 file_count = 1 [(buf.validate.field).int32.gte = 0];
+  int32 mount_count = 2 [(buf.validate.field).int32.gte = 0];
+  int32 transaction_count = 3 [(buf.validate.field).int32.gte = 0];
+  int32 lazy_mount_count = 4 [(buf.validate.field).int32.gte = 0];
+  int32 hydrated_file_count = 5 [(buf.validate.field).int32.gte = 0];
+  int32 cerebro_candidate_count = 6 [(buf.validate.field).int32.gte = 0];
+  int32 cerebro_ready_count = 7 [(buf.validate.field).int32.gte = 0];
+  int32 accepted_file_count = 8 [(buf.validate.field).int32.gte = 0];
+  int32 content_address_count = 9 [(buf.validate.field).int32.gte = 0];
+  int32 hydration_cache_hit_count = 10 [(buf.validate.field).int32.gte = 0];
+  int32 stale_transaction_count = 11 [(buf.validate.field).int32.gte = 0];
+  int32 shadowed_file_count = 12 [(buf.validate.field).int32.gte = 0];
+  int32 producer_count = 13 [(buf.validate.field).int32.gte = 0];
+  int32 preview_only_file_count = 14 [(buf.validate.field).int32.gte = 0];
+  int32 denied_file_count = 15 [(buf.validate.field).int32.gte = 0];
+  int32 restricted_file_count = 16 [(buf.validate.field).int32.gte = 0];
+  int32 tombstone_file_count = 17 [(buf.validate.field).int32.gte = 0];
+  int32 delete_file_count = 18 [(buf.validate.field).int32.gte = 0];
+  int32 rename_file_count = 19 [(buf.validate.field).int32.gte = 0];
+}
+
+message RuntimeVirtualFileInspectorMount {
+  string path = 1;
+  int32 file_count = 2 [(buf.validate.field).int32.gte = 0];
+  int64 size_bytes = 3 [(buf.validate.field).int64.gte = 0];
+  bool lazy = 4;
+  string provider_id = 5;
+  string connection_id = 6;
+  string cache_policy = 7;
+  string policy = 8;
+  string cerebro_index = 9;
+  int32 secret_ref_count = 10 [(buf.validate.field).int32.gte = 0];
+  repeated string source_services = 11;
+  int32 preview_only_file_count = 12 [(buf.validate.field).int32.gte = 0];
+  int32 denied_file_count = 13 [(buf.validate.field).int32.gte = 0];
+  int32 restricted_file_count = 14 [(buf.validate.field).int32.gte = 0];
+  repeated string capabilities = 15;
+  bool writable = 16;
+  bool read_only = 17;
+  bool generated = 18;
+  bool evidence_backed = 19;
+  bool externally_indexed = 20;
+}
+
+message RuntimeVirtualFileInspectorTransaction {
+  string transaction_id = 1;
+  string view = 2;
+  string parent_revision_id = 3;
+  int32 file_count = 4 [(buf.validate.field).int32.gte = 0];
+  string policy = 5;
+  string cerebro_index = 6;
+  repeated string content_addresses = 7;
+  int32 tombstone_file_count = 8 [(buf.validate.field).int32.gte = 0];
+  int32 delete_file_count = 9 [(buf.validate.field).int32.gte = 0];
+  int32 rename_file_count = 10 [(buf.validate.field).int32.gte = 0];
+}
+
+message RuntimeVirtualFileInspectorProducer {
+  string producer_service = 1;
+  string producer_kind = 2;
+  int32 file_count = 3 [(buf.validate.field).int32.gte = 0];
+  int32 revision_count = 4 [(buf.validate.field).int32.gte = 0];
+  repeated string runtime_event_ids = 5;
+  repeated string artifact_ids = 6;
+  repeated string step_ids = 7;
+  repeated string tool_execution_ids = 8;
+  repeated string trace_ids = 9;
+  repeated string hydration_ids = 10;
+  repeated string transaction_ids = 11;
+  repeated string parent_revision_ids = 12;
+}
+
+message InspectRunVirtualFilesResponse {
+  RuntimeVirtualFileInspectorSummary summary = 1;
+  repeated RuntimeVirtualFileInspectorMount mounts = 2;
+  repeated RuntimeVirtualFileInspectorTransaction transactions = 3;
+  repeated RuntimeVirtualFileEntry entries = 4;
+  repeated RuntimeVirtualFileInspectorProducer producers = 5;
+}
+
+// A provider-owned object the actor was viewing when a channel turn began.
+// The edge converts Slack's polymorphic app_context JSON into this bounded
+// contract; Platform may use the coordinates for governed source reads but
+// must not treat them as tenant authority.
+enum OperatingChannelContextEntityKind {
+  OPERATING_CHANNEL_CONTEXT_ENTITY_KIND_UNSPECIFIED = 0;
+  OPERATING_CHANNEL_CONTEXT_ENTITY_KIND_CHANNEL = 1;
+  OPERATING_CHANNEL_CONTEXT_ENTITY_KIND_MESSAGE = 2;
+  OPERATING_CHANNEL_CONTEXT_ENTITY_KIND_CANVAS = 3;
+  OPERATING_CHANNEL_CONTEXT_ENTITY_KIND_LIST = 4;
+}
+
+message OperatingChannelContextEntity {
+  OperatingChannelContextEntityKind kind = 1 [(buf.validate.field).enum.defined_only = true];
+  string provider_workspace_id = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+  string provider_channel_id = 3 [(buf.validate.field).string.max_len = 512];
+  string provider_message_id = 4 [(buf.validate.field).string.max_len = 512];
+  string provider_resource_id = 5 [(buf.validate.field).string.max_len = 512];
+}
+
+// Identity supplies these coordinates from its approved organization directory.
+message EnsureOrganizationEmailRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message EnsureOrganizationEmailResponse {
+  string organization_id = 1;
+  string workspace_id = 2;
+  string mailbox = 3;
+  string connection_id = 4;
+}
