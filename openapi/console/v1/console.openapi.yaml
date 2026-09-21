@@ -4680,6 +4680,222 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/console.v1.EngageStaffProductIssueReportResponse'
+  /console.v1.ConsoleService/PrepareStaffProductIssueRecovery:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: PrepareStaffProductIssueRecovery
+      description: PrepareStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+      operationId: console.v1.ConsoleService.PrepareStaffProductIssueRecovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.PrepareStaffProductIssueRecoveryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ProductIssueRecoveryResponse'
+  /console.v1.ConsoleService/ScanStaffProductIssueRecovery:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: ScanStaffProductIssueRecovery
+      description: ScanStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+      operationId: console.v1.ConsoleService.ScanStaffProductIssueRecovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.ScanStaffProductIssueRecoveryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ProductIssueRecoveryResponse'
+  /console.v1.ConsoleService/ReviewStaffProductIssueRecovery:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: ReviewStaffProductIssueRecovery
+      description: ReviewStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+      operationId: console.v1.ConsoleService.ReviewStaffProductIssueRecovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.ReviewStaffProductIssueRecoveryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ProductIssueRecoveryResponse'
+  /console.v1.ConsoleService/ExecuteStaffProductIssueRecovery:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: ExecuteStaffProductIssueRecovery
+      description: ExecuteStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+      operationId: console.v1.ConsoleService.ExecuteStaffProductIssueRecovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.ExecuteStaffProductIssueRecoveryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ProductIssueRecoveryResponse'
+  /console.v1.ConsoleService/GetProductIssueRecovery:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: GetProductIssueRecovery
+      description: GetProductIssueRecovery accesses only the authenticated recovery recipient or authorized staff.
+      operationId: console.v1.ConsoleService.GetProductIssueRecovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.GetProductIssueRecoveryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ProductIssueRecoveryResponse'
+  /console.v1.ConsoleService/ReplyProductIssueRecovery:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: ReplyProductIssueRecovery
+      description: ReplyProductIssueRecovery accesses only the authenticated recovery recipient or authorized staff.
+      operationId: console.v1.ConsoleService.ReplyProductIssueRecovery
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.ReplyProductIssueRecoveryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ProductIssueRecoveryResponse'
   /console.v1.ConsoleService/GetOperatingFeedback:
     post:
       tags:
@@ -17846,6 +18062,29 @@ components:
           maxItems: 200
       title: EvaluateWorkspaceArtifactStyleGuideResponse
       additionalProperties: false
+    console.v1.ExecuteStaffProductIssueRecoveryRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          maxLength: 4000
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 4000
+        recoveryId:
+          type: string
+          title: recovery_id
+          maxLength: 4000
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+      title: ExecuteStaffProductIssueRecoveryRequest
+      additionalProperties: false
     console.v1.FinalizeBusinessObjectAuthorityTransferRequest:
       type: object
       properties:
@@ -18997,6 +19236,19 @@ components:
           $ref: '#/components/schemas/console.v1.TenantPrivacySetting'
       title: GetPrivacySettingsResponse
       additionalProperties: false
+    console.v1.GetProductIssueRecoveryRequest:
+      type: object
+      properties:
+        query:
+          title: query
+          $ref: '#/components/schemas/console.v1.ConsoleQuery'
+        recoveryId:
+          type: string
+          title: recovery_id
+          maxLength: 4000
+      title: GetProductIssueRecoveryRequest
+      additionalProperties: false
+      description: Durable, explicitly scoped customer recovery contract.
     console.v1.GetProspectingWatchProgramRequest:
       type: object
       properties:
@@ -19558,6 +19810,13 @@ components:
     console.v1.InferenceCreditBalance:
       type: object
       properties:
+        compensatedMicros:
+          type:
+            - integer
+            - string
+          title: compensated_micros
+          format: int64
+          description: Original cash charges restored through verified customer recovery.
         grantedMicros:
           type:
             - integer
@@ -19744,6 +20003,12 @@ components:
     console.v1.InferenceCreditReconciliation:
       type: object
       properties:
+        compensatedDifferenceMicros:
+          type:
+            - integer
+            - string
+          title: compensated_difference_micros
+          format: int64
         balanced:
           type: boolean
           title: balanced
@@ -24912,6 +25177,60 @@ components:
           title: unavailable_reason
       title: PrepareBusinessObjectAuthorityTransferResponse
       additionalProperties: false
+    console.v1.PrepareStaffProductIssueRecoveryRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          maxLength: 4000
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 4000
+        sourceOrganizationId:
+          type: string
+          title: source_organization_id
+          maxLength: 4000
+        sourceWorkspaceId:
+          type: string
+          title: source_workspace_id
+          maxLength: 4000
+        reportId:
+          type: string
+          title: report_id
+          maxLength: 4000
+        errorCode:
+          type: string
+          title: error_code
+          maxLength: 4000
+        startUnixSeconds:
+          type:
+            - integer
+            - string
+          title: start_unix_seconds
+          format: int64
+        endUnixSeconds:
+          type:
+            - integer
+            - string
+          title: end_unix_seconds
+          format: int64
+        recipientPrincipalId:
+          type: string
+          title: recipient_principal_id
+          maxLength: 4000
+        customerSummary:
+          type: string
+          title: customer_summary
+          maxLength: 4000
+        deploymentVerification:
+          type: string
+          title: deployment_verification
+          maxLength: 4000
+      title: PrepareStaffProductIssueRecoveryRequest
+      additionalProperties: false
+      description: Durable, explicitly scoped customer recovery contract.
     console.v1.PrewarmOperatingThreadRequest:
       type: object
       properties:
@@ -25095,6 +25414,95 @@ components:
           title: private_route
       title: PrivateProfileRoute
       additionalProperties: false
+    console.v1.ProductIssueRecovery:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          maxLength: 4000
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 4000
+        recoveryId:
+          type: string
+          title: recovery_id
+          maxLength: 4000
+        reportReference:
+          type: string
+          title: report_reference
+          maxLength: 4000
+        recipientPrincipalId:
+          type: string
+          title: recipient_principal_id
+          maxLength: 4000
+        customerSummary:
+          type: string
+          title: customer_summary
+          maxLength: 4000
+        state:
+          type: string
+          title: state
+          maxLength: 4000
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+        affectedRequestCount:
+          type:
+            - integer
+            - string
+          title: affected_request_count
+          format: int64
+        expectedCreditMicros:
+          type:
+            - integer
+            - string
+          title: expected_credit_micros
+          format: int64
+        compensatedMicros:
+          type:
+            - integer
+            - string
+          title: compensated_micros
+          format: int64
+        remainingRequestCount:
+          type:
+            - integer
+            - string
+          title: remaining_request_count
+          format: int64
+        notificationId:
+          type: string
+          title: notification_id
+          maxLength: 4000
+        lastReply:
+          type: string
+          title: last_reply
+          maxLength: 4000
+        coverage:
+          type: string
+          title: coverage
+          maxLength: 4000
+        deploymentVerification:
+          type: string
+          title: deployment_verification
+          maxLength: 4000
+      title: ProductIssueRecovery
+      additionalProperties: false
+      description: Durable, explicitly scoped customer recovery contract.
+    console.v1.ProductIssueRecoveryResponse:
+      type: object
+      properties:
+        recovery:
+          title: recovery
+          $ref: '#/components/schemas/console.v1.ProductIssueRecovery'
+      title: ProductIssueRecoveryResponse
+      additionalProperties: false
+      description: Durable, explicitly scoped customer recovery contract.
     console.v1.ProductIssueReport:
       type: object
       properties:
@@ -26065,6 +26473,30 @@ components:
       required:
         - channel
       additionalProperties: false
+    console.v1.ReplyProductIssueRecoveryRequest:
+      type: object
+      properties:
+        query:
+          title: query
+          $ref: '#/components/schemas/console.v1.ConsoleQuery'
+        recoveryId:
+          type: string
+          title: recovery_id
+          maxLength: 4000
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          maxLength: 4000
+        message:
+          type: string
+          title: message
+          maxLength: 4000
+        resolved:
+          type: boolean
+          title: resolved
+      title: ReplyProductIssueRecoveryRequest
+      additionalProperties: false
+      description: Durable, explicitly scoped customer recovery contract.
     console.v1.ReserveComputerMissionApexSessionRequest:
       type: object
       properties:
@@ -26544,6 +26976,29 @@ components:
         - draft
         - receipt
       additionalProperties: false
+    console.v1.ReviewStaffProductIssueRecoveryRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          maxLength: 4000
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 4000
+        recoveryId:
+          type: string
+          title: recovery_id
+          maxLength: 4000
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+      title: ReviewStaffProductIssueRecoveryRequest
+      additionalProperties: false
     console.v1.ReviewWorkspaceMemoryRequest:
       type: object
       properties:
@@ -26793,6 +27248,30 @@ components:
           title: evidence_refs
       title: RunAsIdentitySummary
       additionalProperties: false
+    console.v1.ScanStaffProductIssueRecoveryRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          maxLength: 4000
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 4000
+        recoveryId:
+          type: string
+          title: recovery_id
+          maxLength: 4000
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+      title: ScanStaffProductIssueRecoveryRequest
+      additionalProperties: false
+      description: Durable, explicitly scoped customer recovery contract.
     console.v1.ScenarioFixture:
       type: object
       properties:
@@ -31368,6 +31847,13 @@ components:
     meter.v1.PrepaidCreditBalance:
       type: object
       properties:
+        compensatedMicros:
+          type:
+            - integer
+            - string
+          title: compensated_micros
+          format: int64
+          description: Cash recovery, separate from purchases and non-cash grants.
         developmentCreditOnly:
           type: boolean
           title: development_credit_only
@@ -31444,6 +31930,12 @@ components:
     meter.v1.PrepaidCreditReconciliation:
       type: object
       properties:
+        compensatedDifferenceMicros:
+          type:
+            - integer
+            - string
+          title: compensated_difference_micros
+          format: int64
         grantedDifferenceMicros:
           type:
             - integer

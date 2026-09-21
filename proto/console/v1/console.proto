@@ -656,6 +656,7 @@ service ConsoleService {
   // ListIntegrationTiles returns setup and health tiles for onboarding.
   rpc ListIntegrationTiles(ListIntegrationTilesRequest) returns (ListIntegrationTilesResponse) {
     option (common.v1.required_scopes) = "console:read";
+    option (common.v1.required_scopes) = "connectors:read";
     option (common.v1.workspace_scope_field) = "query.workspace_id";
 
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
@@ -985,6 +986,42 @@ service ConsoleService {
   rpc EngageStaffProductIssueReport(EngageStaffProductIssueReportRequest) returns (EngageStaffProductIssueReportResponse) {
     option (common.v1.staff_account_required) = true;
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // PrepareStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc PrepareStaffProductIssueRecovery(PrepareStaffProductIssueRecoveryRequest) returns (ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ScanStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc ScanStaffProductIssueRecovery(ScanStaffProductIssueRecoveryRequest) returns (ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ReviewStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc ReviewStaffProductIssueRecovery(ReviewStaffProductIssueRecoveryRequest) returns (ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ExecuteStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc ExecuteStaffProductIssueRecovery(ExecuteStaffProductIssueRecoveryRequest) returns (ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // GetProductIssueRecovery accesses only the authenticated recovery recipient or authorized staff.
+  rpc GetProductIssueRecovery(GetProductIssueRecoveryRequest) returns (ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // ReplyProductIssueRecovery accesses only the authenticated recovery recipient or authorized staff.
+  rpc ReplyProductIssueRecovery(ReplyProductIssueRecoveryRequest) returns (ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
   }
   // GetOperatingFeedback returns the latest durable feedback revision for one
   // Dex response, including a retraction marker when the operator removed it.
@@ -8575,6 +8612,8 @@ enum OperatingHomepageSuggestionFeedbackAction {
 
 // Model credits are separate from subscriptions; automatic refill requires explicit consent.
 message InferenceCreditBalance {
+  // Original cash charges restored through verified customer recovery.
+  int64 compensated_micros = 13 [(buf.validate.field).int64.gte = 0];
   // Non-cash development funding remains separate from purchased credits.
   int64 granted_micros = 8 [(buf.validate.field).int64.gte = 0];
   int64 expired_grant_micros = 9 [(buf.validate.field).int64.gte = 0];
@@ -8634,6 +8673,7 @@ message InferenceRunCreditBalance {
   google.protobuf.Timestamp oldest_pending_at = 6;
 }
 message InferenceCreditReconciliation {
+  int64 compensated_difference_micros = 10;
   // A comparison of materialized counters with source rows in one snapshot.
   bool balanced = 1;
   int64 purchased_difference_micros = 2;
@@ -10684,4 +10724,180 @@ message WorkspaceBrandVoice {
   // voice's name, description, guidance, scopes, or archive state changes.
   uint64 version = 7;
   google.protobuf.Timestamp updated_at = 8;
+}
+
+// Durable, explicitly scoped customer recovery contract.
+message PrepareStaffProductIssueRecoveryRequest {
+  string organization_id = 1 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string workspace_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string source_organization_id = 3 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string source_workspace_id = 4 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string report_id = 5 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string error_code = 6 [
+    (common.v1.classification) = DATA_CLASSIFICATION_SAFE,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  int64 start_unix_seconds = 7;
+  int64 end_unix_seconds = 8;
+  string recipient_principal_id = 9 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string customer_summary = 10 [
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string deployment_verification = 11 [
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT,
+    (buf.validate.field).string.max_len = 4000
+  ];
+}
+
+// Durable, explicitly scoped customer recovery contract.
+message ScanStaffProductIssueRecoveryRequest {
+  string organization_id = 1 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string workspace_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string recovery_id = 3 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  int64 expected_revision = 4;
+}
+
+message ReviewStaffProductIssueRecoveryRequest {
+  string organization_id = 1 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string workspace_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string recovery_id = 3 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  int64 expected_revision = 4;
+}
+
+message ExecuteStaffProductIssueRecoveryRequest {
+  string organization_id = 1 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string workspace_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string recovery_id = 3 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  int64 expected_revision = 4;
+}
+
+// Durable, explicitly scoped customer recovery contract.
+message GetProductIssueRecoveryRequest {
+  ConsoleQuery query = 1;
+  string recovery_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+}
+
+// Durable, explicitly scoped customer recovery contract.
+message ReplyProductIssueRecoveryRequest {
+  ConsoleQuery query = 1;
+  string recovery_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string idempotency_key = 3 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string message = 4 [
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  bool resolved = 5;
+}
+
+// Durable, explicitly scoped customer recovery contract.
+message ProductIssueRecovery {
+  string organization_id = 1 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string workspace_id = 2 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string recovery_id = 3 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string report_reference = 4 [
+    (common.v1.classification) = DATA_CLASSIFICATION_SAFE,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string recipient_principal_id = 5 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string customer_summary = 6 [
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string state = 7 [
+    (common.v1.classification) = DATA_CLASSIFICATION_SAFE,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  int64 revision = 8;
+  int64 affected_request_count = 9;
+  int64 expected_credit_micros = 10;
+  int64 compensated_micros = 11;
+  int64 remaining_request_count = 12;
+  string notification_id = 13 [
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string last_reply = 14 [
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string coverage = 15 [
+    (common.v1.classification) = DATA_CLASSIFICATION_SAFE,
+    (buf.validate.field).string.max_len = 4000
+  ];
+  string deployment_verification = 16 [
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT,
+    (buf.validate.field).string.max_len = 4000
+  ];
+}
+
+// Durable, explicitly scoped customer recovery contract.
+message ProductIssueRecoveryResponse {
+  ProductIssueRecovery recovery = 1;
 }

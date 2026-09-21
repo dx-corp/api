@@ -62,6 +62,18 @@ service MeterService {
     option (common.v1.workspace_scope_field) = "workspace_id";
     option (common.v1.risk_level) = RISK_LEVEL_HIGH;
   }
+  // Read original settlement eligibility without accepting or issuing compensation.
+  rpc PreviewPrepaidCompensation(PreviewPrepaidCompensationRequest) returns (PreviewPrepaidCompensationResponse) {
+    option (common.v1.required_scopes) = "meter:credits:compensate";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Restore a cash-funded settled request once across all recovery incidents.
+  rpc CompensatePrepaidCredit(CompensatePrepaidCreditRequest) returns (CompensatePrepaidCreditResponse) {
+    option (common.v1.required_scopes) = "meter:credits:compensate";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
   // SettlePrepaidCredits operates only on the caller's authorized organization and workspace.
   rpc SettlePrepaidCredits(SettlePrepaidCreditsRequest) returns (SettlePrepaidCreditsResponse) {
     option (common.v1.required_scopes) = "meter:credits:settle";
@@ -761,6 +773,8 @@ message GetEventDashboardResponse {
 // Prepaid credits are USD amounts in integer millionths of a dollar.
 // Meter owns funding, reservations, settlement, and the available balance.
 message PrepaidCreditBalance {
+  // Cash recovery, separate from purchases and non-cash grants.
+  int64 compensated_micros = 13 [(buf.validate.field).int64.gte = 0];
   // Enrolled development programs cannot consume paid credits or trigger paid refill.
   bool development_credit_only = 12;
   // Non-cash development funding, kept separate from purchased credits.
@@ -805,6 +819,7 @@ message PrepaidRunBalance {
   google.protobuf.Timestamp oldest_pending_at = 6;
 }
 message PrepaidCreditReconciliation {
+  int64 compensated_difference_micros = 12;
   int64 granted_difference_micros = 10;
   int64 invalid_grant_allocation_count = 11 [(buf.validate.field).int64.gte = 0];
   // A comparison of materialized counters with source rows in one snapshot.
@@ -1051,4 +1066,57 @@ message ReserveWorkCreditsResponse {
   bool settled = 2;
   // True only for the atomic first reservation; false never authorizes execution.
   bool created = 3;
+}
+
+// Organization and actor come exclusively from the authenticated recovery service.
+message CompensatePrepaidCreditRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string gateway_request_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string incident_id = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string idempotency_key = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+}
+message CompensatePrepaidCreditResponse {
+  int64 compensated_micros = 1 [(buf.validate.field).int64.gt = 0];
+  string receipt_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  // Another incident or retry already restored this original charge.
+  bool duplicate = 3;
+}
+
+message PreviewPrepaidCompensationRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 256,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  repeated string gateway_request_ids = 2 [
+    (buf.validate.field).repeated.min_items = 1,
+    (buf.validate.field).repeated.max_items = 100,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+}
+message PrepaidCompensationEligibility {
+  string gateway_request_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  bool eligible = 2;
+  int64 credit_micros = 3 [(buf.validate.field).int64.gte = 0];
+  // Stable owner codes: eligible, not_found, unsettled, zero_charge, grant_funded.
+  string reason = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+}
+message PreviewPrepaidCompensationResponse {
+  repeated PrepaidCompensationEligibility entries = 1;
 }
