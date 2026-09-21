@@ -137,6 +137,36 @@ message ToolExecutionLinkage {
   string application_id = 13 [(buf.validate.field).string.min_len = 1];
   ToolExecutionProjectSource project_source = 14;
   ToolExecutionProjectImport project_import = 15;
+  // Exact Platform-admitted task recipe. Executor preparation is authorized
+  // from this typed linkage, never from caller-controlled metadata.
+  ToolExecutionWorkspaceRecipe workspace_recipe = 16;
+  // Platform-admitted task identity used for tenant-scoped owner inspection.
+  string task_id = 17;
+}
+
+// Versioned, server-owned preparation recipe for one task workspace. The
+// recipe carries bounded declarative requirements; it cannot contain shell
+// commands, repository hooks, credentials, or approval policy.
+message ToolExecutionWorkspaceRecipe {
+  string schema_version = 1 [(buf.validate.field).string.const = "deixic.workspace_recipe.v1"];
+  string recipe_id = 2 [(buf.validate.field).string.min_len = 1];
+  uint64 recipe_version = 3 [(buf.validate.field).uint64.gte = 1];
+  string recipe_digest = 4 [(buf.validate.field).string.min_len = 1];
+  string source_manifest_digest = 5 [(buf.validate.field).string.min_len = 1];
+  repeated string required_runtimes = 6 [(buf.validate.field).repeated = {
+    max_items: 16
+    items: {
+      string: {
+        min_len: 1
+        max_len: 64
+      }
+    }
+  }];
+  string preparation_tool = 7 [(buf.validate.field).string.const = "computer.check_runtimes"];
+  // Skills, MCP tools, approvals, and credentials remain authorized through
+  // their existing admitted contracts; this recipe carries no such authority.
+  reserved 8, 9;
+  string execution_owner = 10 [(buf.validate.field).string.const = "platform-api.dex"];
 }
 
 // ToolExecutionAttachmentMount is an immutable, server-authorized VFS version
@@ -414,6 +444,7 @@ message ListToolExecutionsRequest {
   int32 limit = 10 [(buf.validate.field).int32.gte = 0];
   int32 offset = 11 [(buf.validate.field).int32.gte = 0];
   string organization_id = 12;
+  string task_id = 13;
 }
 
 message ListToolExecutionsResponse {

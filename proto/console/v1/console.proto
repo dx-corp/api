@@ -2026,6 +2026,16 @@ message OperatingTurnRecord {
   // prompts, outputs, customer identifiers, credentials, or tool payloads.
   OperatingCustomerOutcomeIdentity customer_outcome_identity = 18;
   toolexecution.v1.ToolExecutionProjectSource project_source = 19;
+  // Accepted once with the task and replayed unchanged.
+  toolexecution.v1.ToolExecutionWorkspaceRecipe workspace_recipe = 20;
+  // Exact coding requirements accepted on the first task revision. Later
+  // revisions must match this value rather than re-running current selector
+  // policy. Absence is meaningful for an admitted non-coding task.
+  CodingAcceptanceContract coding_acceptance = 21;
+  // Marks records admitted by the immutable workspace-recipe contract.
+  // Zero identifies legacy records whose absent recipe/contract must replay
+  // without reinterpretation.
+  int32 workspace_recipe_admission_version = 22 [(buf.validate.field).int32.gte = 0];
 }
 
 message OperatingCustomerOutcomeIdentity {
@@ -3883,6 +3893,7 @@ message OperatingTaskEnvironmentBinding {
       720
     ]
   }];
+  toolexecution.v1.ToolExecutionWorkspaceRecipe workspace_recipe = 10;
 }
 
 message OperatingRequiredInitialToolIntent {
@@ -10104,6 +10115,41 @@ message GetOperatingTaskEnvironmentResponse {
   // A cleanup decision was already accepted before a later policy change.
   bool cleanup_accepted = 8;
   int32 retention_hours = 9;
+  repeated OperatingTaskEnvironmentStage stages = 10;
+  toolexecution.v1.ToolExecutionWorkspaceRecipe workspace_recipe = 11;
+}
+
+enum OperatingTaskEnvironmentStageKind {
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_UNSPECIFIED = 0;
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_SOURCE = 1;
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_PREPARATION = 2;
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_PROVISIONING = 3;
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_NETWORK = 4;
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_EXECUTION = 5;
+  OPERATING_TASK_ENVIRONMENT_STAGE_KIND_RETAINED_STATE = 6;
+}
+
+enum OperatingTaskEnvironmentStageState {
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_UNSPECIFIED = 0;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_NOT_REQUIRED = 1;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_ABSENT = 2;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_PENDING = 3;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_READY = 4;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_FAILED = 5;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_RETAINED = 6;
+  OPERATING_TASK_ENVIRONMENT_STAGE_STATE_UNKNOWN = 7;
+}
+
+message OperatingTaskEnvironmentStage {
+  OperatingTaskEnvironmentStageKind kind = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  OperatingTaskEnvironmentStageState state = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  string code = 3 [(buf.validate.field).string.max_len = 128];
 }
 
 // Caller chooses the project and observed acceptance version, never a Git SHA.

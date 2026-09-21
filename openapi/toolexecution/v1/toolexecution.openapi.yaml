@@ -673,6 +673,9 @@ components:
         organizationId:
           type: string
           title: organization_id
+        taskId:
+          type: string
+          title: task_id
       title: ListToolExecutionsRequest
       additionalProperties: false
     toolexecution.v1.ListToolExecutionsResponse:
@@ -1047,6 +1050,16 @@ components:
         projectImport:
           title: project_import
           $ref: '#/components/schemas/toolexecution.v1.ToolExecutionProjectImport'
+        workspaceRecipe:
+          title: workspace_recipe
+          description: |-
+            Exact Platform-admitted task recipe. Executor preparation is authorized
+             from this typed linkage, never from caller-controlled metadata.
+          $ref: '#/components/schemas/toolexecution.v1.ToolExecutionWorkspaceRecipe'
+        taskId:
+          type: string
+          title: task_id
+          description: Platform-admitted task identity used for tenant-scoped owner inspection.
       title: ToolExecutionLinkage
       additionalProperties: false
       description: |-
@@ -1349,6 +1362,55 @@ components:
         ToolExecutionTraceContext carries the W3C trace context that causally owns a
          tool call. It lets the AgentRun, ToolExecution, connector, and MCP spans stay
          on one distributed trace even when the execution is retried or parked.
+    toolexecution.v1.ToolExecutionWorkspaceRecipe:
+      type: object
+      properties:
+        schemaVersion:
+          type: string
+          title: schema_version
+          const: deixic.workspace_recipe.v1
+        recipeId:
+          type: string
+          title: recipe_id
+          minLength: 1
+        recipeVersion:
+          type:
+            - integer
+            - string
+          title: recipe_version
+          minimum: 1
+          format: int64
+        recipeDigest:
+          type: string
+          title: recipe_digest
+          minLength: 1
+        sourceManifestDigest:
+          type: string
+          title: source_manifest_digest
+          minLength: 1
+        requiredRuntimes:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+            minLength: 1
+            maxItems: 16
+          title: required_runtimes
+          maxItems: 16
+        preparationTool:
+          type: string
+          title: preparation_tool
+          const: computer.check_runtimes
+        executionOwner:
+          type: string
+          title: execution_owner
+          const: platform-api.dex
+      title: ToolExecutionWorkspaceRecipe
+      additionalProperties: false
+      description: |-
+        Versioned, server-owned preparation recipe for one task workspace. The
+         recipe carries bounded declarative requirements; it cannot contain shell
+         commands, repository hooks, credentials, or approval policy.
     toolexecution.v1.ToolOutputProposal:
       type: object
       properties:
