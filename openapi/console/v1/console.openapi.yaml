@@ -9591,6 +9591,29 @@ components:
         - OPERATING_SURFACE_KIND_WHATSAPP
         - OPERATING_SURFACE_KIND_APPLE_MESSAGES
         - OPERATING_SURFACE_KIND_EMAIL
+    console.v1.OperatingTaskEnvironmentStageKind:
+      type: string
+      title: OperatingTaskEnvironmentStageKind
+      enum:
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_UNSPECIFIED
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_SOURCE
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_PREPARATION
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_PROVISIONING
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_NETWORK
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_EXECUTION
+        - OPERATING_TASK_ENVIRONMENT_STAGE_KIND_RETAINED_STATE
+    console.v1.OperatingTaskEnvironmentStageState:
+      type: string
+      title: OperatingTaskEnvironmentStageState
+      enum:
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_UNSPECIFIED
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_NOT_REQUIRED
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_ABSENT
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_PENDING
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_READY
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_FAILED
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_RETAINED
+        - OPERATING_TASK_ENVIRONMENT_STAGE_STATE_UNKNOWN
     console.v1.OperatingTaskKind:
       type: string
       title: OperatingTaskKind
@@ -18756,6 +18779,14 @@ components:
           type: integer
           title: retention_hours
           format: int32
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/console.v1.OperatingTaskEnvironmentStage'
+          title: stages
+        workspaceRecipe:
+          title: workspace_recipe
+          $ref: '#/components/schemas/toolexecution.v1.ToolExecutionWorkspaceRecipe'
       title: GetOperatingTaskEnvironmentResponse
       additionalProperties: false
     console.v1.GetOperatingThreadRequest:
@@ -24261,9 +24292,33 @@ components:
             - 8
             - 168
             - 720
+        workspaceRecipe:
+          title: workspace_recipe
+          $ref: '#/components/schemas/toolexecution.v1.ToolExecutionWorkspaceRecipe'
       title: OperatingTaskEnvironmentBinding
       additionalProperties: false
       description: Immutable task identity admitted from authenticated actor and tenant/channel scope.
+    console.v1.OperatingTaskEnvironmentStage:
+      type: object
+      properties:
+        kind:
+          not:
+            enum:
+              - 0
+          title: kind
+          $ref: '#/components/schemas/console.v1.OperatingTaskEnvironmentStageKind'
+        state:
+          not:
+            enum:
+              - 0
+          title: state
+          $ref: '#/components/schemas/console.v1.OperatingTaskEnvironmentStageState'
+        code:
+          type: string
+          title: code
+          maxLength: 128
+      title: OperatingTaskEnvironmentStage
+      additionalProperties: false
     console.v1.OperatingThreadEvent:
       type: object
       properties:
@@ -24574,6 +24629,25 @@ components:
         projectSource:
           title: project_source
           $ref: '#/components/schemas/toolexecution.v1.ToolExecutionProjectSource'
+        workspaceRecipe:
+          title: workspace_recipe
+          description: Accepted once with the task and replayed unchanged.
+          $ref: '#/components/schemas/toolexecution.v1.ToolExecutionWorkspaceRecipe'
+        codingAcceptance:
+          title: coding_acceptance
+          description: |-
+            Exact coding requirements accepted on the first task revision. Later
+             revisions must match this value rather than re-running current selector
+             policy. Absence is meaningful for an admitted non-coding task.
+          $ref: '#/components/schemas/console.v1.CodingAcceptanceContract'
+        workspaceRecipeAdmissionVersion:
+          type: integer
+          title: workspace_recipe_admission_version
+          format: int32
+          description: |-
+            Marks records admitted by the immutable workspace-recipe contract.
+             Zero identifies legacy records whose absent recipe/contract must replay
+             without reinterpretation.
       title: OperatingTurnRecord
       additionalProperties: false
     console.v1.OperatingTurnRoute:
@@ -31855,6 +31929,55 @@ components:
       title: ToolExecutionProjectSourceFile
       additionalProperties: false
       description: An immutable file restored below the private task workspace.
+    toolexecution.v1.ToolExecutionWorkspaceRecipe:
+      type: object
+      properties:
+        schemaVersion:
+          type: string
+          title: schema_version
+          const: deixic.workspace_recipe.v1
+        recipeId:
+          type: string
+          title: recipe_id
+          minLength: 1
+        recipeVersion:
+          type:
+            - integer
+            - string
+          title: recipe_version
+          minimum: 1
+          format: int64
+        recipeDigest:
+          type: string
+          title: recipe_digest
+          minLength: 1
+        sourceManifestDigest:
+          type: string
+          title: source_manifest_digest
+          minLength: 1
+        requiredRuntimes:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+            minLength: 1
+            maxItems: 16
+          title: required_runtimes
+          maxItems: 16
+        preparationTool:
+          type: string
+          title: preparation_tool
+          const: computer.check_runtimes
+        executionOwner:
+          type: string
+          title: execution_owner
+          const: platform-api.dex
+      title: ToolExecutionWorkspaceRecipe
+      additionalProperties: false
+      description: |-
+        Versioned, server-owned preparation recipe for one task workspace. The
+         recipe carries bounded declarative requirements; it cannot contain shell
+         commands, repository hooks, credentials, or approval policy.
     traces.v1.TraceAnnotation:
       type: object
       properties:
