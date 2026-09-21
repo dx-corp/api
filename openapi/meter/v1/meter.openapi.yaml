@@ -294,6 +294,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/meter.v1.ReserveWorkCreditsResponse'
+  /meter.v1.MeterService/PreviewPrepaidCompensation:
+    post:
+      tags:
+        - meter.v1.MeterService
+      summary: PreviewPrepaidCompensation
+      description: Read original settlement eligibility without accepting or issuing compensation.
+      operationId: meter.v1.MeterService.PreviewPrepaidCompensation
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/meter.v1.PreviewPrepaidCompensationRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/meter.v1.PreviewPrepaidCompensationResponse'
+  /meter.v1.MeterService/CompensatePrepaidCredit:
+    post:
+      tags:
+        - meter.v1.MeterService
+      summary: CompensatePrepaidCredit
+      description: Restore a cash-funded settled request once across all recovery incidents.
+      operationId: meter.v1.MeterService.CompensatePrepaidCredit
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/meter.v1.CompensatePrepaidCreditRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/meter.v1.CompensatePrepaidCreditResponse'
   /meter.v1.MeterService/SettlePrepaidCredits:
     post:
       tags:
@@ -1587,6 +1659,51 @@ components:
           title: warnings
       title: CheckBudgetResponse
       additionalProperties: false
+    meter.v1.CompensatePrepaidCreditRequest:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 256
+          minLength: 1
+        gatewayRequestId:
+          type: string
+          title: gateway_request_id
+          maxLength: 256
+          minLength: 1
+        incidentId:
+          type: string
+          title: incident_id
+          maxLength: 256
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          maxLength: 256
+          minLength: 1
+      title: CompensatePrepaidCreditRequest
+      additionalProperties: false
+      description: Organization and actor come exclusively from the authenticated recovery service.
+    meter.v1.CompensatePrepaidCreditResponse:
+      type: object
+      properties:
+        compensatedMicros:
+          exclusiveMinimum: 0
+          type:
+            - integer
+            - string
+          title: compensated_micros
+          format: int64
+        receiptId:
+          type: string
+          title: receipt_id
+        duplicate:
+          type: boolean
+          title: duplicate
+          description: Another incident or retry already restored this original charge.
+      title: CompensatePrepaidCreditResponse
+      additionalProperties: false
     meter.v1.DevelopmentCreditGrant:
       type: object
       properties:
@@ -2526,9 +2643,37 @@ components:
           format: int64
       title: MeterSummaryBucket
       additionalProperties: false
+    meter.v1.PrepaidCompensationEligibility:
+      type: object
+      properties:
+        gatewayRequestId:
+          type: string
+          title: gateway_request_id
+        eligible:
+          type: boolean
+          title: eligible
+        creditMicros:
+          type:
+            - integer
+            - string
+          title: credit_micros
+          format: int64
+        reason:
+          type: string
+          title: reason
+          description: 'Stable owner codes: eligible, not_found, unsettled, zero_charge, grant_funded.'
+      title: PrepaidCompensationEligibility
+      additionalProperties: false
     meter.v1.PrepaidCreditBalance:
       type: object
       properties:
+        compensatedMicros:
+          type:
+            - integer
+            - string
+          title: compensated_micros
+          format: int64
+          description: Cash recovery, separate from purchases and non-cash grants.
         developmentCreditOnly:
           type: boolean
           title: development_credit_only
@@ -2605,6 +2750,12 @@ components:
     meter.v1.PrepaidCreditReconciliation:
       type: object
       properties:
+        compensatedDifferenceMicros:
+          type:
+            - integer
+            - string
+          title: compensated_difference_micros
+          format: int64
         grantedDifferenceMicros:
           type:
             - integer
@@ -2702,6 +2853,34 @@ components:
           title: oldest_pending_at
           $ref: '#/components/schemas/google.protobuf.Timestamp'
       title: PrepaidRunBalance
+      additionalProperties: false
+    meter.v1.PreviewPrepaidCompensationRequest:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          title: workspace_id
+          maxLength: 256
+          minLength: 1
+        gatewayRequestIds:
+          type: array
+          items:
+            type: string
+            maxItems: 100
+          title: gateway_request_ids
+          maxItems: 100
+          minItems: 1
+      title: PreviewPrepaidCompensationRequest
+      additionalProperties: false
+    meter.v1.PreviewPrepaidCompensationResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/meter.v1.PrepaidCompensationEligibility'
+          title: entries
+      title: PreviewPrepaidCompensationResponse
       additionalProperties: false
     meter.v1.QueryUsageRequest:
       type: object

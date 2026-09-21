@@ -1218,6 +1218,42 @@ service DeixicService {
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
 
+  // PrepareStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc PrepareStaffProductIssueRecovery(console.v1.PrepareStaffProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ScanStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc ScanStaffProductIssueRecovery(console.v1.ScanStaffProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ReviewStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc ReviewStaffProductIssueRecovery(console.v1.ReviewStaffProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // ExecuteStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
+  rpc ExecuteStaffProductIssueRecovery(console.v1.ExecuteStaffProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_HIGH;
+  }
+  // GetProductIssueRecovery accesses only the authenticated recovery recipient or authorized staff.
+  rpc GetProductIssueRecovery(console.v1.GetProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // ReplyProductIssueRecovery accesses only the authenticated recovery recipient or authorized staff.
+  rpc ReplyProductIssueRecovery(console.v1.ReplyProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   // Uses the canonical console.v1.ConsoleService.GetOperatingFeedback message contract.
   rpc GetOperatingFeedback(console.v1.GetOperatingFeedbackRequest) returns (console.v1.GetOperatingFeedbackResponse) {
     option (common.v1.required_scopes) = "console:read";
