@@ -3287,6 +3287,13 @@ components:
             Selects the provider identity represented by the resulting token. The
              app actor is currently supported only by Linear agent installations.
           $ref: '#/components/schemas/connectors.v1.OAuthActorMode'
+        actorLinkConnectionId:
+          type: string
+          title: actor_link_connection_id
+          description: |-
+            Existing connection whose provider actor should be privately linked to
+             the authenticated Deixic principal. This runs user OAuth only, verifies
+             the provider subject, and never replaces the connection's credentials.
       title: InitiateOAuthFlowRequest
       additionalProperties: false
     connectors.v1.InitiateOAuthFlowResponse:

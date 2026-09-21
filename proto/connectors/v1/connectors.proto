@@ -1152,6 +1152,10 @@ message InitiateOAuthFlowRequest {
   // Selects the provider identity represented by the resulting token. The
   // app actor is currently supported only by Linear agent installations.
   OAuthActorMode actor_mode = 7;
+  // Existing connection whose provider actor should be privately linked to
+  // the authenticated Deixic principal. This runs user OAuth only, verifies
+  // the provider subject, and never replaces the connection's credentials.
+  string actor_link_connection_id = 8;
 }
 
 enum OAuthActorMode {
