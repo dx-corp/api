@@ -874,7 +874,8 @@ paths:
       summary: CompleteOAuthFlow
       description: |-
         CompleteOAuthFlow exchanges the authorization code for access/refresh
-         tokens and registers the connection in one call.
+         tokens. Providers that authorize more than one tenant return an explicit
+         selection list; the caller completes the same state with selected_tenant_id.
       operationId: connectors.v1.ConnectorService.CompleteOAuthFlow
       parameters:
         - name: Connect-Protocol-Version
@@ -1282,6 +1283,7 @@ components:
         - AUTH_TYPE_BASIC
         - AUTH_TYPE_MTLS
         - AUTH_TYPE_GITHUB_APP
+        - AUTH_TYPE_NONE
       description: AuthType describes the authentication method for a connection.
     connectors.v1.ConnectorActionErrorKind:
       type: string
@@ -1568,8 +1570,10 @@ components:
         code:
           type: string
           title: code
-          minLength: 1
-          description: Authorization code returned by the provider on the redirect.
+          description: |-
+            Authorization code returned by the provider on the redirect. Required on
+             the first completion and empty only when selected_tenant_id completes an
+             already-custodied multi-tenant authorization.
         redirectUri:
           type: string
           title: redirect_uri
@@ -1591,6 +1595,13 @@ components:
           description: |-
             Untrusted GitHub callback coordinate; verified against the authenticated
              provider user and configured product App before connection registration.
+        selectedTenantId:
+          type: string
+          title: selected_tenant_id
+          description: |-
+            Exact provider tenant selected from a prior CompleteOAuthFlow response.
+             Leave empty on the authorization-code exchange. The server never chooses
+             an authorized tenant implicitly.
       title: CompleteOAuthFlowRequest
       additionalProperties: false
     connectors.v1.CompleteOAuthFlowResponse:
@@ -1599,6 +1610,17 @@ components:
         connection:
           title: connection
           $ref: '#/components/schemas/connectors.v1.Connection'
+        authorizedTenants:
+          type: array
+          items:
+            $ref: '#/components/schemas/connectors.v1.OAuthProviderTenant'
+          title: authorized_tenants
+          description: |-
+            Authorized provider tenants requiring explicit customer selection before
+             the connection can be registered. Empty when connection is populated.
+        tenantSelectionRequired:
+          type: boolean
+          title: tenant_selection_required
       title: CompleteOAuthFlowResponse
       additionalProperties: false
     connectors.v1.Connection:
@@ -3549,6 +3571,20 @@ components:
           title: source_state
           $ref: '#/components/schemas/connectors.v1.UpcomingCallSourceState'
       title: ListUpcomingCallsResponse
+      additionalProperties: false
+    connectors.v1.OAuthProviderTenant:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          title: tenant_id
+        tenantName:
+          type: string
+          title: tenant_name
+        tenantType:
+          type: string
+          title: tenant_type
+      title: OAuthProviderTenant
       additionalProperties: false
     connectors.v1.PreviewCustomConnectorRequest:
       type: object

@@ -181,7 +181,8 @@ service ConnectorService {
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
   // CompleteOAuthFlow exchanges the authorization code for access/refresh
-  // tokens and registers the connection in one call.
+  // tokens. Providers that authorize more than one tenant return an explicit
+  // selection list; the caller completes the same state with selected_tenant_id.
   rpc CompleteOAuthFlow(CompleteOAuthFlowRequest) returns (CompleteOAuthFlowResponse) {
     option (common.v1.required_scopes) = "connectors:write";
     option (common.v1.organization_scope_field) = "organization_id";
@@ -271,6 +272,10 @@ enum AuthType {
   AUTH_TYPE_BASIC = 3;
   AUTH_TYPE_MTLS = 4;
   AUTH_TYPE_GITHUB_APP = 5;
+  // The provider endpoint is public and registration requires no credential.
+  // This is distinct from UNSPECIFIED, which asks the server to use the
+  // provider's configured default authentication type.
+  AUTH_TYPE_NONE = 6;
 }
 
 // HealthStatus describes the health state of a connection.
@@ -1183,8 +1188,10 @@ message CompleteOAuthFlowRequest {
   string provider_id = 3 [(buf.validate.field).string.min_len = 1];
   // State token returned from InitiateOAuthFlow.
   string state = 4 [(buf.validate.field).string.min_len = 1];
-  // Authorization code returned by the provider on the redirect.
-  string code = 5 [(buf.validate.field).string.min_len = 1];
+  // Authorization code returned by the provider on the redirect. Required on
+  // the first completion and empty only when selected_tenant_id completes an
+  // already-custodied multi-tenant authorization.
+  string code = 5;
   // Same redirect_uri passed to InitiateOAuthFlow; providers verify it.
   string redirect_uri = 6 [(buf.validate.field).string.min_len = 1];
   // Human-friendly label persisted on the connection record.
@@ -1193,10 +1200,24 @@ message CompleteOAuthFlowRequest {
   // Untrusted GitHub callback coordinate; verified against the authenticated
   // provider user and configured product App before connection registration.
   uint64 github_installation_id = 9;
+  // Exact provider tenant selected from a prior CompleteOAuthFlow response.
+  // Leave empty on the authorization-code exchange. The server never chooses
+  // an authorized tenant implicitly.
+  string selected_tenant_id = 10;
 }
 
 message CompleteOAuthFlowResponse {
   Connection connection = 1;
+  // Authorized provider tenants requiring explicit customer selection before
+  // the connection can be registered. Empty when connection is populated.
+  repeated OAuthProviderTenant authorized_tenants = 2;
+  bool tenant_selection_required = 3;
+}
+
+message OAuthProviderTenant {
+  string tenant_id = 1;
+  string tenant_name = 2;
+  string tenant_type = 3;
 }
 
 message InitiateMcpOAuthFlowRequest {

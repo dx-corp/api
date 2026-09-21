@@ -430,6 +430,7 @@ service DeixicService {
   // Uses the canonical console.v1.ConsoleService.ListIntegrationTiles message contract.
   rpc ListIntegrationTiles(console.v1.ListIntegrationTilesRequest) returns (console.v1.ListIntegrationTilesResponse) {
     option (common.v1.required_scopes) = "console:read";
+    option (common.v1.required_scopes) = "connectors:read";
     option (common.v1.workspace_scope_field) = "query.workspace_id";
 
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
