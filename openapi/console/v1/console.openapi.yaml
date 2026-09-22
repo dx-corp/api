@@ -9672,6 +9672,19 @@ components:
         - OPERATING_CORRECTION_REVIEW_STATE_APPROVED
         - OPERATING_CORRECTION_REVIEW_STATE_REJECTED
         - OPERATING_CORRECTION_REVIEW_STATE_INELIGIBLE
+    console.v1.OperatingExecutionPlacement:
+      type: string
+      title: OperatingExecutionPlacement
+      enum:
+        - OPERATING_EXECUTION_PLACEMENT_UNSPECIFIED
+        - OPERATING_EXECUTION_PLACEMENT_INLINE_TURN
+        - OPERATING_EXECUTION_PLACEMENT_COMPUTER_MISSION
+      description: |-
+        Server-owned Auto decision pinned to an accepted task, never a channel preference.
+         Where an accepted Auto task executes. The classifier already picks a model
+         from the task's purpose; this records the execution environment that same
+         decision implies, so placement is durable, replayable, and attributable to
+         the policy version that chose it rather than re-derived at each stage.
     console.v1.OperatingExecutionProfileKind:
       type: string
       title: OperatingExecutionProfileKind
@@ -23012,9 +23025,11 @@ components:
         policyVersion:
           type: string
           title: policy_version
+        placement:
+          title: placement
+          $ref: '#/components/schemas/console.v1.OperatingExecutionPlacement'
       title: OperatingAutoModelRoute
       additionalProperties: false
-      description: Server-owned Auto decision pinned to an accepted task, never a channel preference.
     console.v1.OperatingCapabilityContract:
       type: object
       properties:
