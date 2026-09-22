@@ -8709,10 +8709,25 @@ message FulfillInferenceCreditCheckoutResponse {
 }
 
 // Server-owned Auto decision pinned to an accepted task, never a channel preference.
+// Where an accepted Auto task executes. The classifier already picks a model
+// from the task's purpose; this records the execution environment that same
+// decision implies, so placement is durable, replayable, and attributable to
+// the policy version that chose it rather than re-derived at each stage.
+enum OperatingExecutionPlacement {
+  OPERATING_EXECUTION_PLACEMENT_UNSPECIFIED = 0;
+  // The turn runs inline on the conversation's own runner.
+  OPERATING_EXECUTION_PLACEMENT_INLINE_TURN = 1;
+  // The work is long-running and belongs on a Computer. Platform remains the
+  // durable Run authority; this records the placement decision, it does not
+  // transfer mission ownership.
+  OPERATING_EXECUTION_PLACEMENT_COMPUTER_MISSION = 2;
+}
+
 message OperatingAutoModelRoute {
   OperatingModelSelection target = 1;
   StaffInferenceRoutingPurpose purpose = 2;
   string policy_version = 3;
+  OperatingExecutionPlacement placement = 4;
 }
 
 // Customer-defined business schemas. Field and relationship IDs remain stable across versions.
