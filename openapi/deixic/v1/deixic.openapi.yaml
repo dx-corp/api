@@ -4116,6 +4116,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/console.v1.ArchiveOperatingThreadResponse'
+  /deixic.v1.DeixicService/ForkOperatingThread:
+    post:
+      tags:
+        - deixic.v1.DeixicService
+      summary: ForkOperatingThread
+      description: Uses the canonical console.v1.ConsoleService.ForkOperatingThread message contract.
+      operationId: deixic.v1.DeixicService.ForkOperatingThread
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.ForkOperatingThreadRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ForkOperatingThreadResponse'
   /deixic.v1.DeixicService/RenameOperatingThread:
     post:
       tags:
@@ -17589,6 +17625,59 @@ components:
           title: memory_id
       title: ForgetWorkspaceMemoryResponse
       additionalProperties: false
+    console.v1.ForkOperatingThreadRequest:
+      type: object
+      properties:
+        query:
+          title: query
+          $ref: '#/components/schemas/console.v1.ConsoleQuery'
+        sourceChannelId:
+          type: string
+          title: source_channel_id
+          minLength: 1
+        throughMessageId:
+          type: string
+          title: through_message_id
+          maxLength: 512
+          description: |-
+            Copy history up to and including this message. Empty copies the whole
+             thread as of expected_source_conversation_revision.
+        expectedSourceConversationRevision:
+          type:
+            - integer
+            - string
+          title: expected_source_conversation_revision
+          format: int64
+          description: |-
+            The source conversation_revision the caller observed. The fork is refused
+             when the source has moved since, so a fork always names a state the
+             caller actually read.
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          maxLength: 512
+          minLength: 1
+        label:
+          type: string
+          title: label
+          maxLength: 80
+      title: ForkOperatingThreadRequest
+      required:
+        - query
+      additionalProperties: false
+    console.v1.ForkOperatingThreadResponse:
+      type: object
+      properties:
+        channel:
+          title: channel
+          $ref: '#/components/schemas/console.v1.OperatingChannel'
+        replayed:
+          type: boolean
+          title: replayed
+      title: ForkOperatingThreadResponse
+      required:
+        - channel
+      additionalProperties: false
     console.v1.FulfillInferenceCreditCheckoutRequest:
       type: object
       properties:
@@ -22267,6 +22356,12 @@ components:
         archivedByDisplayName:
           type: string
           title: archived_by_display_name
+        fork:
+          title: fork
+          description: |-
+            Fork provenance is durable owner metadata, absent on a thread that was
+             started directly.
+          $ref: '#/components/schemas/console.v1.OperatingThreadFork'
       title: OperatingChannel
       additionalProperties: false
       description: |-
@@ -23362,6 +23457,45 @@ components:
         OperatingThreadExecution is the user-safe projection of one durable Dex
          thread. Runner, Pod, service, certificate, and cluster coordinates are
          intentionally absent.
+    console.v1.OperatingThreadFork:
+      type: object
+      properties:
+        sourceChannelId:
+          type: string
+          title: source_channel_id
+        throughMessageId:
+          type: string
+          title: through_message_id
+          description: The last source message copied into the fork.
+        sourceConversationRevision:
+          type:
+            - integer
+            - string
+          title: source_conversation_revision
+          format: int64
+          description: |-
+            The source's conversation_revision at the moment of the fork. Together
+             with through_message_id this names exactly what was copied.
+        forkedByPrincipalId:
+          type: string
+          title: forked_by_principal_id
+        forkedAt:
+          title: forked_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        copiedMessageCount:
+          type: integer
+          title: copied_message_count
+          format: int32
+      title: OperatingThreadFork
+      additionalProperties: false
+      description: |-
+        Where a forked operating thread came from.
+
+         A fork copies conversation content and nothing else. It does not inherit
+         the source's pinned model selection, its Auto route, its receipts, its
+         attachments, or its turn records, because each of those carries authority
+         that was granted to the source thread's principal rather than to whoever
+         forked it. The fork re-resolves all of them under the forking principal.
     console.v1.OperatingThreadResponse:
       type: object
       properties:

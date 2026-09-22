@@ -827,6 +827,18 @@ service ConsoleService {
 
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
+  // ForkOperatingThread copies one operating thread's conversation content
+  // into a new thread owned by the caller. The fork inherits content only:
+  // the source's model selection, Auto route, receipts, attachments, and turn
+  // records are all dropped, because each carries authority granted to the
+  // source's principal rather than to the forker. Repeating a request with
+  // the same idempotency key and digest returns the original fork.
+  rpc ForkOperatingThread(ForkOperatingThreadRequest) returns (ForkOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
   // RenameOperatingThread replaces the durable user-visible title for one
   // owner-backed operating thread. The desired title makes retries idempotent.
   rpc RenameOperatingThread(RenameOperatingThreadRequest) returns (RenameOperatingThreadResponse) {
@@ -1934,6 +1946,28 @@ message OperatingChannel {
   // archived channel and cleared when the channel is unarchived.
   string archived_by_principal_id = 13;
   string archived_by_display_name = 14;
+  // Fork provenance is durable owner metadata, absent on a thread that was
+  // started directly.
+  OperatingThreadFork fork = 15;
+}
+
+// Where a forked operating thread came from.
+//
+// A fork copies conversation content and nothing else. It does not inherit
+// the source's pinned model selection, its Auto route, its receipts, its
+// attachments, or its turn records, because each of those carries authority
+// that was granted to the source thread's principal rather than to whoever
+// forked it. The fork re-resolves all of them under the forking principal.
+message OperatingThreadFork {
+  string source_channel_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  // The last source message copied into the fork.
+  string through_message_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  // The source's conversation_revision at the moment of the fork. Together
+  // with through_message_id this names exactly what was copied.
+  int64 source_conversation_revision = 3;
+  string forked_by_principal_id = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  google.protobuf.Timestamp forked_at = 5;
+  int32 copied_message_count = 6;
 }
 
 enum OperatingThreadArchiveFilter {
@@ -2388,6 +2422,38 @@ message ArchiveOperatingThreadResponse {
   OperatingChannel channel = 1 [(buf.validate.field).required = true];
   bool changed = 2;
   bool replayed = 3;
+}
+
+message ForkOperatingThreadRequest {
+  ConsoleQuery query = 1 [(buf.validate.field).required = true];
+  string source_channel_id = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  // Copy history up to and including this message. Empty copies the whole
+  // thread as of expected_source_conversation_revision.
+  string through_message_id = 3 [
+    (buf.validate.field).string.max_len = 512,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  // The source conversation_revision the caller observed. The fork is refused
+  // when the source has moved since, so a fork always names a state the
+  // caller actually read.
+  int64 expected_source_conversation_revision = 4;
+  string idempotency_key = 5 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
+  string label = 6 [
+    (buf.validate.field).string.max_len = 80,
+    (common.v1.classification) = DATA_CLASSIFICATION_CONTENT
+  ];
+}
+
+message ForkOperatingThreadResponse {
+  OperatingChannel channel = 1 [(buf.validate.field).required = true];
+  bool replayed = 2;
 }
 
 message RenameOperatingThreadRequest {
