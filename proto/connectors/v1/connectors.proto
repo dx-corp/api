@@ -846,16 +846,26 @@ message CustomConnector {
 }
 
 message PreviewCustomConnectorRequest {
+  option (buf.validate.message).cel = {
+    id: "connectors.v1.preview_custom_connector_request.source_required"
+    message: "document or source_uri is required"
+    expression: "size(this.document) > 0 || size(this.source_uri) > 0"
+  };
+
   string organization_id = 1 [(buf.validate.field).string.min_len = 1];
   string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
   string name = 3 [(buf.validate.field).string.min_len = 1];
   string description = 4;
   string source_type = 5 [(buf.validate.field).string.min_len = 1];
-  string document = 6 [(buf.validate.field).string.min_len = 1];
+  string document = 6;
   string source_uri = 7;
   repeated string approved_destination_origins = 8;
   repeated CustomConnectorActionMetadata actions = 9;
   bool descriptions_reviewed = 10;
+  // expected_spec_sha256 binds a create request to the exact remote bytes
+  // returned by preview. It is optional for preview and inline definitions,
+  // and required by the Connectors owner when create fetches source_uri.
+  string expected_spec_sha256 = 11 [(buf.validate.field).string.pattern = "^(|[0-9a-f]{64})$"];
 }
 
 message PreviewCustomConnectorResponse {

@@ -1218,6 +1218,12 @@ service DeixicService {
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
 
+  // Lists the global recovery queue under verified staff authority.
+  rpc ListStaffProductIssueRecoveries(console.v1.ListStaffProductIssueRecoveriesRequest) returns (console.v1.ListStaffProductIssueRecoveriesResponse) {
+    option (common.v1.required_scopes) = "support_access.manage";
+    option (common.v1.staff_account_required) = true;
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   // PrepareStaffProductIssueRecovery advances the staff-reviewed recovery of charged failures.
   rpc PrepareStaffProductIssueRecovery(console.v1.PrepareStaffProductIssueRecoveryRequest) returns (console.v1.ProductIssueRecoveryResponse) {
     option (common.v1.required_scopes) = "support_access.manage";

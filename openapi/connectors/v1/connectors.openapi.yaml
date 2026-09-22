@@ -3611,7 +3611,6 @@ components:
         document:
           type: string
           title: document
-          minLength: 1
         sourceUri:
           type: string
           title: source_uri
@@ -3628,8 +3627,22 @@ components:
         descriptionsReviewed:
           type: boolean
           title: descriptions_reviewed
+        expectedSpecSha256:
+          type: string
+          title: expected_spec_sha256
+          pattern: ^(|[0-9a-f]{64})$
+          description: |-
+            expected_spec_sha256 binds a create request to the exact remote bytes
+             returned by preview. It is optional for preview and inline definitions,
+             and required by the Connectors owner when create fetches source_uri.
       title: PreviewCustomConnectorRequest
       additionalProperties: false
+      description: |+
+        document or source_uri is required:
+        ```
+        size(this.document) > 0 || size(this.source_uri) > 0
+        ```
+
     connectors.v1.PreviewCustomConnectorResponse:
       type: object
       properties:
