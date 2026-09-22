@@ -5953,6 +5953,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/console.v1.EngageStaffProductIssueReportResponse'
+  /deixic.v1.DeixicService/ListStaffProductIssueRecoveries:
+    post:
+      tags:
+        - deixic.v1.DeixicService
+      summary: ListStaffProductIssueRecoveries
+      description: Lists the global recovery queue under verified staff authority.
+      operationId: deixic.v1.DeixicService.ListStaffProductIssueRecoveries
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.ListStaffProductIssueRecoveriesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.ListStaffProductIssueRecoveriesResponse'
   /deixic.v1.DeixicService/PrepareStaffProductIssueRecovery:
     post:
       tags:
@@ -21387,6 +21423,39 @@ components:
           $ref: '#/components/schemas/meter.v1.ListManagedInferenceAdminEventsRequest'
       title: ListStaffManagedInferenceAdminEventsRequest
       additionalProperties: false
+    console.v1.ListStaffProductIssueRecoveriesRequest:
+      type: object
+      properties:
+        state:
+          type: string
+          title: state
+          maxLength: 32
+          description: Empty means all states; otherwise one existing recovery state.
+        pageSize:
+          type: integer
+          title: page_size
+          maximum: 100
+          description: Zero defaults to 25; at most 100 rows.
+        pageToken:
+          type: string
+          title: page_token
+          maxLength: 4096
+      title: ListStaffProductIssueRecoveriesRequest
+      additionalProperties: false
+      description: Global staff queue. Tenant scope is returned explicitly on each row.
+    console.v1.ListStaffProductIssueRecoveriesResponse:
+      type: object
+      properties:
+        recoveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/console.v1.StaffProductIssueRecoverySummary'
+          title: recoveries
+        nextPageToken:
+          type: string
+          title: next_page_token
+      title: ListStaffProductIssueRecoveriesResponse
+      additionalProperties: false
     console.v1.ListStaffProductIssueReportsRequest:
       type: object
       properties:
@@ -26428,6 +26497,38 @@ components:
       description: |-
         StaffInferenceRoutingProfile is the durable Dex inference override for the
          single server-configured STAFF organization.
+    console.v1.StaffProductIssueRecoverySummary:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        recoveryId:
+          type: string
+          title: recovery_id
+        reportReference:
+          type: string
+          title: report_reference
+        recipientPrincipalId:
+          type: string
+          title: recipient_principal_id
+        customerSummary:
+          type: string
+          title: customer_summary
+        state:
+          type: string
+          title: state
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        lastReply:
+          type: string
+          title: last_reply
+      title: StaffProductIssueRecoverySummary
+      additionalProperties: false
     console.v1.StaffProductIssueReport:
       type: object
       properties:
