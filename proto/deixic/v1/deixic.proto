@@ -842,6 +842,14 @@ service DeixicService {
     option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
 
+  // Uses the canonical console.v1.ConsoleService.ForkOperatingThread message contract.
+  rpc ForkOperatingThread(console.v1.ForkOperatingThreadRequest) returns (console.v1.ForkOperatingThreadResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.workspace_scope_field) = "query.workspace_id";
+
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+
   // Uses the canonical console.v1.ConsoleService.RenameOperatingThread message contract.
   rpc RenameOperatingThread(console.v1.RenameOperatingThreadRequest) returns (console.v1.RenameOperatingThreadResponse) {
     option (common.v1.required_scopes) = "console:write";
