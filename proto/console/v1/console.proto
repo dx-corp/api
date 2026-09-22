@@ -1949,6 +1949,17 @@ message OperatingChannel {
   // Fork provenance is durable owner metadata, absent on a thread that was
   // started directly.
   OperatingThreadFork fork = 15;
+
+  // The source project this thread's work belongs to, empty when the thread
+  // has never submitted a turn against one. This is the existing
+  // `project_resource_id` from SubmitOperatingMessageRequest, recorded durably
+  // on the thread so several threads working the same project can be listed
+  // together. It is a grouping, never an authority: every read still resolves
+  // the thread under the caller's own tenant scope.
+  string project_resource_id = 16 [
+    (buf.validate.field).string.max_len = 255,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
 }
 
 // Where a forked operating thread came from.
@@ -2392,6 +2403,12 @@ message OperatingReceiptAction {
 message ListOperatingChannelsRequest {
   ConsoleQuery query = 1 [(buf.validate.field).required = true];
   OperatingThreadArchiveFilter archive_filter = 2 [(buf.validate.field).enum.defined_only = true];
+  // Return only the threads bound to this source project. Empty returns every
+  // thread in the tenant scope, bound or not.
+  string project_resource_id = 3 [
+    (buf.validate.field).string.max_len = 255,
+    (common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER
+  ];
 }
 
 message ListOperatingChannelsResponse {

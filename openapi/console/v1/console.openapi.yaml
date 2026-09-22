@@ -21858,6 +21858,13 @@ components:
         archiveFilter:
           title: archive_filter
           $ref: '#/components/schemas/console.v1.OperatingThreadArchiveFilter'
+        projectResourceId:
+          type: string
+          title: project_resource_id
+          maxLength: 255
+          description: |-
+            Return only the threads bound to this source project. Empty returns every
+             thread in the tenant scope, bound or not.
       title: ListOperatingChannelsRequest
       required:
         - query
@@ -23281,6 +23288,17 @@ components:
             Fork provenance is durable owner metadata, absent on a thread that was
              started directly.
           $ref: '#/components/schemas/console.v1.OperatingThreadFork'
+        projectResourceId:
+          type: string
+          title: project_resource_id
+          maxLength: 255
+          description: |-
+            The source project this thread's work belongs to, empty when the thread
+             has never submitted a turn against one. This is the existing
+             `project_resource_id` from SubmitOperatingMessageRequest, recorded durably
+             on the thread so several threads working the same project can be listed
+             together. It is a grouping, never an authority: every read still resolves
+             the thread under the caller's own tenant scope.
       title: OperatingChannel
       additionalProperties: false
       description: |-
