@@ -33,6 +33,18 @@ service ConsoleService {
     option (common.v1.workspace_scope_field) = "workspace_id";
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
   }
+  rpc RecordComplianceAssessment(RecordComplianceAssessmentRequest) returns (RecordComplianceAssessmentResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  rpc GetComplianceAssessment(GetComplianceAssessmentRequest) returns (GetComplianceAssessmentResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   // Lists built-in native business blueprints available to every authorized tenant.
   rpc ListBusinessBlueprints(ListBusinessBlueprintsRequest) returns (ListBusinessBlueprintsResponse) {
     option (common.v1.required_scopes) = "console:read";
@@ -11079,4 +11091,39 @@ message ComplianceSubjectAssessment {
 
 message AssessComplianceSubjectResponse {
   ComplianceSubjectAssessment assessment = 1;
+}
+
+// Records a server-evaluated snapshot. A replay key always returns its first accepted result.
+message RecordComplianceAssessmentRequest {
+  string organization_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string workspace_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string profile_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string subject_kind = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string subject_id = 5 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string idempotency_key = 6 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+
+message ComplianceAssessmentRecord {
+  string id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string organization_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string workspace_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string evaluator_version = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  ComplianceSubjectAssessment assessment = 5;
+  string manifest_digest = 6 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string recorded_by_principal_id = 7 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+
+message RecordComplianceAssessmentResponse {
+  ComplianceAssessmentRecord record = 1;
+  bool idempotent_replay = 2;
+}
+
+message GetComplianceAssessmentRequest {
+  string organization_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string workspace_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string record_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+
+message GetComplianceAssessmentResponse {
+  ComplianceAssessmentRecord record = 1;
 }
