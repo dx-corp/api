@@ -438,6 +438,27 @@ service DeixicService {
 
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
   }
+  // Reads the registered agent product object from its versioned and connector owners.
+  rpc GetAgentProduct(console.v1.GetAgentProductRequest) returns (console.v1.GetAgentProductResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Clones safe agent behavior through the registry owner for the current workspace.
+  rpc CloneAgentProduct(console.v1.CloneAgentProductRequest) returns (console.v1.CloneAgentProductResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Writes editable agent behavior through the registry's immutable versioned owner.
+  rpc UpdateAgentProduct(console.v1.UpdateAgentProductRequest) returns (console.v1.UpdateAgentProductResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
 
   // Uses the canonical console.v1.ConsoleService.SubmitAgentWorkforceEvidence message contract.
   rpc SubmitAgentWorkforceEvidence(console.v1.SubmitAgentWorkforceEvidenceRequest) returns (console.v1.SubmitAgentWorkforceEvidenceResponse) {
