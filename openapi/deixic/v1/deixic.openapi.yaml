@@ -2,6 +2,42 @@ openapi: 3.1.0
 info:
   title: deixic.v1
 paths:
+  /deixic.v1.DeixicService/AssessComplianceSubject:
+    post:
+      tags:
+        - deixic.v1.DeixicService
+      summary: AssessComplianceSubject
+      description: Evaluates a versioned compliance profile against owner-fetched, tenant-scoped facts.
+      operationId: deixic.v1.DeixicService.AssessComplianceSubject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.AssessComplianceSubjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.AssessComplianceSubjectResponse'
   /deixic.v1.DeixicService/ListBusinessBlueprints:
     post:
       tags:
@@ -8838,6 +8874,15 @@ components:
          this workspace. NOT_CONFIGURED means the deployment has no commitment-ledger
          origin configured, so the response carries no commitments instead of an
          empty ledger that would read as "you have none".
+    console.v1.ComplianceFindingStatus:
+      type: string
+      title: ComplianceFindingStatus
+      enum:
+        - COMPLIANCE_FINDING_STATUS_UNSPECIFIED
+        - COMPLIANCE_FINDING_STATUS_SATISFIED
+        - COMPLIANCE_FINDING_STATUS_VIOLATED
+        - COMPLIANCE_FINDING_STATUS_INDETERMINATE
+        - COMPLIANCE_FINDING_STATUS_NOT_APPLICABLE
     console.v1.ComputerMissionAuthorityMode:
       type: string
       title: ComputerMissionAuthorityMode
@@ -10740,6 +10785,35 @@ components:
       title: ArchiveWorkspaceResponse
       required:
         - settings
+      additionalProperties: false
+    console.v1.AssessComplianceSubjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        profileId:
+          type: string
+          title: profile_id
+        subjectKind:
+          type: string
+          title: subject_kind
+        subjectId:
+          type: string
+          title: subject_id
+      title: AssessComplianceSubjectRequest
+      additionalProperties: false
+      description: One versioned control profile runs against one owner-fetched subject.
+    console.v1.AssessComplianceSubjectResponse:
+      type: object
+      properties:
+        assessment:
+          title: assessment
+          $ref: '#/components/schemas/console.v1.ComplianceSubjectAssessment'
+      title: AssessComplianceSubjectResponse
       additionalProperties: false
     console.v1.AttachPrivateEndpointToProfileRequest:
       type: object
@@ -13833,6 +13907,65 @@ components:
       required:
         - upload
       additionalProperties: false
+    console.v1.ComplianceRequirementFinding:
+      type: object
+      properties:
+        requirementId:
+          type: string
+          title: requirement_id
+        status:
+          title: status
+          $ref: '#/components/schemas/console.v1.ComplianceFindingStatus'
+        reasonCode:
+          type: string
+          title: reason_code
+        sourceRef:
+          type: string
+          title: source_ref
+      title: ComplianceRequirementFinding
+      additionalProperties: false
+    console.v1.ComplianceSubjectAssessment:
+      type: object
+      properties:
+        profileId:
+          type: string
+          title: profile_id
+        subjectKind:
+          type: string
+          title: subject_kind
+        subjectId:
+          type: string
+          title: subject_id
+        sourceDigest:
+          type: string
+          title: source_digest
+        sourceUpdatedAt:
+          title: source_updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        assessedAt:
+          title: assessed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        status:
+          title: status
+          $ref: '#/components/schemas/console.v1.ComplianceFindingStatus'
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/console.v1.ComplianceRequirementFinding'
+          title: findings
+        inspectedCount:
+          type: integer
+          title: inspected_count
+          description: This route covers exactly the one requested owner record.
+        expectedCount:
+          type: integer
+          title: expected_count
+        controlId:
+          type: string
+          title: control_id
+      title: ComplianceSubjectAssessment
+      additionalProperties: false
+      description: A live, bounded assessment of one execution. It is not an immutable snapshot.
     console.v1.ComputerMission:
       type: object
       properties:
