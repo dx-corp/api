@@ -2884,6 +2884,114 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/console.v1.ListAgentWorkforceRecordsResponse'
+  /console.v1.ConsoleService/GetAgentProduct:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: GetAgentProduct
+      description: Reads one registered agent, its active immutable config, and its bound workspace connections.
+      operationId: console.v1.ConsoleService.GetAgentProduct
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.GetAgentProductRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.GetAgentProductResponse'
+  /console.v1.ConsoleService/CloneAgentProduct:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: CloneAgentProduct
+      description: Clones safe behavior into a distinct registered agent without workspace credentials.
+      operationId: console.v1.ConsoleService.CloneAgentProduct
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.CloneAgentProductRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.CloneAgentProductResponse'
+  /console.v1.ConsoleService/UpdateAgentProduct:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: UpdateAgentProduct
+      description: Replaces editable agent behavior with a new immutable configuration version.
+      operationId: console.v1.ConsoleService.UpdateAgentProduct
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.UpdateAgentProductRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.UpdateAgentProductResponse'
   /console.v1.ConsoleService/ListOrbControlTargets:
     post:
       tags:
@@ -9167,6 +9275,178 @@ components:
         RuntimeWorkEnvelopeKind classifies the durable human/work object a trigger
          belongs to. Envelopes group retries and follow-up messages across channels
          without making the runtime depend on Slack-specific string labels.
+    agents.v1.AgentStatus:
+      type: string
+      title: AgentStatus
+      enum:
+        - AGENT_STATUS_UNSPECIFIED
+        - AGENT_STATUS_ACTIVE
+        - AGENT_STATUS_IDLE
+        - AGENT_STATUS_BUSY
+        - AGENT_STATUS_OFFLINE
+        - AGENT_STATUS_DEGRADED
+        - AGENT_STATUS_SUSPENDED
+      description: AgentStatus describes the operational state of an agent.
+    agents.v1.AutonomyAuthority:
+      type: string
+      title: AutonomyAuthority
+      enum:
+        - AUTONOMY_AUTHORITY_UNSPECIFIED
+        - AUTONOMY_AUTHORITY_OWN
+        - AUTONOMY_AUTHORITY_RECOMMEND
+        - AUTONOMY_AUTHORITY_REQUIRE_APPROVAL
+        - AUTONOMY_AUTHORITY_DENY
+      description: AutonomyAuthority describes how independently a teammate may act.
+    agents.v1.CommitmentKind:
+      type: string
+      title: CommitmentKind
+      enum:
+        - COMMITMENT_KIND_UNSPECIFIED
+        - COMMITMENT_KIND_FOLLOW_UP
+        - COMMITMENT_KIND_WATCH
+        - COMMITMENT_KIND_RETRY
+        - COMMITMENT_KIND_SUMMARIZE
+        - COMMITMENT_KIND_MONITOR
+        - COMMITMENT_KIND_REMEDIATE
+        - COMMITMENT_KIND_HANDOFF
+      description: CommitmentKind describes the durable commitments a teammate can accept.
+    agents.v1.InitiativeTriggerKind:
+      type: string
+      title: InitiativeTriggerKind
+      enum:
+        - INITIATIVE_TRIGGER_KIND_UNSPECIFIED
+        - INITIATIVE_TRIGGER_KIND_SCHEDULE
+        - INITIATIVE_TRIGGER_KIND_SLACK_EVENT
+        - INITIATIVE_TRIGGER_KIND_PLATFORM_EVENT
+        - INITIATIVE_TRIGGER_KIND_OBJECTIVE_WAKE
+        - INITIATIVE_TRIGGER_KIND_WAIT_RESOLVED
+        - INITIATIVE_TRIGGER_KIND_EVAL_REGRESSION
+        - INITIATIVE_TRIGGER_KIND_STALLED_WORK
+      description: |-
+        InitiativeTriggerKind describes events that can let a teammate start work
+         without a fresh direct human prompt.
+    agents.v1.PresenceEvent:
+      type: string
+      title: PresenceEvent
+      enum:
+        - PRESENCE_EVENT_UNSPECIFIED
+        - PRESENCE_EVENT_ACCEPTED
+        - PRESENCE_EVENT_WAITING
+        - PRESENCE_EVENT_PROGRESS
+        - PRESENCE_EVENT_BLOCKED
+        - PRESENCE_EVENT_COMPLETED
+        - PRESENCE_EVENT_FAILED
+        - PRESENCE_EVENT_ESCALATED
+      description: PresenceEvent describes channel-visible teammate activity.
+    agents.v1.TeammateChannelCapability:
+      type: string
+      title: TeammateChannelCapability
+      enum:
+        - TEAMMATE_CHANNEL_CAPABILITY_UNSPECIFIED
+        - TEAMMATE_CHANNEL_CAPABILITY_INGEST
+        - TEAMMATE_CHANNEL_CAPABILITY_RENDER
+      description: |-
+        TeammateChannelCapability describes what a channel adapter can do for a
+         teammate profile.
+    agents.v1.TeammateChannelEventKind:
+      type: string
+      title: TeammateChannelEventKind
+      enum:
+        - TEAMMATE_CHANNEL_EVENT_KIND_UNSPECIFIED
+        - TEAMMATE_CHANNEL_EVENT_KIND_MESSAGE_CREATED
+        - TEAMMATE_CHANNEL_EVENT_KIND_THREAD_REPLY_CREATED
+        - TEAMMATE_CHANNEL_EVENT_KIND_COMMAND_INVOKED
+        - TEAMMATE_CHANNEL_EVENT_KIND_ACTION_INVOKED
+        - TEAMMATE_CHANNEL_EVENT_KIND_REACTION_ADDED
+        - TEAMMATE_CHANNEL_EVENT_KIND_REACTION_REMOVED
+        - TEAMMATE_CHANNEL_EVENT_KIND_ASSISTANT_THREAD_STARTED
+        - TEAMMATE_CHANNEL_EVENT_KIND_ASSISTANT_THREAD_CONTEXT_CHANGED
+        - TEAMMATE_CHANNEL_EVENT_KIND_EMAIL_RECEIVED
+        - TEAMMATE_CHANNEL_EVENT_KIND_CALENDAR_EVENT_CHANGED
+        - TEAMMATE_CHANNEL_EVENT_KIND_ISSUE_CHANGED
+        - TEAMMATE_CHANNEL_EVENT_KIND_SCHEDULED_WAKE
+        - TEAMMATE_CHANNEL_EVENT_KIND_WEBHOOK_RECEIVED
+      description: |-
+        TeammateChannelEventKind describes normalized inbound channel events that can
+         become AgentRuntime triggers.
+    agents.v1.TeammateChannelKind:
+      type: string
+      title: TeammateChannelKind
+      enum:
+        - TEAMMATE_CHANNEL_KIND_UNSPECIFIED
+        - TEAMMATE_CHANNEL_KIND_SLACK
+        - TEAMMATE_CHANNEL_KIND_EMAIL
+        - TEAMMATE_CHANNEL_KIND_CALENDAR
+        - TEAMMATE_CHANNEL_KIND_JIRA
+        - TEAMMATE_CHANNEL_KIND_TEAMS
+        - TEAMMATE_CHANNEL_KIND_WEB
+        - TEAMMATE_CHANNEL_KIND_WEBHOOK
+        - TEAMMATE_CHANNEL_KIND_WHATSAPP
+        - TEAMMATE_CHANNEL_KIND_APPLE_MESSAGES
+      description: |-
+        TeammateChannelKind identifies a product or provider channel that can ingest
+         user activity or render teammate runtime events. It intentionally lives in
+         agents/v1 instead of agentruntime/v1 so teammate profiles can describe
+         supported channels without creating a proto import cycle.
+    agents.v1.TeammateLifecycle:
+      type: string
+      title: TeammateLifecycle
+      enum:
+        - TEAMMATE_LIFECYCLE_UNSPECIFIED
+        - TEAMMATE_LIFECYCLE_DRAFT
+        - TEAMMATE_LIFECYCLE_ACTIVE
+        - TEAMMATE_LIFECYCLE_PAUSED
+        - TEAMMATE_LIFECYCLE_DEPRECATED
+      description: |-
+        TeammateLifecycle describes whether a teammate profile can be used to
+         initiate durable work.
+    agents.v1.TeammateRuntimeRenderEventKind:
+      type: string
+      title: TeammateRuntimeRenderEventKind
+      enum:
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_UNSPECIFIED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_TRIGGER_ACCEPTED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_RUN_STARTED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_PROGRESS
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_STEP_STARTED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_STEP_COMPLETED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_OBJECTIVE_UPDATED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_APPROVAL_REQUESTED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_APPROVAL_RESOLVED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_TOOL_PROPOSED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_TOOL_COMPLETED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_ARTIFACT_CREATED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_MEMORY_PROPOSED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_WAITING
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_RESUMED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_COMPLETED
+        - TEAMMATE_RUNTIME_RENDER_EVENT_KIND_FAILED
+      description: |-
+        TeammateRuntimeRenderEventKind describes Platform runtime events a channel
+         adapter can project back into the provider surface.
+    common.v1.DeliveryChannel:
+      type: string
+      title: DeliveryChannel
+      enum:
+        - DELIVERY_CHANNEL_UNSPECIFIED
+        - DELIVERY_CHANNEL_SLACK
+        - DELIVERY_CHANNEL_EMAIL
+        - DELIVERY_CHANNEL_WEBHOOK
+        - DELIVERY_CHANNEL_IN_APP
+        - DELIVERY_CHANNEL_PUSH
+      description: DeliveryChannel identifies the notification delivery channel.
+    common.v1.EntityType:
+      type: string
+      title: EntityType
+      enum:
+        - ENTITY_TYPE_UNSPECIFIED
+        - ENTITY_TYPE_CONTACT
+        - ENTITY_TYPE_COMPANY
+        - ENTITY_TYPE_DEAL
+        - ENTITY_TYPE_TICKET
+        - ENTITY_TYPE_CUSTOMER
+        - ENTITY_TYPE_OPPORTUNITY
+      description: EntityType identifies the kind of entity across systems.
     common.v1.RiskLevel:
       type: string
       title: RiskLevel
@@ -9177,6 +9457,21 @@ components:
         - RISK_LEVEL_HIGH
         - RISK_LEVEL_CRITICAL
       description: RiskLevel classifies the risk of an action.
+    common.v1.Surface:
+      type: string
+      title: Surface
+      enum:
+        - SURFACE_UNSPECIFIED
+        - SURFACE_ENSEMBLE
+        - SURFACE_CHAT
+        - SURFACE_MAESTRO
+        - SURFACE_CONDUCTOR
+        - SURFACE_SLACK
+        - SURFACE_EXTERNAL_AGENT
+      description: |-
+        Surface identifies the product or channel surface that originated a platform
+         action. It is shared by runtime, audit, and product-facing services so
+         callers do not invent drift-prone string labels.
     connectors.v1.ConnectorEvidenceKind:
       type: string
       title: ConnectorEvidenceKind
@@ -9205,6 +9500,16 @@ components:
         ConnectorVerificationLevel is the fail-closed evidence ladder for a
          connector catalog subject. Higher levels require the canonical verification
          ledger to contain evidence that justifies the promotion.
+    connectors.v1.HealthStatus:
+      type: string
+      title: HealthStatus
+      enum:
+        - HEALTH_STATUS_UNSPECIFIED
+        - HEALTH_STATUS_HEALTHY
+        - HEALTH_STATUS_DEGRADED
+        - HEALTH_STATUS_UNHEALTHY
+        - HEALTH_STATUS_UNKNOWN
+      description: HealthStatus describes the health state of a connection.
     connectors.v1.ProviderContentTrust:
       type: string
       title: ProviderContentTrust
@@ -10558,6 +10863,916 @@ components:
           title: value
       title: AttributesEntry
       additionalProperties: false
+    agents.v1.Agent:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        workspaceId:
+          type: string
+          title: workspace_id
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        agentType:
+          type: string
+          title: agent_type
+          description: |-
+            agent_type aligns with identity/v1 IntrospectResponse.agent_type and
+             IssueAgentTokenRequest.agent_type. Examples: "sdr", "support", "coding",
+             "ops", "research".
+        capabilities:
+          type: array
+          items:
+            type: string
+          title: capabilities
+          description: |-
+            capabilities aligns with identity/v1 IntrospectResponse.capabilities and
+             IssueAgentTokenRequest.capabilities. Used by capability-based delegation
+             routing. Examples: "hubspot-write", "email-send", "code-review".
+        surfaces:
+          type: array
+          items:
+            type: string
+          title: surfaces
+          description: |-
+            surfaces this agent can operate on. Aligns with the surface field in
+             meter/v1, objectives/v1, approvals/v1. Examples: "ensemble", "chat",
+             "maestro", "conductor", "slack".
+        status:
+          title: status
+          $ref: '#/components/schemas/agents.v1.AgentStatus'
+        activeConfigVersion:
+          type: integer
+          title: active_config_version
+          format: int32
+        ownerId:
+          type: string
+          title: owner_id
+        lastHeartbeatAt:
+          title: last_heartbeat_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        surfaceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.Surface'
+          title: surface_types
+        a2a:
+          title: a2a
+          description: |-
+            a2a is the Platform-owned discovery projection for spec-native A2A peers.
+             Remote agents use it to discover where to fetch the Agent Card, which
+             transport/profile is supported, and which skills can be delegated to this
+             agent or its child/subagent lanes.
+          $ref: '#/components/schemas/agents.v1.AgentA2APeerProjection'
+        capacity:
+          title: capacity
+          description: |-
+            capacity is the registry-owned load projection used by fleet-scale
+             delegation discovery and operator read models.
+          $ref: '#/components/schemas/agents.v1.AgentCapacity'
+      title: Agent
+      additionalProperties: false
+      description: |-
+        Agent is the canonical agent definition record.
+         The id field is the value stored in every agent_id / agent string field
+         across the platform: meter/v1 RecordUsageRequest.agent_id,
+         objectives/v1 Objective.agent_id, approvals/v1 ApprovalRequest.agent_id,
+         governance/v1 EvaluateActionRequest.agent_id, memory/v1 Memory.agent,
+         and events/v1 Change.actor_id when actor_type is "agent".
+    agents.v1.AgentA2APeerProjection:
+      type: object
+      properties:
+        publicEndpointUrl:
+          type: string
+          title: public_endpoint_url
+        internalEndpointUrl:
+          type: string
+          title: internal_endpoint_url
+        agentCardUrl:
+          type: string
+          title: agent_card_url
+        protocolBinding:
+          type: string
+          title: protocol_binding
+        protocolVersion:
+          type: string
+          title: protocol_version
+        supportedExtensions:
+          type: array
+          items:
+            type: string
+          title: supported_extensions
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.AgentA2ASkill'
+          title: skills
+        securitySchemes:
+          type: array
+          items:
+            type: string
+          title: security_schemes
+        agentCardObservedAt:
+          title: agent_card_observed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        agentCardEtag:
+          type: string
+          title: agent_card_etag
+        agentCardHash:
+          type: string
+          title: agent_card_hash
+        pushNotifications:
+          type: boolean
+          title: push_notifications
+        attributes:
+          type: object
+          title: attributes
+          additionalProperties:
+            type: string
+            title: value
+      title: AgentA2APeerProjection
+      additionalProperties: false
+    agents.v1.AgentA2APeerProjection.AttributesEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: AttributesEntry
+      additionalProperties: false
+    agents.v1.AgentA2ASkill:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        tags:
+          type: array
+          items:
+            type: string
+          title: tags
+        inputModes:
+          type: array
+          items:
+            type: string
+          title: input_modes
+        outputModes:
+          type: array
+          items:
+            type: string
+          title: output_modes
+        requiredContextGrants:
+          type: array
+          items:
+            type: string
+          title: required_context_grants
+        approvalPolicyRef:
+          type: string
+          title: approval_policy_ref
+        maxAutonomy:
+          type: string
+          title: max_autonomy
+        requiredArtifactKinds:
+          type: array
+          items:
+            type: string
+          title: required_artifact_kinds
+        optionalArtifactKinds:
+          type: array
+          items:
+            type: string
+          title: optional_artifact_kinds
+        allowedTaskClasses:
+          type: array
+          items:
+            type: string
+          title: allowed_task_classes
+        deniedTaskClasses:
+          type: array
+          items:
+            type: string
+          title: denied_task_classes
+        attributes:
+          type: object
+          title: attributes
+          additionalProperties:
+            type: string
+            title: value
+      title: AgentA2ASkill
+      additionalProperties: false
+    agents.v1.AgentA2ASkill.AttributesEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: AttributesEntry
+      additionalProperties: false
+    agents.v1.AgentCapacity:
+      type: object
+      properties:
+        current:
+          type: integer
+          title: current
+          format: int32
+        max:
+          type: integer
+          title: max
+          format: int32
+        remaining:
+          type: integer
+          title: remaining
+          format: int32
+        reservedDelegationCount:
+          type: integer
+          title: reserved_delegation_count
+          format: int32
+      title: AgentCapacity
+      additionalProperties: false
+    agents.v1.AgentConfig:
+      type: object
+      properties:
+        version:
+          type: integer
+          title: version
+          format: int32
+        agentId:
+          type: string
+          title: agent_id
+        skillIds:
+          type: array
+          items:
+            type: string
+          title: skill_ids
+          description: |-
+            skill_ids reference skills/v1 Skill.id — the reusable capabilities
+             this agent has loaded.
+        promptBindings:
+          type: object
+          title: prompt_bindings
+          additionalProperties:
+            type: string
+            title: value
+          description: |-
+            prompt_bindings maps prompt name to label (e.g., "sdr-outreach" -> "production").
+             Aligns with prompts/v1 ResolveRequest.name and ResolveRequest.label.
+        modelPreferences:
+          type: object
+          title: model_preferences
+          additionalProperties:
+            type: string
+            title: value
+          description: |-
+            model_preferences maps surface to preferred model identifier
+             (e.g., "ensemble" -> "claude-opus-4.6"). Aligns with meter/v1
+             RecordUsageRequest.model and keys/v1 ResolveProviderRefRequest.provider.
+        integrationIds:
+          type: array
+          items:
+            type: string
+          title: integration_ids
+          description: |-
+            integration_ids reference connectors/v1 Connection.id — the external
+             system connections this agent is authorized to use.
+        entityTypeScopes:
+          type: array
+          items:
+            type: string
+          title: entity_type_scopes
+          description: |-
+            entity_type_scopes restrict which entities/v1 EntityType values this
+             agent can operate on. Empty means unrestricted.
+        maxConcurrentObjectives:
+          type: integer
+          title: max_concurrent_objectives
+          format: int32
+          description: |-
+            max_concurrent_objectives caps the number of objectives/v1 Objective
+             records this agent can hold in RUNNING or BLOCKED state simultaneously.
+        costBudgetUsd:
+          type: number
+          title: cost_budget_usd
+          format: double
+          description: |-
+            cost_budget_usd is the per-period spend ceiling enforced against
+             meter/v1 usage records for this agent.
+        notificationChannel:
+          type: string
+          title: notification_channel
+          description: |-
+            notification_channel specifies the preferred notifications/v1
+             DeliveryChannel for this agent's escalations. Stored as string to
+             avoid cross-package import (e.g., "DELIVERY_CHANNEL_SLACK").
+        parameters:
+          title: parameters
+          description: parameters holds arbitrary agent-specific tuning knobs.
+          $ref: '#/components/schemas/google.protobuf.Struct'
+        author:
+          type: string
+          title: author
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        entityTypeScopeEnums:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.EntityType'
+          title: entity_type_scope_enums
+        notificationChannelEnum:
+          title: notification_channel_enum
+          $ref: '#/components/schemas/common.v1.DeliveryChannel'
+        teammateProfile:
+          title: teammate_profile
+          $ref: '#/components/schemas/agents.v1.DigitalTeammateProfile'
+        connectorRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.ConnectorRequirement'
+          title: connector_requirements
+          description: Portable provider needs. Connection IDs remain workspace-local bindings.
+      title: AgentConfig
+      additionalProperties: false
+      description: |-
+        AgentConfig is an immutable snapshot of everything that shapes an agent's
+         behavior. Promotion and rollback are both config version reassignments —
+         the same pattern as prompts/v1 Label.
+    agents.v1.AgentConfig.ModelPreferencesEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: ModelPreferencesEntry
+      additionalProperties: false
+    agents.v1.AgentConfig.PromptBindingsEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: PromptBindingsEntry
+      additionalProperties: false
+    agents.v1.AutonomyPolicy:
+      type: object
+      properties:
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.AutonomyRule'
+          title: rules
+        defaultAuthority:
+          title: default_authority
+          $ref: '#/components/schemas/agents.v1.AutonomyAuthority'
+        maxRiskWithoutApproval:
+          title: max_risk_without_approval
+          $ref: '#/components/schemas/common.v1.RiskLevel'
+      title: AutonomyPolicy
+      additionalProperties: false
+      description: |-
+        AutonomyPolicy describes the default authority and specific action rules
+         that ToolExecution, Governance, and Approvals can enforce.
+    agents.v1.AutonomyRule:
+      type: object
+      properties:
+        actionType:
+          type: string
+          title: action_type
+        toolCapability:
+          type: string
+          title: tool_capability
+        maxRisk:
+          title: max_risk
+          $ref: '#/components/schemas/common.v1.RiskLevel'
+        authority:
+          not:
+            enum:
+              - 0
+          title: authority
+          $ref: '#/components/schemas/agents.v1.AutonomyAuthority'
+        approvalPolicyRef:
+          type: string
+          title: approval_policy_ref
+        governancePolicyRef:
+          type: string
+          title: governance_policy_ref
+        rationale:
+          type: string
+          title: rationale
+      title: AutonomyRule
+      additionalProperties: false
+      description: AutonomyRule constrains a class of actions or tool capabilities.
+    agents.v1.CommitmentPolicy:
+      type: object
+      properties:
+        allowedKinds:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.CommitmentKind'
+          title: allowed_kinds
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.CommitmentTemplate'
+          title: templates
+        defaultDueSeconds:
+          type: integer
+          title: default_due_seconds
+          format: int32
+        maxOpenCommitments:
+          type: integer
+          title: max_open_commitments
+          format: int32
+        requireObjectiveForCommitment:
+          type: boolean
+          title: require_objective_for_commitment
+      title: CommitmentPolicy
+      additionalProperties: false
+      description: |-
+        CommitmentPolicy describes which durable objectives and wakes can be created
+         from teammate commitments.
+    agents.v1.CommitmentTemplate:
+      type: object
+      properties:
+        kind:
+          not:
+            enum:
+              - 0
+          title: kind
+          $ref: '#/components/schemas/agents.v1.CommitmentKind'
+        objectiveTitleTemplate:
+          type: string
+          title: objective_title_template
+        objectiveDescriptionTemplate:
+          type: string
+          title: objective_description_template
+        wakeReasonTemplate:
+          type: string
+          title: wake_reason_template
+        requiredJoinKeys:
+          type: array
+          items:
+            type: string
+          title: required_join_keys
+      title: CommitmentTemplate
+      additionalProperties: false
+      description: CommitmentTemplate maps a commitment kind to objective and wake templates.
+    agents.v1.ConnectorRequirement:
+      type: object
+      properties:
+        providerId:
+          type: string
+          title: provider_id
+          minLength: 1
+        requiredCapabilities:
+          type: array
+          items:
+            type: string
+          title: required_capabilities
+        optionalCapabilities:
+          type: array
+          items:
+            type: string
+          title: optional_capabilities
+        required:
+          type: boolean
+          title: required
+      title: ConnectorRequirement
+      additionalProperties: false
+    agents.v1.DigitalTeammateProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        version:
+          type: integer
+          title: version
+          format: int32
+        workspaceId:
+          type: string
+          title: workspace_id
+        agentId:
+          type: string
+          title: agent_id
+        displayName:
+          type: string
+          title: display_name
+        role:
+          type: string
+          title: role
+        purpose:
+          type: string
+          title: purpose
+        ownerUserId:
+          type: string
+          title: owner_user_id
+        ownerTeamId:
+          type: string
+          title: owner_team_id
+        surfaceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.Surface'
+          title: surface_types
+        lifecycle:
+          title: lifecycle
+          $ref: '#/components/schemas/agents.v1.TeammateLifecycle'
+        responsibilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.TeammateResponsibility'
+          title: responsibilities
+        commitmentPolicy:
+          title: commitment_policy
+          $ref: '#/components/schemas/agents.v1.CommitmentPolicy'
+        initiativePolicy:
+          title: initiative_policy
+          $ref: '#/components/schemas/agents.v1.InitiativePolicy'
+        autonomyPolicy:
+          title: autonomy_policy
+          $ref: '#/components/schemas/agents.v1.AutonomyPolicy'
+        memoryPolicy:
+          title: memory_policy
+          $ref: '#/components/schemas/agents.v1.MemoryPolicy'
+        presencePolicy:
+          title: presence_policy
+          $ref: '#/components/schemas/agents.v1.PresencePolicy'
+        outputPolicy:
+          title: output_policy
+          $ref: '#/components/schemas/agents.v1.OutputPolicy'
+        evalPolicy:
+          title: eval_policy
+          $ref: '#/components/schemas/agents.v1.EvalPolicy'
+        escalationPolicy:
+          title: escalation_policy
+          $ref: '#/components/schemas/agents.v1.EscalationPolicy'
+        labels:
+          type: object
+          title: labels
+          additionalProperties:
+            type: string
+            title: value
+        parameters:
+          title: parameters
+          $ref: '#/components/schemas/google.protobuf.Struct'
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        channelManifests:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.TeammateChannelManifest'
+          title: channel_manifests
+      title: DigitalTeammateProfile
+      additionalProperties: false
+      description: |-
+        DigitalTeammateProfile is the versioned contract for how an AgentConfig acts
+         as a durable teammate across objectives, workflows, tools, memory, evals, and
+         Slack or other delivery surfaces.
+    agents.v1.DigitalTeammateProfile.LabelsEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: LabelsEntry
+      additionalProperties: false
+    agents.v1.EscalationPolicy:
+      type: object
+      properties:
+        approverUserIds:
+          type: array
+          items:
+            type: string
+          title: approver_user_ids
+        approverTeamIds:
+          type: array
+          items:
+            type: string
+          title: approver_team_ids
+        escalateAfterSeconds:
+          type: integer
+          title: escalate_after_seconds
+          format: int32
+        fallbackChannel:
+          title: fallback_channel
+          $ref: '#/components/schemas/common.v1.DeliveryChannel'
+      title: EscalationPolicy
+      additionalProperties: false
+      description: |-
+        EscalationPolicy describes who must be contacted when the teammate blocks or
+         needs approval.
+    agents.v1.EvalBinding:
+      type: object
+      properties:
+        suiteName:
+          type: string
+          title: suite_name
+        metricName:
+          type: string
+          title: metric_name
+        minimumScore:
+          type: number
+          title: minimum_score
+          format: double
+        failureAction:
+          type: string
+          title: failure_action
+      title: EvalBinding
+      additionalProperties: false
+      description: EvalBinding describes one score that should gate or monitor teammate quality.
+    agents.v1.EvalPolicy:
+      type: object
+      properties:
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.EvalBinding'
+          title: bindings
+        loopDefinitionId:
+          type: string
+          title: loop_definition_id
+        productionSampleRateBasisPoints:
+          type: integer
+          title: production_sample_rate_basis_points
+          maximum: 10000
+          format: int32
+      title: EvalPolicy
+      additionalProperties: false
+      description: EvalPolicy binds production behavior to loop and eval scoring.
+    agents.v1.InitiativePolicy:
+      type: object
+      properties:
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.InitiativeTrigger'
+          title: triggers
+        maxInitiatedRunsPerDay:
+          type: integer
+          title: max_initiated_runs_per_day
+          format: int32
+        requireHumanSeed:
+          type: boolean
+          title: require_human_seed
+      title: InitiativePolicy
+      additionalProperties: false
+      description: |-
+        InitiativePolicy describes bounded conditions where a teammate can start or
+         resume work proactively.
+    agents.v1.InitiativeTrigger:
+      type: object
+      properties:
+        kind:
+          not:
+            enum:
+              - 0
+          title: kind
+          $ref: '#/components/schemas/agents.v1.InitiativeTriggerKind'
+        triggerRef:
+          type: string
+          title: trigger_ref
+        filterExpr:
+          type: string
+          title: filter_expr
+        workflowDefinitionId:
+          type: string
+          title: workflow_definition_id
+        objectiveTemplateId:
+          type: string
+          title: objective_template_id
+      title: InitiativeTrigger
+      additionalProperties: false
+      description: InitiativeTrigger binds a proactive trigger to workflow or objective state.
+    agents.v1.MemoryPolicy:
+      type: object
+      properties:
+        allowedScopeRefs:
+          type: array
+          items:
+            type: string
+          title: allowed_scope_refs
+        allowUserMemory:
+          type: boolean
+          title: allow_user_memory
+        allowTeamMemory:
+          type: boolean
+          title: allow_team_memory
+        allowAgentMemory:
+          type: boolean
+          title: allow_agent_memory
+        requireReviewForNewMemory:
+          type: boolean
+          title: require_review_for_new_memory
+        defaultRetentionDays:
+          type: integer
+          title: default_retention_days
+          format: int32
+        requiredSourceTypes:
+          type: array
+          items:
+            type: string
+          title: required_source_types
+        allowCrossChannelRecall:
+          type: boolean
+          title: allow_cross_channel_recall
+      title: MemoryPolicy
+      additionalProperties: false
+      description: MemoryPolicy describes what a teammate may recall or propose remembering.
+    agents.v1.OutputPolicy:
+      type: object
+      properties:
+        requiredArtifactKinds:
+          type: array
+          items:
+            type: string
+          title: required_artifact_kinds
+        optionalArtifactKinds:
+          type: array
+          items:
+            type: string
+          title: optional_artifact_kinds
+        renderChannelCards:
+          type: boolean
+          title: render_channel_cards
+        defaultVisibility:
+          type: string
+          title: default_visibility
+      title: OutputPolicy
+      additionalProperties: false
+      description: OutputPolicy describes durable work products and channel-safe renderings.
+    agents.v1.PresencePolicy:
+      type: object
+      properties:
+        primaryChannel:
+          title: primary_channel
+          $ref: '#/components/schemas/common.v1.DeliveryChannel'
+        primaryChannelId:
+          type: string
+          title: primary_channel_id
+        defaultThreadPolicy:
+          type: string
+          title: default_thread_policy
+        progressUpdateIntervalSeconds:
+          type: integer
+          title: progress_update_interval_seconds
+          format: int32
+        visibleEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.PresenceEvent'
+          title: visible_events
+        postActionReceipts:
+          type: boolean
+          title: post_action_receipts
+        postBlockerUpdates:
+          type: boolean
+          title: post_blocker_updates
+      title: PresencePolicy
+      additionalProperties: false
+      description: |-
+        PresencePolicy describes how a teammate reports work back to Slack or other
+         delivery channels.
+    agents.v1.TeammateChannelManifest:
+      type: object
+      properties:
+        kind:
+          not:
+            enum:
+              - 0
+          title: kind
+          $ref: '#/components/schemas/agents.v1.TeammateChannelKind'
+        label:
+          type: string
+          title: label
+        deliveryChannel:
+          not:
+            enum:
+              - 0
+          title: delivery_channel
+          $ref: '#/components/schemas/common.v1.DeliveryChannel'
+        platformSurface:
+          title: platform_surface
+          $ref: '#/components/schemas/common.v1.Surface'
+        channelId:
+          type: string
+          title: channel_id
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.TeammateChannelCapability'
+          title: capabilities
+        inboundEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.TeammateChannelEventKind'
+          title: inbound_events
+        runtimeEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.TeammateRuntimeRenderEventKind'
+          title: runtime_events
+        attributes:
+          type: object
+          title: attributes
+          additionalProperties:
+            type: string
+            title: value
+      title: TeammateChannelManifest
+      additionalProperties: false
+      description: |-
+        TeammateChannelManifest describes one channel adapter supported by a
+         teammate profile. Durable execution remains owned by AgentRuntime; this
+         manifest lets product surfaces declare the provider-specific ingress and
+         rendering coverage they can project.
+    agents.v1.TeammateChannelManifest.AttributesEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: AttributesEntry
+      additionalProperties: false
+    agents.v1.TeammateResponsibility:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        title:
+          type: string
+          title: title
+        description:
+          type: string
+          title: description
+        capabilityRefs:
+          type: array
+          items:
+            type: string
+          title: capability_refs
+        ownedEntityTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.EntityType'
+          title: owned_entity_types
+        defaultSkillIds:
+          type: array
+          items:
+            type: string
+          title: default_skill_ids
+        promptNames:
+          type: array
+          items:
+            type: string
+          title: prompt_names
+        successMetricRefs:
+          type: array
+          items:
+            type: string
+          title: success_metric_refs
+      title: TeammateResponsibility
+      additionalProperties: false
+      description: |-
+        TeammateResponsibility binds a role claim to capabilities, entities, prompts,
+         skills, and measurable outcomes.
     connectors.v1.ConnectorCatalogProvenance:
       type: object
       properties:
@@ -10826,6 +12041,32 @@ components:
           title: object
           $ref: '#/components/schemas/console.v1.BusinessObject'
       title: AdmitBusinessObjectObservationResponse
+      additionalProperties: false
+    console.v1.AgentProductConnection:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        providerId:
+          type: string
+          title: provider_id
+        displayName:
+          type: string
+          title: display_name
+        healthStatus:
+          title: health_status
+          $ref: '#/components/schemas/connectors.v1.HealthStatus'
+        healthReason:
+          type: string
+          title: health_reason
+        providerName:
+          type: string
+          title: provider_name
+        bound:
+          type: boolean
+          title: bound
+      title: AgentProductConnection
       additionalProperties: false
     console.v1.AgentWorkforceActionAuthorityBoundary:
       type: object
@@ -14086,6 +15327,47 @@ components:
       required:
         - objectTarget
         - branding
+      additionalProperties: false
+    console.v1.CloneAgentProductRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        sourceAgentId:
+          type: string
+          title: source_agent_id
+          minLength: 1
+        sourceConfigVersion:
+          exclusiveMinimum: 0
+          type: integer
+          title: source_config_version
+          format: int32
+        name:
+          type: string
+          title: name
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+      title: CloneAgentProductRequest
+      additionalProperties: false
+    console.v1.CloneAgentProductResponse:
+      type: object
+      properties:
+        agent:
+          title: agent
+          $ref: '#/components/schemas/agents.v1.Agent'
+        config:
+          title: config
+          $ref: '#/components/schemas/agents.v1.AgentConfig'
+      title: CloneAgentProductResponse
       additionalProperties: false
     console.v1.CloneBusinessBlueprintRequest:
       type: object
@@ -18551,6 +19833,39 @@ components:
           title: balance
           $ref: '#/components/schemas/console.v1.InferenceCreditBalance'
       title: FulfillInferenceCreditCheckoutResponse
+      additionalProperties: false
+    console.v1.GetAgentProductRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        agentId:
+          type: string
+          title: agent_id
+          minLength: 1
+      title: GetAgentProductRequest
+      additionalProperties: false
+    console.v1.GetAgentProductResponse:
+      type: object
+      properties:
+        agent:
+          title: agent
+          $ref: '#/components/schemas/agents.v1.Agent'
+        config:
+          title: config
+          $ref: '#/components/schemas/agents.v1.AgentConfig'
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/console.v1.AgentProductConnection'
+          title: connections
+      title: GetAgentProductResponse
       additionalProperties: false
     console.v1.GetAssetRequest:
       type: object
@@ -29803,6 +31118,89 @@ components:
     console.v1.UnpinSourceResponse:
       type: object
       title: UnpinSourceResponse
+      additionalProperties: false
+    console.v1.UpdateAgentProductRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+          minLength: 1
+        workspaceId:
+          type: string
+          title: workspace_id
+          minLength: 1
+        agentId:
+          type: string
+          title: agent_id
+          minLength: 1
+        expectedConfigVersion:
+          exclusiveMinimum: 0
+          type: integer
+          title: expected_config_version
+          format: int32
+        name:
+          type: string
+          title: name
+          minLength: 1
+        description:
+          type: string
+          title: description
+        promptBindings:
+          type: object
+          title: prompt_bindings
+          additionalProperties:
+            type: string
+            title: value
+        integrationIds:
+          type: array
+          items:
+            type: string
+          title: integration_ids
+        connectorRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.ConnectorRequirement'
+          title: connector_requirements
+        role:
+          type: string
+          title: role
+        purpose:
+          type: string
+          title: purpose
+        responsibilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.TeammateResponsibility'
+          title: responsibilities
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.InitiativeTrigger'
+          title: triggers
+      title: UpdateAgentProductRequest
+      additionalProperties: false
+    console.v1.UpdateAgentProductRequest.PromptBindingsEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: PromptBindingsEntry
+      additionalProperties: false
+    console.v1.UpdateAgentProductResponse:
+      type: object
+      properties:
+        agent:
+          title: agent
+          $ref: '#/components/schemas/agents.v1.Agent'
+        config:
+          title: config
+          $ref: '#/components/schemas/agents.v1.AgentConfig'
+      title: UpdateAgentProductResponse
       additionalProperties: false
     console.v1.UpdateBusinessObjectRequest:
       type: object

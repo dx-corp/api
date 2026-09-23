@@ -1286,6 +1286,12 @@ components:
         teammateProfile:
           title: teammate_profile
           $ref: '#/components/schemas/agents.v1.DigitalTeammateProfile'
+        connectorRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.ConnectorRequirement'
+          title: connector_requirements
+          description: Portable provider needs. Connection IDs remain workspace-local bindings.
       title: AgentConfig
       additionalProperties: false
       description: |-
@@ -1518,6 +1524,28 @@ components:
       title: CommitmentTemplate
       additionalProperties: false
       description: CommitmentTemplate maps a commitment kind to objective and wake templates.
+    agents.v1.ConnectorRequirement:
+      type: object
+      properties:
+        providerId:
+          type: string
+          title: provider_id
+          minLength: 1
+        requiredCapabilities:
+          type: array
+          items:
+            type: string
+          title: required_capabilities
+        optionalCapabilities:
+          type: array
+          items:
+            type: string
+          title: optional_capabilities
+        required:
+          type: boolean
+          title: required
+      title: ConnectorRequirement
+      additionalProperties: false
     agents.v1.ControlA2ADelegationTaskRequest:
       type: object
       properties:
@@ -2441,6 +2469,11 @@ components:
         teammateProfile:
           title: teammate_profile
           $ref: '#/components/schemas/agents.v1.DigitalTeammateProfile'
+        connectorRequirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/agents.v1.ConnectorRequirement'
+          title: connector_requirements
       title: PushConfigRequest
       additionalProperties: false
     agents.v1.PushConfigRequest.ModelPreferencesEntry:

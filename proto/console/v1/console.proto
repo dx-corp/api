@@ -3,6 +3,7 @@ syntax = "proto3";
 package console.v1;
 
 import "agentruntime/v1/runtime.proto";
+import "agents/v1/agents.proto";
 import "buf/validate/validate.proto";
 import "common/v1/authz.proto";
 import "common/v1/classification.proto";
@@ -628,6 +629,27 @@ service ConsoleService {
     option (common.v1.workspace_scope_field) = "query.workspace_id";
 
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Reads one registered agent, its active immutable config, and its bound workspace connections.
+  rpc GetAgentProduct(GetAgentProductRequest) returns (GetAgentProductResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
+  // Clones safe behavior into a distinct registered agent without workspace credentials.
+  rpc CloneAgentProduct(CloneAgentProductRequest) returns (CloneAgentProductResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  // Replaces editable agent behavior with a new immutable configuration version.
+  rpc UpdateAgentProduct(UpdateAgentProductRequest) returns (UpdateAgentProductResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
   }
   // ListOrbControlTargets returns Platform-owned projections of Orb runtime targets.
   rpc ListOrbControlTargets(ListOrbControlTargetsRequest) returns (ListOrbControlTargetsResponse) {
@@ -5214,6 +5236,63 @@ message ListAgentWorkforceRecordsResponse {
   // singleton matching; an empty value means no source-event selector was
   // applied.
   string source_event_id = 7;
+}
+
+message GetAgentProductRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 3 [(buf.validate.field).string.min_len = 1];
+}
+
+message AgentProductConnection {
+  string id = 1;
+  string provider_id = 2;
+  string display_name = 3;
+  connectors.v1.HealthStatus health_status = 4;
+  string health_reason = 5;
+  string provider_name = 6;
+  bool bound = 7;
+}
+
+message GetAgentProductResponse {
+  agents.v1.Agent agent = 1;
+  agents.v1.AgentConfig config = 2;
+  repeated AgentProductConnection connections = 3;
+}
+
+message CloneAgentProductRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string source_agent_id = 3 [(buf.validate.field).string.min_len = 1];
+  int32 source_config_version = 4 [(buf.validate.field).int32.gt = 0];
+  string name = 5 [(buf.validate.field).string.min_len = 1];
+  string idempotency_key = 6 [(buf.validate.field).string.min_len = 1];
+}
+
+message CloneAgentProductResponse {
+  agents.v1.Agent agent = 1;
+  agents.v1.AgentConfig config = 2;
+}
+
+message UpdateAgentProductRequest {
+  string organization_id = 1 [(buf.validate.field).string.min_len = 1];
+  string workspace_id = 2 [(buf.validate.field).string.min_len = 1];
+  string agent_id = 3 [(buf.validate.field).string.min_len = 1];
+  int32 expected_config_version = 4 [(buf.validate.field).int32.gt = 0];
+  string name = 5 [(buf.validate.field).string.min_len = 1];
+  string description = 6;
+  map<string, string> prompt_bindings = 7;
+  repeated string integration_ids = 8;
+  repeated agents.v1.ConnectorRequirement connector_requirements = 9;
+  string role = 10;
+  string purpose = 11;
+  repeated agents.v1.TeammateResponsibility responsibilities = 12;
+  repeated agents.v1.InitiativeTrigger triggers = 13;
+}
+
+message UpdateAgentProductResponse {
+  agents.v1.Agent agent = 1;
+  agents.v1.AgentConfig config = 2;
 }
 
 // OrbControlTarget is the Platform-owned customer-facing runtime projection.
