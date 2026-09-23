@@ -38,6 +38,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/console.v1.AssessComplianceSubjectResponse'
+  /console.v1.ConsoleService/RecordComplianceAssessment:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: RecordComplianceAssessment
+      operationId: console.v1.ConsoleService.RecordComplianceAssessment
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.RecordComplianceAssessmentRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.RecordComplianceAssessmentResponse'
+  /console.v1.ConsoleService/GetComplianceAssessment:
+    post:
+      tags:
+        - console.v1.ConsoleService
+      summary: GetComplianceAssessment
+      operationId: console.v1.ConsoleService.GetComplianceAssessment
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/console.v1.GetComplianceAssessmentRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/console.v1.GetComplianceAssessmentResponse'
   /console.v1.ConsoleService/ListBusinessBlueprints:
     post:
       tags:
@@ -14518,6 +14588,32 @@ components:
       required:
         - upload
       additionalProperties: false
+    console.v1.ComplianceAssessmentRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        evaluatorVersion:
+          type: string
+          title: evaluator_version
+        assessment:
+          title: assessment
+          $ref: '#/components/schemas/console.v1.ComplianceSubjectAssessment'
+        manifestDigest:
+          type: string
+          title: manifest_digest
+        recordedByPrincipalId:
+          type: string
+          title: recorded_by_principal_id
+      title: ComplianceAssessmentRecord
+      additionalProperties: false
     console.v1.ComplianceRequirementFinding:
       type: object
       properties:
@@ -18721,6 +18817,28 @@ components:
       title: GetCaptureFormSubmissionResponse
       required:
         - submission
+      additionalProperties: false
+    console.v1.GetComplianceAssessmentRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        recordId:
+          type: string
+          title: record_id
+      title: GetComplianceAssessmentRequest
+      additionalProperties: false
+    console.v1.GetComplianceAssessmentResponse:
+      type: object
+      properties:
+        record:
+          title: record
+          $ref: '#/components/schemas/console.v1.ComplianceAssessmentRecord'
+      title: GetComplianceAssessmentResponse
       additionalProperties: false
     console.v1.GetComputerMissionCanaryEvidenceRequest:
       type: object
@@ -26548,6 +26666,41 @@ components:
       title: ReauthorizeDexMcpOAuthProfileResponse
       required:
         - profile
+      additionalProperties: false
+    console.v1.RecordComplianceAssessmentRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        profileId:
+          type: string
+          title: profile_id
+        subjectKind:
+          type: string
+          title: subject_kind
+        subjectId:
+          type: string
+          title: subject_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+      title: RecordComplianceAssessmentRequest
+      additionalProperties: false
+      description: Records a server-evaluated snapshot. A replay key always returns its first accepted result.
+    console.v1.RecordComplianceAssessmentResponse:
+      type: object
+      properties:
+        record:
+          title: record
+          $ref: '#/components/schemas/console.v1.ComplianceAssessmentRecord'
+        idempotentReplay:
+          type: boolean
+          title: idempotent_replay
+      title: RecordComplianceAssessmentResponse
       additionalProperties: false
     console.v1.RecordOperatingHomepageSuggestionFeedbackRequest:
       type: object

@@ -18,6 +18,18 @@ service DeixicService {
     option (common.v1.workspace_scope_field) = "workspace_id";
     option (common.v1.risk_level) = RISK_LEVEL_LOW;
   }
+  rpc RecordComplianceAssessment(console.v1.RecordComplianceAssessmentRequest) returns (console.v1.RecordComplianceAssessmentResponse) {
+    option (common.v1.required_scopes) = "console:write";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_MEDIUM;
+  }
+  rpc GetComplianceAssessment(console.v1.GetComplianceAssessmentRequest) returns (console.v1.GetComplianceAssessmentResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   // Lists built-in native business blueprints available to every authorized tenant.
   rpc ListBusinessBlueprints(console.v1.ListBusinessBlueprintsRequest) returns (console.v1.ListBusinessBlueprintsResponse) {
     option (common.v1.required_scopes) = "console:read";
