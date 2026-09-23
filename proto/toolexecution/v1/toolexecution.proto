@@ -319,6 +319,18 @@ message ToolExecutionProvenance {
   string input_digest = 10;
   string output_digest = 11;
   map<string, string> metadata = 12;
+  // Owner-persisted acknowledgement of a Runner Host event append. This
+  // binds a recording to the execution, not the producer of the event.
+  CommandAuditReceipt command_audit_receipt = 13;
+}
+
+message CommandAuditReceipt {
+  string event_id = 1;
+  string runner_session_id = 2;
+  int64 sequence = 3;
+  string event_type = 4;
+  google.protobuf.Timestamp occurred_at = 5;
+  string payload_digest_sha256 = 6;
 }
 
 // ToolExecutionFailureCode is the bounded, owner-assigned terminal failure

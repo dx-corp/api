@@ -511,6 +511,32 @@ components:
          workspace authority in the surrounding request, while a resolver owned by
          the resource's service decides whether a reference yields metadata, VFS
          identity, or a short-lived byte-access grant.
+    toolexecution.v1.CommandAuditReceipt:
+      type: object
+      properties:
+        eventId:
+          type: string
+          title: event_id
+        runnerSessionId:
+          type: string
+          title: runner_session_id
+        sequence:
+          type:
+            - integer
+            - string
+          title: sequence
+          format: int64
+        eventType:
+          type: string
+          title: event_type
+        occurredAt:
+          title: occurred_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        payloadDigestSha256:
+          type: string
+          title: payload_digest_sha256
+      title: CommandAuditReceipt
+      additionalProperties: false
     toolexecution.v1.ConnectorRef:
       type: object
       properties:
@@ -1272,6 +1298,12 @@ components:
           additionalProperties:
             type: string
             title: value
+        commandAuditReceipt:
+          title: command_audit_receipt
+          description: |-
+            Owner-persisted acknowledgement of a Runner Host event append. This
+             binds a recording to the execution, not the producer of the event.
+          $ref: '#/components/schemas/toolexecution.v1.CommandAuditReceipt'
       title: ToolExecutionProvenance
       additionalProperties: false
       description: |-
