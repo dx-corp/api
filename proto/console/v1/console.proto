@@ -26,6 +26,13 @@ option go_package = "github.com/evalops/platform/gen/go/console/v1;consolev1";
 // governance, usage, integrations, and posture without exposing protocol
 // details such as MCP as the primary product contract.
 service ConsoleService {
+  // Evaluates a versioned compliance profile against owner-fetched, tenant-scoped facts.
+  rpc AssessComplianceSubject(AssessComplianceSubjectRequest) returns (AssessComplianceSubjectResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   // Lists built-in native business blueprints available to every authorized tenant.
   rpc ListBusinessBlueprints(ListBusinessBlueprintsRequest) returns (ListBusinessBlueprintsResponse) {
     option (common.v1.required_scopes) = "console:read";
@@ -11028,4 +11035,48 @@ message StaffProductIssueRecoverySummary {
   string state = 7 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
   google.protobuf.Timestamp created_at = 8;
   string last_reply = 9 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+}
+
+// One versioned control profile runs against one owner-fetched subject.
+message AssessComplianceSubjectRequest {
+  string organization_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string workspace_id = 2 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string profile_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string subject_kind = 4 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string subject_id = 5 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+
+enum ComplianceFindingStatus {
+  COMPLIANCE_FINDING_STATUS_UNSPECIFIED = 0;
+  COMPLIANCE_FINDING_STATUS_SATISFIED = 1;
+  COMPLIANCE_FINDING_STATUS_VIOLATED = 2;
+  COMPLIANCE_FINDING_STATUS_INDETERMINATE = 3;
+  COMPLIANCE_FINDING_STATUS_NOT_APPLICABLE = 4;
+}
+
+message ComplianceRequirementFinding {
+  string requirement_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  ComplianceFindingStatus status = 2;
+  string reason_code = 3 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string source_ref = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+}
+
+// A live, bounded assessment of one execution. It is not an immutable snapshot.
+message ComplianceSubjectAssessment {
+  string profile_id = 1 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string subject_kind = 2 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+  string subject_id = 3 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  string source_digest = 4 [(common.v1.classification) = DATA_CLASSIFICATION_IDENTIFIER];
+  google.protobuf.Timestamp source_updated_at = 5;
+  google.protobuf.Timestamp assessed_at = 6;
+  ComplianceFindingStatus status = 7;
+  repeated ComplianceRequirementFinding findings = 8;
+  // This route covers exactly the one requested owner record.
+  uint32 inspected_count = 9;
+  uint32 expected_count = 10;
+  string control_id = 11 [(common.v1.classification) = DATA_CLASSIFICATION_SAFE];
+}
+
+message AssessComplianceSubjectResponse {
+  ComplianceSubjectAssessment assessment = 1;
 }

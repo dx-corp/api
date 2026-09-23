@@ -11,6 +11,13 @@ option go_package = "github.com/evalops/platform/gen/go/deixic/v1;deixicv1";
 // DeixicService is the producer-owned browser contract served by Platform API.
 // Canonical message schemas remain in console.v1 for wire compatibility.
 service DeixicService {
+  // Evaluates a versioned compliance profile against owner-fetched, tenant-scoped facts.
+  rpc AssessComplianceSubject(console.v1.AssessComplianceSubjectRequest) returns (console.v1.AssessComplianceSubjectResponse) {
+    option (common.v1.required_scopes) = "console:read";
+    option (common.v1.organization_scope_field) = "organization_id";
+    option (common.v1.workspace_scope_field) = "workspace_id";
+    option (common.v1.risk_level) = RISK_LEVEL_LOW;
+  }
   // Lists built-in native business blueprints available to every authorized tenant.
   rpc ListBusinessBlueprints(console.v1.ListBusinessBlueprintsRequest) returns (console.v1.ListBusinessBlueprintsResponse) {
     option (common.v1.required_scopes) = "console:read";
