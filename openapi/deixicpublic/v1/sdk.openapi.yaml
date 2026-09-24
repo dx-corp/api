@@ -1,0 +1,2268 @@
+openapi: 3.1.0
+info:
+  title: deixicpublic.v1
+paths:
+  /deixicpublic.v1.DeixicPublicService/GetThread:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetThread
+      operationId: deixicpublic.v1.DeixicPublicService.GetThread
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetThreadRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetThreadResponse'
+  /deixicpublic.v1.DeixicPublicService/ListThreads:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListThreads
+      operationId: deixicpublic.v1.DeixicPublicService.ListThreads
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListThreadsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListThreadsResponse'
+  /deixicpublic.v1.DeixicPublicService/RenameThread:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: RenameThread
+      operationId: deixicpublic.v1.DeixicPublicService.RenameThread
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.RenameThreadRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.RenameThreadResponse'
+  /deixicpublic.v1.DeixicPublicService/ArchiveThread:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ArchiveThread
+      operationId: deixicpublic.v1.DeixicPublicService.ArchiveThread
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ArchiveThreadRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ArchiveThreadResponse'
+  /deixicpublic.v1.DeixicPublicService/ListEvents:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListEvents
+      operationId: deixicpublic.v1.DeixicPublicService.ListEvents
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListEventsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListEventsResponse'
+  /deixicpublic.v1.DeixicPublicService/WatchEvents: {}
+  /deixicpublic.v1.DeixicPublicService/SubmitTask:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: SubmitTask
+      operationId: deixicpublic.v1.DeixicPublicService.SubmitTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.SubmitTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.SubmitTaskResponse'
+  /deixicpublic.v1.DeixicPublicService/InterruptTask:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: InterruptTask
+      operationId: deixicpublic.v1.DeixicPublicService.InterruptTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.InterruptTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.InterruptTaskResponse'
+  /deixicpublic.v1.DeixicPublicService/RespondToRequest:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: RespondToRequest
+      operationId: deixicpublic.v1.DeixicPublicService.RespondToRequest
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.RespondToRequestRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.RespondToRequestResponse'
+  /deixicpublic.v1.DeixicPublicService/GetReceipt:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetReceipt
+      operationId: deixicpublic.v1.DeixicPublicService.GetReceipt
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetReceiptRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetReceiptResponse'
+  /deixicpublic.v1.DeixicPublicService/ResolveReceiptAction:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ResolveReceiptAction
+      operationId: deixicpublic.v1.DeixicPublicService.ResolveReceiptAction
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ResolveReceiptActionRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ResolveReceiptActionResponse'
+  /deixicpublic.v1.DeixicPublicService/GetModelReadiness:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetModelReadiness
+      operationId: deixicpublic.v1.DeixicPublicService.GetModelReadiness
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetModelReadinessRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetModelReadinessResponse'
+  /deixicpublic.v1.DeixicPublicService/GetClientSetup:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetClientSetup
+      operationId: deixicpublic.v1.DeixicPublicService.GetClientSetup
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetClientSetupRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetClientSetupResponse'
+  /deixicpublic.v1.DeixicPublicService/SubmitIssueReport:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: SubmitIssueReport
+      operationId: deixicpublic.v1.DeixicPublicService.SubmitIssueReport
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.SubmitIssueReportRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.SubmitIssueReportResponse'
+  /deixicpublic.v1.DeixicPublicService/CreateBusinessObject:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: CreateBusinessObject
+      operationId: deixicpublic.v1.DeixicPublicService.CreateBusinessObject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.CreateBusinessObjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.CreateBusinessObjectResponse'
+  /deixicpublic.v1.DeixicPublicService/GetBusinessObject:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetBusinessObject
+      operationId: deixicpublic.v1.DeixicPublicService.GetBusinessObject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetBusinessObjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetBusinessObjectResponse'
+  /deixicpublic.v1.DeixicPublicService/UpdateBusinessObject:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: UpdateBusinessObject
+      operationId: deixicpublic.v1.DeixicPublicService.UpdateBusinessObject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.UpdateBusinessObjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.UpdateBusinessObjectResponse'
+  /deixicpublic.v1.DeixicPublicService/DeleteBusinessObject:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: DeleteBusinessObject
+      operationId: deixicpublic.v1.DeixicPublicService.DeleteBusinessObject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.DeleteBusinessObjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.DeleteBusinessObjectResponse'
+components:
+  schemas:
+    deixicpublic.v1.ClientMcpMode:
+      type: string
+      title: ClientMcpMode
+      enum:
+        - CLIENT_MCP_MODE_UNSPECIFIED
+        - CLIENT_MCP_MODE_OPEN
+        - CLIENT_MCP_MODE_ALLOWLIST
+        - CLIENT_MCP_MODE_DENYLIST
+    deixicpublic.v1.ClientRuleScope:
+      type: string
+      title: ClientRuleScope
+      enum:
+        - CLIENT_RULE_SCOPE_UNSPECIFIED
+        - CLIENT_RULE_SCOPE_ORGANIZATION
+        - CLIENT_RULE_SCOPE_WORKSPACE
+    deixicpublic.v1.EventKind:
+      type: string
+      title: EventKind
+      enum:
+        - EVENT_KIND_UNSPECIFIED
+        - EVENT_KIND_TURN_ACCEPTED
+        - EVENT_KIND_TURN_STARTED
+        - EVENT_KIND_PROGRESS
+        - EVENT_KIND_APPROVAL_REQUIRED
+        - EVENT_KIND_INPUT_REQUIRED
+        - EVENT_KIND_ARTIFACT_RECORDED
+        - EVENT_KIND_TURN_COMPLETED
+        - EVENT_KIND_TURN_FAILED
+        - EVENT_KIND_TURN_INTERRUPTED
+        - EVENT_KIND_CLIENT_TOOL_REQUIRED
+        - EVENT_KIND_EXTERNAL_RETRY_REQUIRED
+    deixicpublic.v1.MessageRole:
+      type: string
+      title: MessageRole
+      enum:
+        - MESSAGE_ROLE_UNSPECIFIED
+        - MESSAGE_ROLE_USER
+        - MESSAGE_ROLE_ASSISTANT
+        - MESSAGE_ROLE_SYSTEM
+    deixicpublic.v1.ModelNextAction:
+      type: string
+      title: ModelNextAction
+      enum:
+        - MODEL_NEXT_ACTION_UNSPECIFIED
+        - MODEL_NEXT_ACTION_CONTACT_ADMINISTRATOR
+        - MODEL_NEXT_ACTION_VIEW_FUNDING
+        - MODEL_NEXT_ACTION_RETRY
+    deixicpublic.v1.ModelReadinessState:
+      type: string
+      title: ModelReadinessState
+      enum:
+        - MODEL_READINESS_STATE_UNSPECIFIED
+        - MODEL_READINESS_STATE_READY
+        - MODEL_READINESS_STATE_ACTIVATION_REQUIRED
+        - MODEL_READINESS_STATE_FUNDING_REQUIRED
+        - MODEL_READINESS_STATE_LIMIT_REACHED
+        - MODEL_READINESS_STATE_ACCESS_SUSPENDED
+        - MODEL_READINESS_STATE_TEMPORARILY_UNAVAILABLE
+      description: |-
+        Model readiness is an application-level decision; billing and routing
+         implementation details stay behind this projection.
+    deixicpublic.v1.ReceiptState:
+      type: string
+      title: ReceiptState
+      enum:
+        - RECEIPT_STATE_UNSPECIFIED
+        - RECEIPT_STATE_UNKNOWN
+        - RECEIPT_STATE_PROPOSED
+        - RECEIPT_STATE_QUEUED
+        - RECEIPT_STATE_WAITING_APPROVAL
+        - RECEIPT_STATE_BLOCKED
+        - RECEIPT_STATE_NEEDS_INPUT
+        - RECEIPT_STATE_UNAVAILABLE
+        - RECEIPT_STATE_RUNNING
+        - RECEIPT_STATE_SUCCEEDED
+        - RECEIPT_STATE_VERIFIED
+        - RECEIPT_STATE_DENIED
+        - RECEIPT_STATE_CANCELLED
+        - RECEIPT_STATE_FAILED
+    deixicpublic.v1.RequestKind:
+      type: string
+      title: RequestKind
+      enum:
+        - REQUEST_KIND_UNSPECIFIED
+        - REQUEST_KIND_APPROVAL
+        - REQUEST_KIND_USER_INPUT
+        - REQUEST_KIND_CLIENT_TOOL
+        - REQUEST_KIND_EXTERNAL_RETRY
+    deixicpublic.v1.ResponseAction:
+      type: string
+      title: ResponseAction
+      enum:
+        - RESPONSE_ACTION_UNSPECIFIED
+        - RESPONSE_ACTION_APPROVE
+        - RESPONSE_ACTION_DENY
+        - RESPONSE_ACTION_ANSWER
+        - RESPONSE_ACTION_RETRY
+        - RESPONSE_ACTION_SKIP
+        - RESPONSE_ACTION_ABORT
+    deixicpublic.v1.TurnState:
+      type: string
+      title: TurnState
+      enum:
+        - TURN_STATE_UNSPECIFIED
+        - TURN_STATE_ACCEPTED
+        - TURN_STATE_RUNNING
+        - TURN_STATE_WAITING
+        - TURN_STATE_RESPONDED
+        - TURN_STATE_COMPLETED
+        - TURN_STATE_FAILED
+        - TURN_STATE_INTERRUPTED
+    deixicpublic.v1.WaitingReason:
+      type: string
+      title: WaitingReason
+      enum:
+        - WAITING_REASON_UNSPECIFIED
+        - WAITING_REASON_APPROVAL
+        - WAITING_REASON_USER_INPUT
+        - WAITING_REASON_CLIENT_TOOL
+        - WAITING_REASON_EXTERNAL_RETRY
+    deixicpublic.v1.ArchiveThreadRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        archived:
+          type: boolean
+          title: archived
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+      title: ArchiveThreadRequest
+      additionalProperties: false
+    deixicpublic.v1.ArchiveThreadResponse:
+      type: object
+      properties:
+        thread:
+          title: thread
+          $ref: '#/components/schemas/deixicpublic.v1.Thread'
+        changed:
+          type: boolean
+          title: changed
+        replayed:
+          type: boolean
+          title: replayed
+      title: ArchiveThreadResponse
+      additionalProperties: false
+    deixicpublic.v1.AvailableModel:
+      type: object
+      properties:
+        provider:
+          type: string
+          title: provider
+        model:
+          type: string
+          title: model
+        ready:
+          type: boolean
+          title: ready
+        displayName:
+          type: string
+          title: display_name
+      title: AvailableModel
+      additionalProperties: false
+    deixicpublic.v1.BusinessArtifactReference:
+      type: object
+      properties:
+        artifactVersionId:
+          type: string
+          title: artifact_version_id
+      title: BusinessArtifactReference
+      additionalProperties: false
+    deixicpublic.v1.BusinessFieldValue:
+      type: object
+      oneOf:
+        - properties:
+            artifact:
+              title: artifact
+              $ref: '#/components/schemas/deixicpublic.v1.BusinessArtifactReference'
+          title: artifact
+          required:
+            - artifact
+        - properties:
+            boolean:
+              type: boolean
+              title: boolean
+          title: boolean
+          required:
+            - boolean
+        - properties:
+            date:
+              type: string
+              title: date
+          title: date
+          required:
+            - date
+        - properties:
+            decimal:
+              type: string
+              title: decimal
+          title: decimal
+          required:
+            - decimal
+        - properties:
+            enumValue:
+              type: string
+              title: enum_value
+          title: enum_value
+          required:
+            - enumValue
+        - properties:
+            integer:
+              type:
+                - integer
+                - string
+              title: integer
+              format: int64
+          title: integer
+          required:
+            - integer
+        - properties:
+            money:
+              title: money
+              $ref: '#/components/schemas/deixicpublic.v1.BusinessMoney'
+          title: money
+          required:
+            - money
+        - properties:
+            reference:
+              title: reference
+              $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectReference'
+          title: reference
+          required:
+            - reference
+        - properties:
+            text:
+              type: string
+              title: text
+          title: text
+          required:
+            - text
+        - properties:
+            textList:
+              title: text_list
+              $ref: '#/components/schemas/deixicpublic.v1.BusinessTextList'
+          title: text_list
+          required:
+            - textList
+        - properties:
+            timestamp:
+              type: string
+              title: timestamp
+          title: timestamp
+          required:
+            - timestamp
+      properties:
+        artifact:
+          title: artifact
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessArtifactReference'
+        boolean:
+          type: boolean
+          title: boolean
+        date:
+          type: string
+          title: date
+        decimal:
+          type: string
+          title: decimal
+        enumValue:
+          type: string
+          title: enum_value
+        integer:
+          type:
+            - integer
+            - string
+          title: integer
+          format: int64
+        money:
+          title: money
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessMoney'
+        reference:
+          title: reference
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectReference'
+        text:
+          type: string
+          title: text
+        textList:
+          title: text_list
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessTextList'
+        timestamp:
+          type: string
+          title: timestamp
+        fieldId:
+          type: string
+          title: field_id
+      title: BusinessFieldValue
+      additionalProperties: false
+    deixicpublic.v1.BusinessMoney:
+      type: object
+      properties:
+        amount:
+          type: string
+          title: amount
+        currency:
+          type: string
+          title: currency
+      title: BusinessMoney
+      additionalProperties: false
+      description: |-
+        This resource is the supported Terraform provider contract. Source authority,
+         connector state and recovery coordinates belong to the implementation.
+    deixicpublic.v1.BusinessObject:
+      type: object
+      properties:
+        objectId:
+          type: string
+          title: object_id
+        typeId:
+          type: string
+          title: type_id
+        schemaRevision:
+          type:
+            - integer
+            - string
+          title: schema_revision
+          format: int64
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessFieldValue'
+          title: values
+        deleted:
+          type: boolean
+          title: deleted
+        updatedAt:
+          type: string
+          title: updated_at
+        createdAt:
+          type: string
+          title: created_at
+      title: BusinessObject
+      additionalProperties: false
+    deixicpublic.v1.BusinessObjectReference:
+      type: object
+      properties:
+        objectId:
+          type: string
+          title: object_id
+      title: BusinessObjectReference
+      additionalProperties: false
+    deixicpublic.v1.BusinessTextList:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: string
+          title: values
+      title: BusinessTextList
+      additionalProperties: false
+    deixicpublic.v1.ClientMcpPolicy:
+      type: object
+      properties:
+        mode:
+          title: mode
+          $ref: '#/components/schemas/deixicpublic.v1.ClientMcpMode'
+        servers:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ClientMcpServer'
+          title: servers
+      title: ClientMcpPolicy
+      additionalProperties: false
+    deixicpublic.v1.ClientMcpServer:
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        urlPattern:
+          type: string
+          title: url_pattern
+        transport:
+          type: string
+          title: transport
+      title: ClientMcpServer
+      additionalProperties: false
+    deixicpublic.v1.ClientRule:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        title:
+          type: string
+          title: title
+        bodyMarkdown:
+          type: string
+          title: body_markdown
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.ClientRuleScope'
+      title: ClientRule
+      additionalProperties: false
+    deixicpublic.v1.ClientSkill:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        source:
+          type: string
+          title: source
+        version:
+          type: string
+          title: version
+        required:
+          type: boolean
+          title: required
+      title: ClientSkill
+      additionalProperties: false
+    deixicpublic.v1.CodingAcceptance:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+          title: accepted
+        contractDigest:
+          type: string
+          title: contract_digest
+        submissionDigest:
+          type: string
+          title: submission_digest
+        reasons:
+          type: array
+          items:
+            type: string
+          title: reasons
+        revision:
+          type: string
+          title: revision
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.CodingOutput'
+          title: outputs
+      title: CodingAcceptance
+      additionalProperties: false
+    deixicpublic.v1.CodingContract:
+      type: object
+      properties:
+        repositoryId:
+          type: string
+          title: repository_id
+        generation:
+          type:
+            - integer
+            - string
+          title: generation
+          format: int64
+        requiredAssertionIds:
+          type: array
+          items:
+            type: string
+          title: required_assertion_ids
+        requireReview:
+          type: boolean
+          title: require_review
+        requireBehavior:
+          type: boolean
+          title: require_behavior
+        readinessRequirements:
+          type: array
+          items:
+            type: string
+          title: readiness_requirements
+        authorizedSkips:
+          type: array
+          items:
+            type: string
+          title: authorized_skips
+        authorizedDispositions:
+          type: array
+          items:
+            type: string
+          title: authorized_dispositions
+        outputPaths:
+          type: array
+          items:
+            type: string
+          title: output_paths
+      title: CodingContract
+      additionalProperties: false
+    deixicpublic.v1.CodingOutput:
+      type: object
+      properties:
+        path:
+          type: string
+          title: path
+        objectId:
+          type: string
+          title: object_id
+        versionId:
+          type: string
+          title: version_id
+        sha256:
+          type: string
+          title: sha256
+        sizeBytes:
+          type:
+            - integer
+            - string
+          title: size_bytes
+          format: int64
+        content:
+          type: string
+          title: content
+          format: byte
+          description: Included only in an explicitly requested receipt read by the authorized actor.
+      title: CodingOutput
+      additionalProperties: false
+    deixicpublic.v1.CreateBusinessObjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        typeId:
+          type: string
+          title: type_id
+        schemaRevision:
+          type:
+            - integer
+            - string
+          title: schema_revision
+          format: int64
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessFieldValue'
+          title: values
+      title: CreateBusinessObjectRequest
+      additionalProperties: false
+    deixicpublic.v1.CreateBusinessObjectResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: CreateBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.DeleteBusinessObjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        objectId:
+          type: string
+          title: object_id
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+      title: DeleteBusinessObjectRequest
+      additionalProperties: false
+    deixicpublic.v1.DeleteBusinessObjectResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: DeleteBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.ErrorDetail:
+      type: object
+      properties:
+        code:
+          type: string
+          title: code
+        message:
+          type: string
+          title: message
+        requestId:
+          type: string
+          title: request_id
+        retryable:
+          type: boolean
+          title: retryable
+      title: ErrorDetail
+      additionalProperties: false
+    deixicpublic.v1.EvidenceReference:
+      type: object
+      properties:
+        kind:
+          type: string
+          title: kind
+        id:
+          type: string
+          title: id
+        label:
+          type: string
+          title: label
+        uri:
+          type: string
+          title: uri
+      title: EvidenceReference
+      additionalProperties: false
+    deixicpublic.v1.GetBusinessObjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        objectId:
+          type: string
+          title: object_id
+      title: GetBusinessObjectRequest
+      additionalProperties: false
+    deixicpublic.v1.GetBusinessObjectResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: GetBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.GetClientSetupRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+      title: GetClientSetupRequest
+      additionalProperties: false
+    deixicpublic.v1.GetClientSetupResponse:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        version:
+          type:
+            - integer
+            - string
+          title: version
+          format: int64
+        issuedAt:
+          title: issued_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ClientRule'
+          title: rules
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ClientSkill'
+          title: skills
+        mcp:
+          title: mcp
+          $ref: '#/components/schemas/deixicpublic.v1.ClientMcpPolicy'
+        sandboxPolicyToml:
+          type: string
+          title: sandbox_policy_toml
+      title: GetClientSetupResponse
+      additionalProperties: false
+    deixicpublic.v1.GetModelReadinessRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        selection:
+          title: selection
+          $ref: '#/components/schemas/deixicpublic.v1.ModelSelection'
+        environment:
+          type: string
+          title: environment
+      title: GetModelReadinessRequest
+      additionalProperties: false
+    deixicpublic.v1.GetModelReadinessResponse:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        selection:
+          title: selection
+          $ref: '#/components/schemas/deixicpublic.v1.ModelSelection'
+        environment:
+          type: string
+          title: environment
+        state:
+          title: state
+          $ref: '#/components/schemas/deixicpublic.v1.ModelReadinessState'
+        nextActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ModelNextAction'
+          title: next_actions
+        evaluatedAt:
+          title: evaluated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: GetModelReadinessResponse
+      additionalProperties: false
+    deixicpublic.v1.GetReceiptRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        receiptId:
+          type: string
+          title: receipt_id
+        threadId:
+          type: string
+          title: thread_id
+        includeCodingOutputContent:
+          type: boolean
+          title: include_coding_output_content
+      title: GetReceiptRequest
+      additionalProperties: false
+    deixicpublic.v1.GetReceiptResponse:
+      type: object
+      properties:
+        receipt:
+          title: receipt
+          $ref: '#/components/schemas/deixicpublic.v1.Receipt'
+      title: GetReceiptResponse
+      additionalProperties: false
+    deixicpublic.v1.GetThreadRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+        pageToken:
+          type: string
+          title: page_token
+      title: GetThreadRequest
+      additionalProperties: false
+    deixicpublic.v1.GetThreadResponse:
+      type: object
+      properties:
+        thread:
+          title: thread
+          $ref: '#/components/schemas/deixicpublic.v1.Thread'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskMessage'
+          title: messages
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Receipt'
+          title: receipts
+        turns:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
+          title: turns
+        replayCursor:
+          type:
+            - integer
+            - string
+          title: replay_cursor
+          format: int64
+        nextPageToken:
+          type: string
+          title: next_page_token
+        setup:
+          title: setup
+          $ref: '#/components/schemas/deixicpublic.v1.SetupReadiness'
+      title: GetThreadResponse
+      additionalProperties: false
+    deixicpublic.v1.InterruptTaskRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        turnId:
+          type: string
+          title: turn_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        reason:
+          type: string
+          title: reason
+      title: InterruptTaskRequest
+      additionalProperties: false
+    deixicpublic.v1.InterruptTaskResponse:
+      type: object
+      properties:
+        turnId:
+          type: string
+          title: turn_id
+        replayed:
+          type: boolean
+          title: replayed
+        turns:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
+          title: turns
+        replayCursor:
+          type:
+            - integer
+            - string
+          title: replay_cursor
+          format: int64
+      title: InterruptTaskResponse
+      additionalProperties: false
+    deixicpublic.v1.IssueContext:
+      type: object
+      properties:
+        reproductionSteps:
+          type: string
+          title: reproduction_steps
+        model:
+          type: string
+          title: model
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.IssueEvidence'
+          title: evidence
+      title: IssueContext
+      additionalProperties: false
+    deixicpublic.v1.IssueEvidence:
+      type: object
+      properties:
+        kind:
+          type: string
+          title: kind
+        sourceId:
+          type: string
+          title: source_id
+        text:
+          type: string
+          title: text
+      title: IssueEvidence
+      additionalProperties: false
+    deixicpublic.v1.IssueReport:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        reference:
+          type: string
+          title: reference
+      title: IssueReport
+      additionalProperties: false
+    deixicpublic.v1.ListEventsRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        afterCursor:
+          type:
+            - integer
+            - string
+          title: after_cursor
+          format: int64
+        limit:
+          type: integer
+          title: limit
+          format: int32
+      title: ListEventsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskEvent'
+          title: events
+        nextCursor:
+          type:
+            - integer
+            - string
+          title: next_cursor
+          format: int64
+        hasMore:
+          type: boolean
+          title: has_more
+        resetRequired:
+          type: boolean
+          title: reset_required
+        snapshot:
+          title: snapshot
+          $ref: '#/components/schemas/deixicpublic.v1.Thread'
+        snapshotTurns:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
+          title: snapshot_turns
+      title: ListEventsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListThreadsRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        archived:
+          type: boolean
+          title: archived
+      title: ListThreadsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListThreadsResponse:
+      type: object
+      properties:
+        threads:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Thread'
+          title: threads
+      title: ListThreadsResponse
+      additionalProperties: false
+    deixicpublic.v1.ModelSelection:
+      type: object
+      properties:
+        provider:
+          type: string
+          title: provider
+        model:
+          type: string
+          title: model
+      title: ModelSelection
+      additionalProperties: false
+    deixicpublic.v1.Receipt:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        kind:
+          type: string
+          title: kind
+        title:
+          type: string
+          title: title
+        summary:
+          type: string
+          title: summary
+        state:
+          title: state
+          $ref: '#/components/schemas/deixicpublic.v1.ReceiptState'
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        allowedActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ReceiptAction'
+          title: allowed_actions
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.EvidenceReference'
+          title: evidence
+        codingAcceptance:
+          title: coding_acceptance
+          $ref: '#/components/schemas/deixicpublic.v1.CodingAcceptance'
+      title: Receipt
+      additionalProperties: false
+    deixicpublic.v1.ReceiptAction:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        label:
+          type: string
+          title: label
+        kind:
+          type: string
+          title: kind
+        requiresConfirmation:
+          type: boolean
+          title: requires_confirmation
+        disabledReason:
+          type: string
+          title: disabled_reason
+      title: ReceiptAction
+      additionalProperties: false
+    deixicpublic.v1.RenameThreadRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        title:
+          type: string
+          title: title
+      title: RenameThreadRequest
+      additionalProperties: false
+    deixicpublic.v1.RenameThreadResponse:
+      type: object
+      properties:
+        thread:
+          title: thread
+          $ref: '#/components/schemas/deixicpublic.v1.Thread'
+        changed:
+          type: boolean
+          title: changed
+      title: RenameThreadResponse
+      additionalProperties: false
+    deixicpublic.v1.ResolveReceiptActionRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        receiptId:
+          type: string
+          title: receipt_id
+        actionId:
+          type: string
+          title: action_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+      title: ResolveReceiptActionRequest
+      additionalProperties: false
+    deixicpublic.v1.ResolveReceiptActionResponse:
+      type: object
+      properties:
+        receipt:
+          title: receipt
+          $ref: '#/components/schemas/deixicpublic.v1.Receipt'
+      title: ResolveReceiptActionResponse
+      additionalProperties: false
+    deixicpublic.v1.RespondToRequestRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        turnId:
+          type: string
+          title: turn_id
+        requestId:
+          type: string
+          title: request_id
+        callId:
+          type: string
+          title: call_id
+        requestKind:
+          title: request_kind
+          $ref: '#/components/schemas/deixicpublic.v1.RequestKind'
+        action:
+          title: action
+          $ref: '#/components/schemas/deixicpublic.v1.ResponseAction'
+        text:
+          type: string
+          title: text
+        isError:
+          type: boolean
+          title: is_error
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+      title: RespondToRequestRequest
+      additionalProperties: false
+    deixicpublic.v1.RespondToRequestResponse:
+      type: object
+      properties:
+        replayed:
+          type: boolean
+          title: replayed
+        turns:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
+          title: turns
+        replayCursor:
+          type:
+            - integer
+            - string
+          title: replay_cursor
+          format: int64
+      title: RespondToRequestResponse
+      additionalProperties: false
+    deixicpublic.v1.Scope:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+      title: Scope
+      additionalProperties: false
+    deixicpublic.v1.SetupReadiness:
+      type: object
+      properties:
+        accessible:
+          type: boolean
+          title: accessible
+        missingRequirements:
+          type: array
+          items:
+            type: string
+          title: missing_requirements
+        selection:
+          title: selection
+          $ref: '#/components/schemas/deixicpublic.v1.ModelSelection'
+        defaultModel:
+          title: default_model
+          $ref: '#/components/schemas/deixicpublic.v1.AvailableModel'
+        availableModels:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.AvailableModel'
+          title: available_models
+        nextAction:
+          type: string
+          title: next_action
+      title: SetupReadiness
+      additionalProperties: false
+    deixicpublic.v1.SubmitIssueReportRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        description:
+          type: string
+          title: description
+        expectedBehavior:
+          type: string
+          title: expected_behavior
+        appVersion:
+          type: string
+          title: app_version
+        includeDiagnostics:
+          type: boolean
+          title: include_diagnostics
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        context:
+          title: context
+          $ref: '#/components/schemas/deixicpublic.v1.IssueContext'
+      title: SubmitIssueReportRequest
+      additionalProperties: false
+    deixicpublic.v1.SubmitIssueReportResponse:
+      type: object
+      properties:
+        report:
+          title: report
+          $ref: '#/components/schemas/deixicpublic.v1.IssueReport'
+      title: SubmitIssueReportResponse
+      additionalProperties: false
+    deixicpublic.v1.SubmitTaskRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        body:
+          type: string
+          title: body
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        continuationTaskId:
+          type: string
+          title: continuation_task_id
+        referenceTaskIds:
+          type: array
+          items:
+            type: string
+          title: reference_task_ids
+        modelSelection:
+          title: model_selection
+          $ref: '#/components/schemas/deixicpublic.v1.ModelSelection'
+        codingContract:
+          title: coding_contract
+          $ref: '#/components/schemas/deixicpublic.v1.CodingContract'
+        projectResourceId:
+          type: string
+          title: project_resource_id
+      title: SubmitTaskRequest
+      additionalProperties: false
+    deixicpublic.v1.SubmitTaskResponse:
+      type: object
+      properties:
+        message:
+          title: message
+          $ref: '#/components/schemas/deixicpublic.v1.TaskMessage'
+        acceptedTurn:
+          title: accepted_turn
+          $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
+        replayCursor:
+          type:
+            - integer
+            - string
+          title: replay_cursor
+          format: int64
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Receipt'
+          title: receipts
+      title: SubmitTaskResponse
+      additionalProperties: false
+    deixicpublic.v1.TaskEvent:
+      type: object
+      properties:
+        cursor:
+          type:
+            - integer
+            - string
+          title: cursor
+          format: int64
+        id:
+          type: string
+          title: id
+        turnId:
+          type: string
+          title: turn_id
+        kind:
+          title: kind
+          $ref: '#/components/schemas/deixicpublic.v1.EventKind'
+        text:
+          type: string
+          title: text
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.EvidenceReference'
+          title: evidence
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        requestId:
+          type: string
+          title: request_id
+        requestKind:
+          title: request_kind
+          $ref: '#/components/schemas/deixicpublic.v1.RequestKind'
+        toolName:
+          type: string
+          title: tool_name
+        callId:
+          type: string
+          title: call_id
+        terminalError:
+          title: terminal_error
+          $ref: '#/components/schemas/deixicpublic.v1.ErrorDetail'
+      title: TaskEvent
+      additionalProperties: false
+    deixicpublic.v1.TaskMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        role:
+          title: role
+          $ref: '#/components/schemas/deixicpublic.v1.MessageRole'
+        body:
+          type: string
+          title: body
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        receiptIds:
+          type: array
+          items:
+            type: string
+          title: receipt_ids
+      title: TaskMessage
+      additionalProperties: false
+    deixicpublic.v1.TaskTurn:
+      type: object
+      properties:
+        turnId:
+          type: string
+          title: turn_id
+        sequence:
+          type:
+            - integer
+            - string
+          title: sequence
+          format: int64
+        userMessageId:
+          type: string
+          title: user_message_id
+        assistantMessageId:
+          type: string
+          title: assistant_message_id
+        state:
+          title: state
+          $ref: '#/components/schemas/deixicpublic.v1.TurnState'
+        waitingReason:
+          title: waiting_reason
+          $ref: '#/components/schemas/deixicpublic.v1.WaitingReason'
+        firstCursor:
+          type:
+            - integer
+            - string
+          title: first_cursor
+          format: int64
+        lastCursor:
+          type:
+            - integer
+            - string
+          title: last_cursor
+          format: int64
+        terminalError:
+          title: terminal_error
+          $ref: '#/components/schemas/deixicpublic.v1.ErrorDetail'
+        createdAt:
+          title: created_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        completedAt:
+          title: completed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: TaskTurn
+      additionalProperties: false
+    deixicpublic.v1.Thread:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        title:
+          type: string
+          title: title
+        replayCursor:
+          type:
+            - integer
+            - string
+          title: replay_cursor
+          format: int64
+        activeTurnSequence:
+          type:
+            - integer
+            - string
+          title: active_turn_sequence
+          format: int64
+        updatedAt:
+          title: updated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        unreadCount:
+          type: integer
+          title: unread_count
+          format: int32
+        openCount:
+          type: integer
+          title: open_count
+          format: int32
+        archived:
+          type: boolean
+          title: archived
+      title: Thread
+      additionalProperties: false
+    deixicpublic.v1.UpdateBusinessObjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        objectId:
+          type: string
+          title: object_id
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessFieldValue'
+          title: values
+        schemaRevision:
+          type:
+            - integer
+            - string
+          title: schema_revision
+          format: int64
+      title: UpdateBusinessObjectRequest
+      additionalProperties: false
+    deixicpublic.v1.UpdateBusinessObjectResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: UpdateBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.WatchEventsRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        threadId:
+          type: string
+          title: thread_id
+        afterCursor:
+          type:
+            - integer
+            - string
+          title: after_cursor
+          format: int64
+      title: WatchEventsRequest
+      additionalProperties: false
+    deixicpublic.v1.WatchEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskEvent'
+          title: events
+        nextCursor:
+          type:
+            - integer
+            - string
+          title: next_cursor
+          format: int64
+        resetRequired:
+          type: boolean
+          title: reset_required
+        snapshot:
+          title: snapshot
+          $ref: '#/components/schemas/deixicpublic.v1.Thread'
+        snapshotTurns:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
+          title: snapshot_turns
+      title: WatchEventsResponse
+      additionalProperties: false
+    google.protobuf.Timestamp:
+      type: string
+      examples:
+        - 1s
+        - 1.000340012s
+      format: date-time
+      description: |-
+        A Timestamp represents a point in time independent of any time zone or local
+         calendar, encoded as a count of seconds and fractions of seconds at
+         nanosecond resolution. The count is relative to an epoch at UTC midnight on
+         January 1, 1970, in the proleptic Gregorian calendar which extends the
+         Gregorian calendar backwards to year one.
+
+         All minutes are 60 seconds long. Leap seconds are "smeared" so that no leap
+         second table is needed for interpretation, using a [24-hour linear
+         smear](https://developers.google.com/time/smear).
+
+         The range is from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999999999Z. By
+         restricting to that range, we ensure that we can convert to and from [RFC
+         3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
+
+         # Examples
+
+         Example 1: Compute Timestamp from POSIX `time()`.
+
+             Timestamp timestamp;
+             timestamp.set_seconds(time(NULL));
+             timestamp.set_nanos(0);
+
+         Example 2: Compute Timestamp from POSIX `gettimeofday()`.
+
+             struct timeval tv;
+             gettimeofday(&tv, NULL);
+
+             Timestamp timestamp;
+             timestamp.set_seconds(tv.tv_sec);
+             timestamp.set_nanos(tv.tv_usec * 1000);
+
+         Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
+
+             FILETIME ft;
+             GetSystemTimeAsFileTime(&ft);
+             UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+
+             // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z
+             // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.
+             Timestamp timestamp;
+             timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));
+             timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
+
+         Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
+
+             long millis = System.currentTimeMillis();
+
+             Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)
+                 .setNanos((int) ((millis % 1000) * 1000000)).build();
+
+         Example 5: Compute Timestamp from Java `Instant.now()`.
+
+             Instant now = Instant.now();
+
+             Timestamp timestamp =
+                 Timestamp.newBuilder().setSeconds(now.getEpochSecond())
+                     .setNanos(now.getNano()).build();
+
+         Example 6: Compute Timestamp from current time in Python.
+
+             timestamp = Timestamp()
+             timestamp.GetCurrentTime()
+
+         # JSON Mapping
+
+         In JSON format, the Timestamp type is encoded as a string in the
+         [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
+         format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
+         where {year} is always expressed using four digits while {month}, {day},
+         {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional
+         seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),
+         are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone
+         is required. A proto3 JSON serializer should always use UTC (as indicated by
+         "Z") when printing the Timestamp type and a proto3 JSON parser should be
+         able to accept both UTC and other timezones (as indicated by an offset).
+
+         For example, "2017-01-15T01:30:15.01Z" encodes 15.01 seconds past
+         01:30 UTC on January 15, 2017.
+
+         In JavaScript, one can convert a Date object to this format using the
+         standard
+         [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)
+         method. In Python, a standard `datetime.datetime` object can be converted
+         to this format using
+         [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with
+         the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use
+         the Joda Time's [`ISODateTimeFormat.dateTime()`](
+         http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()
+         ) to obtain a formatter capable of generating timestamps in this format.
+    connect-protocol-version:
+      type: number
+      title: Connect-Protocol-Version
+      enum:
+        - 1
+      description: Define the version of the Connect protocol
+      const: 1
+    connect-timeout-header:
+      type: number
+      title: Connect-Timeout-Ms
+      description: Define the timeout, in ms
+    connect.error:
+      type: object
+      properties:
+        code:
+          type: string
+          examples:
+            - not_found
+          enum:
+            - canceled
+            - unknown
+            - invalid_argument
+            - deadline_exceeded
+            - not_found
+            - already_exists
+            - permission_denied
+            - resource_exhausted
+            - failed_precondition
+            - aborted
+            - out_of_range
+            - unimplemented
+            - internal
+            - unavailable
+            - data_loss
+            - unauthenticated
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+        message:
+          type: string
+          description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+        detail:
+          $ref: '#/components/schemas/google.protobuf.Any'
+      title: Connect Error
+      additionalProperties: true
+      description: 'Error type returned by Connect: https://connectrpc.com/docs/go/errors/#http-representation'
+    google.protobuf.Any:
+      type: object
+      properties:
+        type:
+          type: string
+        value:
+          type: string
+          format: binary
+        debug:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+security: []
+tags:
+  - name: deixicpublic.v1.DeixicPublicService
+    description: |-
+      This is the complete application SDK wire contract. Public messages are
+       projections owned by this service, not aliases of implementation records.

@@ -4,7 +4,8 @@ Use the Deixic SDK when an application needs to submit a task, follow its
 durable progress, interrupt it, answer a tool request, or approve or deny a
 requested action.
 
-The supported clients expose eight operations from the Deixic service. They do
+The supported clients expose eight operations from
+`deixicpublic.v1.DeixicPublicService`. They do
 not expose the browser API or create a second execution path. Deixic remains
 the owner of task state, approvals, and action history.
 
@@ -41,7 +42,7 @@ environment.
   subject, tenant, and declared scopes.
 
 The checked package contract is
-[`sdk/deixic/public-surface.json`](../sdk/deixic/public-surface.json). Package
-examples and error details live in the
-[TypeScript README](../sdk/deixic/typescript/README.md) and
-[Python README](../sdk/deixic/python/README.md).
+[public-surface.json](https://github.com/dx-corp/api/blob/main/contracts/public-surface.json).
+Package examples and error details live in the
+[TypeScript SDK](https://github.com/dx-corp/deixic-node/blob/main/README.md) and
+[Python SDK](https://github.com/dx-corp/deixic-python/blob/main/README.md).
