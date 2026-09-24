@@ -11457,6 +11457,33 @@ components:
           title: bound
       title: AgentProductConnection
       additionalProperties: false
+    console.v1.AgentProductPrompt:
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        label:
+          type: string
+          title: label
+        content:
+          type: string
+          title: content
+        versionId:
+          type: string
+          title: version_id
+        version:
+          type: integer
+          title: version
+          format: int32
+        resolved:
+          type: boolean
+          title: resolved
+      title: AgentProductPrompt
+      additionalProperties: false
+      description: |-
+        Prompt content is resolved by the Prompt owner for the active configuration.
+         An unavailable owner never turns a binding label into claimed instructions.
     console.v1.AgentWorkforceActionAuthorityBoundary:
       type: object
       properties:
@@ -12945,6 +12972,10 @@ components:
         cloneId:
           type: string
           title: clone_id
+        sourceTypeId:
+          type: string
+          title: source_type_id
+          description: Stable template member ID. Cloned type_id is tenant-owned and editable.
       title: BusinessBlueprintSource
       additionalProperties: false
       description: Exact built-in source retained on each cloned schema for future comparison.
@@ -19241,6 +19272,11 @@ components:
           items:
             $ref: '#/components/schemas/console.v1.AgentProductConnection'
           title: connections
+        prompts:
+          type: array
+          items:
+            $ref: '#/components/schemas/console.v1.AgentProductPrompt'
+          title: prompts
       title: GetAgentProductResponse
       additionalProperties: false
     console.v1.GetAssetRequest:
