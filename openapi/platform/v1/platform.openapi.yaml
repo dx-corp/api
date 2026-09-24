@@ -2016,6 +2016,11 @@ components:
               - 0
           title: required_independence
           $ref: '#/components/schemas/platform.v1.WorkRemediationEvidenceIndependence'
+        observerCatalogDigest:
+          type: string
+          title: observer_catalog_digest
+          minLength: 1
+          description: Pins the read contract used to independently verify this condition.
       title: WorkRemediationPostcondition
       required:
         - target
