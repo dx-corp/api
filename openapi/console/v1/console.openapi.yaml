@@ -12042,6 +12042,38 @@ components:
           $ref: '#/components/schemas/console.v1.BusinessObject'
       title: AdmitBusinessObjectObservationResponse
       additionalProperties: false
+    console.v1.AgentProductActionCatalog:
+      type: object
+      properties:
+        resolved:
+          type: boolean
+          title: resolved
+        published:
+          type: integer
+          title: published
+          format: int32
+        scopeCompatible:
+          type: integer
+          title: scope_compatible
+          format: int32
+        reads:
+          type: integer
+          title: reads
+          format: int32
+        writes:
+          type: integer
+          title: writes
+          format: int32
+        approvalRequired:
+          type: integer
+          title: approval_required
+          format: int32
+        destructive:
+          type: integer
+          title: destructive
+          format: int32
+      title: AgentProductActionCatalog
+      additionalProperties: false
     console.v1.AgentProductConnection:
       type: object
       properties:
@@ -12066,6 +12098,12 @@ components:
         bound:
           type: boolean
           title: bound
+        actionCatalog:
+          title: action_catalog
+          description: |-
+            Connector-owned published actions compatible with this connection's
+             scopes. These counts do not imply agent policy admission or execution.
+          $ref: '#/components/schemas/console.v1.AgentProductActionCatalog'
       title: AgentProductConnection
       additionalProperties: false
     console.v1.AgentProductPrompt:
