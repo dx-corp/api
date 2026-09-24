@@ -5252,6 +5252,19 @@ message AgentProductConnection {
   string health_reason = 5;
   string provider_name = 6;
   bool bound = 7;
+  // Connector-owned published actions compatible with this connection's
+  // scopes. These counts do not imply agent policy admission or execution.
+  AgentProductActionCatalog action_catalog = 8;
+}
+
+message AgentProductActionCatalog {
+  bool resolved = 1;
+  int32 published = 2;
+  int32 scope_compatible = 3;
+  int32 reads = 4;
+  int32 writes = 5;
+  int32 approval_required = 6;
+  int32 destructive = 7;
 }
 
 // Prompt content is resolved by the Prompt owner for the active configuration.
