@@ -5254,10 +5254,22 @@ message AgentProductConnection {
   bool bound = 7;
 }
 
+// Prompt content is resolved by the Prompt owner for the active configuration.
+// An unavailable owner never turns a binding label into claimed instructions.
+message AgentProductPrompt {
+  string name = 1;
+  string label = 2;
+  string content = 3 [(common.v1.classification) = DATA_CLASSIFICATION_CONTENT];
+  string version_id = 4;
+  int32 version = 5;
+  bool resolved = 6;
+}
+
 message GetAgentProductResponse {
   agents.v1.Agent agent = 1;
   agents.v1.AgentConfig config = 2;
   repeated AgentProductConnection connections = 3;
+  repeated AgentProductPrompt prompts = 4;
 }
 
 message CloneAgentProductRequest {
@@ -10469,6 +10481,8 @@ message BusinessBlueprintSource {
   int64 version = 2;
   string content_digest = 3;
   string clone_id = 4;
+  // Stable template member ID. Cloned type_id is tenant-owned and editable.
+  string source_type_id = 5;
 }
 
 // Invitation IDs are opaque locators, never authentication. The owner requires
