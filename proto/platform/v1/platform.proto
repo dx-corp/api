@@ -204,6 +204,8 @@ message NewWorkItem {
   string parent_work_id = 3;
   google.protobuf.Struct metadata = 4;
   EvalAssignment eval_assignment = 5;
+  // Immutable, versioned remediation plan owned by this Work item.
+  WorkRemediationPlan remediation_plan = 6;
 }
 
 message WorkItem {
@@ -217,6 +219,7 @@ message WorkItem {
   string lineage_id = 8 [(buf.validate.field).string.min_len = 1];
   google.protobuf.Struct metadata = 9;
   EvalAssignment eval_assignment = 10;
+  WorkRemediationPlan remediation_plan = 11;
 }
 
 enum ResourceKind {
@@ -251,6 +254,81 @@ message ResourceRef {
   // Owner-defined monotonic version number. Zero means the latest version
   // when version_id is empty; version_id wins when both are supplied.
   int32 version = 4 [(buf.validate.field).int32.gte = 0];
+}
+
+enum WorkRemediationClassification {
+  WORK_REMEDIATION_CLASSIFICATION_UNSPECIFIED = 0;
+  WORK_REMEDIATION_CLASSIFICATION_AUTO_EXECUTABLE = 1;
+  WORK_REMEDIATION_CLASSIFICATION_APPROVAL_EXECUTABLE = 2;
+  WORK_REMEDIATION_CLASSIFICATION_MANUAL_WORK = 3;
+  WORK_REMEDIATION_CLASSIFICATION_BLOCKED = 4;
+}
+
+enum WorkRemediationEvidenceIndependence {
+  WORK_REMEDIATION_EVIDENCE_INDEPENDENCE_UNSPECIFIED = 0;
+  WORK_REMEDIATION_EVIDENCE_INDEPENDENCE_ACTION_OUTPUT = 1;
+  WORK_REMEDIATION_EVIDENCE_INDEPENDENCE_INDEPENDENT_OBSERVATION = 2;
+}
+
+// Exact external identity; the enclosing Work scope remains tenant authority.
+message WorkRemediationResource {
+  string provider_id = 1 [(buf.validate.field).string.min_len = 1];
+  string connection_id = 2 [(buf.validate.field).string.min_len = 1];
+  string stable_resource_id = 3 [(buf.validate.field).string.min_len = 1];
+  string resource_kind = 4 [(buf.validate.field).string.min_len = 1];
+  ResourceRef platform_resource = 5;
+}
+
+message WorkRemediationAction {
+  string action_id = 1 [(buf.validate.field).string.min_len = 1];
+  string catalog_digest = 2 [(buf.validate.field).string.min_len = 1];
+  string input_digest = 3 [(buf.validate.field).string.min_len = 1];
+  WorkRemediationResource target = 4 [(buf.validate.field).required = true];
+  RiskTier risk_tier = 5 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  bool approval_required = 6;
+  repeated string required_scopes = 7;
+  string idempotency_key = 8 [(buf.validate.field).string.min_len = 1];
+  repeated string postcondition_ids = 9;
+  // Immutable ArtifactVersion containing schema-validated provider arguments.
+  // input_digest binds its exact bytes; secrets remain references.
+  ResourceRef input_artifact_ref = 10 [(buf.validate.field).required = true];
+}
+
+message WorkRemediationPostcondition {
+  string postcondition_id = 1 [(buf.validate.field).string.min_len = 1];
+  WorkRemediationResource target = 2 [(buf.validate.field).required = true];
+  string observer_action_id = 3 [(buf.validate.field).string.min_len = 1];
+  string expected_state_digest = 4 [(buf.validate.field).string.min_len = 1];
+  uint32 max_age_seconds = 5 [(buf.validate.field).uint32.gt = 0];
+  WorkRemediationEvidenceIndependence required_independence = 6 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+// A typed extension of Platform Work, not a separate execution or approval
+// owner. plan_digest excludes itself and binds every immutable field below.
+message WorkRemediationPlan {
+  uint32 schema_version = 1 [(buf.validate.field).uint32.gt = 0];
+  string plan_digest = 2 [(buf.validate.field).string.min_len = 1];
+  TenantScope scope = 3 [(buf.validate.field).required = true];
+  string source_finding_id = 4 [(buf.validate.field).string.min_len = 1];
+  repeated RecordRef source_evidence = 5;
+  repeated WorkRemediationResource affected_resources = 6;
+  repeated WorkRemediationPostcondition postconditions = 7;
+  repeated WorkRemediationAction actions = 8;
+  WorkRemediationClassification classification = 9 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  string lineage_id = 10 [(buf.validate.field).string.min_len = 1];
+  string idempotency_key = 11 [(buf.validate.field).string.min_len = 1];
+  // Manual and blocked Work retain an explicit reason rather than inventing
+  // an executable connector action.
+  string non_executable_reason = 12;
 }
 
 // RecordKind identifies an authoritative operational record without copying
