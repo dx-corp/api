@@ -307,6 +307,8 @@ message WorkRemediationPostcondition {
     defined_only: true
     not_in: [0]
   }];
+  // Pins the read contract used to independently verify this condition.
+  string observer_catalog_digest = 7 [(buf.validate.field).string.min_len = 1];
 }
 
 // A typed extension of Platform Work, not a separate execution or approval
