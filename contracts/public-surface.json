@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
-  "service": "deixic.v1.DeixicService",
+  "service": "deixicpublic.v1.DeixicPublicService",
   "packages": {
     "typescript": "@evalops/deixic-sdk",
-    "python": "deixic-sdk"
+    "python": "deixic-sdk",
+    "go": "github.com/dx-corp/deixic-go"
   },
   "scope": {
     "constructorBound": true,
@@ -20,47 +21,47 @@
   },
   "operations": [
     {
-      "rpc": "GetOperatingThread",
+      "rpc": "GetThread",
       "facade": "threads.get",
       "kind": "query"
     },
     {
-      "rpc": "ListOperatingThreadEvents",
+      "rpc": "ListEvents",
       "facade": "events.list",
       "kind": "query"
     },
     {
-      "rpc": "WatchOperatingThread",
+      "rpc": "WatchEvents",
       "facade": "events.watch",
       "kind": "server-stream",
       "callerOwnsReconnect": true
     },
     {
-      "rpc": "SubmitOperatingMessage",
+      "rpc": "SubmitTask",
       "facade": "messages.send",
       "kind": "mutation",
       "requiresIdempotencyKey": true,
       "acceptedIsTerminal": false
     },
     {
-      "rpc": "InterruptOperatingThread",
+      "rpc": "InterruptTask",
       "facade": "controls.interrupt",
       "kind": "mutation",
       "requiresIdempotencyKey": true
     },
     {
-      "rpc": "RespondOperatingThread",
+      "rpc": "RespondToRequest",
       "facade": "controls.respond",
       "kind": "mutation",
       "requiresIdempotencyKey": true
     },
     {
-      "rpc": "GetOperatingReceipt",
+      "rpc": "GetReceipt",
       "facade": "receipts.get",
       "kind": "query"
     },
     {
-      "rpc": "ResolveOperatingReceiptAction",
+      "rpc": "ResolveReceiptAction",
       "facade": "receipts.resolve",
       "kind": "mutation",
       "requiresIdempotencyKey": true
