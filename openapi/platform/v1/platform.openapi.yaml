@@ -479,6 +479,22 @@ components:
         - WORK_KIND_EVAL_RUN
         - WORK_KIND_COMPUTER_MISSION
         - WORK_KIND_ARTIFACT_RENDER
+    platform.v1.WorkRemediationClassification:
+      type: string
+      title: WorkRemediationClassification
+      enum:
+        - WORK_REMEDIATION_CLASSIFICATION_UNSPECIFIED
+        - WORK_REMEDIATION_CLASSIFICATION_AUTO_EXECUTABLE
+        - WORK_REMEDIATION_CLASSIFICATION_APPROVAL_EXECUTABLE
+        - WORK_REMEDIATION_CLASSIFICATION_MANUAL_WORK
+        - WORK_REMEDIATION_CLASSIFICATION_BLOCKED
+    platform.v1.WorkRemediationEvidenceIndependence:
+      type: string
+      title: WorkRemediationEvidenceIndependence
+      enum:
+        - WORK_REMEDIATION_EVIDENCE_INDEPENDENCE_UNSPECIFIED
+        - WORK_REMEDIATION_EVIDENCE_INDEPENDENCE_ACTION_OUTPUT
+        - WORK_REMEDIATION_EVIDENCE_INDEPENDENCE_INDEPENDENT_OBSERVATION
     platform.v1.WorkState:
       type: string
       title: WorkState
@@ -1139,6 +1155,10 @@ components:
         evalAssignment:
           title: eval_assignment
           $ref: '#/components/schemas/platform.v1.EvalAssignment'
+        remediationPlan:
+          title: remediation_plan
+          description: Immutable, versioned remediation plan owned by this Work item.
+          $ref: '#/components/schemas/platform.v1.WorkRemediationPlan'
       title: NewWorkItem
       additionalProperties: false
     platform.v1.OperationContext:
@@ -1843,11 +1863,188 @@ components:
         evalAssignment:
           title: eval_assignment
           $ref: '#/components/schemas/platform.v1.EvalAssignment'
+        remediationPlan:
+          title: remediation_plan
+          $ref: '#/components/schemas/platform.v1.WorkRemediationPlan'
       title: WorkItem
       required:
         - scope
         - createdBy
       additionalProperties: false
+    platform.v1.WorkRemediationAction:
+      type: object
+      properties:
+        actionId:
+          type: string
+          title: action_id
+          minLength: 1
+        catalogDigest:
+          type: string
+          title: catalog_digest
+          minLength: 1
+        inputDigest:
+          type: string
+          title: input_digest
+          minLength: 1
+        target:
+          title: target
+          $ref: '#/components/schemas/platform.v1.WorkRemediationResource'
+        riskTier:
+          not:
+            enum:
+              - 0
+          title: risk_tier
+          $ref: '#/components/schemas/platform.v1.RiskTier'
+        approvalRequired:
+          type: boolean
+          title: approval_required
+        requiredScopes:
+          type: array
+          items:
+            type: string
+          title: required_scopes
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        postconditionIds:
+          type: array
+          items:
+            type: string
+          title: postcondition_ids
+        inputArtifactRef:
+          title: input_artifact_ref
+          description: |-
+            Immutable ArtifactVersion containing schema-validated provider arguments.
+             input_digest binds its exact bytes; secrets remain references.
+          $ref: '#/components/schemas/platform.v1.ResourceRef'
+      title: WorkRemediationAction
+      required:
+        - target
+        - inputArtifactRef
+      additionalProperties: false
+    platform.v1.WorkRemediationPlan:
+      type: object
+      properties:
+        schemaVersion:
+          exclusiveMinimum: 0
+          type: integer
+          title: schema_version
+        planDigest:
+          type: string
+          title: plan_digest
+          minLength: 1
+        scope:
+          title: scope
+          $ref: '#/components/schemas/platform.v1.TenantScope'
+        sourceFindingId:
+          type: string
+          title: source_finding_id
+          minLength: 1
+        sourceEvidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/platform.v1.RecordRef'
+          title: source_evidence
+        affectedResources:
+          type: array
+          items:
+            $ref: '#/components/schemas/platform.v1.WorkRemediationResource'
+          title: affected_resources
+        postconditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/platform.v1.WorkRemediationPostcondition'
+          title: postconditions
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/platform.v1.WorkRemediationAction'
+          title: actions
+        classification:
+          not:
+            enum:
+              - 0
+          title: classification
+          $ref: '#/components/schemas/platform.v1.WorkRemediationClassification'
+        lineageId:
+          type: string
+          title: lineage_id
+          minLength: 1
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+          minLength: 1
+        nonExecutableReason:
+          type: string
+          title: non_executable_reason
+          description: |-
+            Manual and blocked Work retain an explicit reason rather than inventing
+             an executable connector action.
+      title: WorkRemediationPlan
+      required:
+        - scope
+      additionalProperties: false
+      description: |-
+        A typed extension of Platform Work, not a separate execution or approval
+         owner. plan_digest excludes itself and binds every immutable field below.
+    platform.v1.WorkRemediationPostcondition:
+      type: object
+      properties:
+        postconditionId:
+          type: string
+          title: postcondition_id
+          minLength: 1
+        target:
+          title: target
+          $ref: '#/components/schemas/platform.v1.WorkRemediationResource'
+        observerActionId:
+          type: string
+          title: observer_action_id
+          minLength: 1
+        expectedStateDigest:
+          type: string
+          title: expected_state_digest
+          minLength: 1
+        maxAgeSeconds:
+          exclusiveMinimum: 0
+          type: integer
+          title: max_age_seconds
+        requiredIndependence:
+          not:
+            enum:
+              - 0
+          title: required_independence
+          $ref: '#/components/schemas/platform.v1.WorkRemediationEvidenceIndependence'
+      title: WorkRemediationPostcondition
+      required:
+        - target
+      additionalProperties: false
+    platform.v1.WorkRemediationResource:
+      type: object
+      properties:
+        providerId:
+          type: string
+          title: provider_id
+          minLength: 1
+        connectionId:
+          type: string
+          title: connection_id
+          minLength: 1
+        stableResourceId:
+          type: string
+          title: stable_resource_id
+          minLength: 1
+        resourceKind:
+          type: string
+          title: resource_kind
+          minLength: 1
+        platformResource:
+          title: platform_resource
+          $ref: '#/components/schemas/platform.v1.ResourceRef'
+      title: WorkRemediationResource
+      additionalProperties: false
+      description: Exact external identity; the enclosing Work scope remains tenant authority.
     connect-protocol-version:
       type: number
       title: Connect-Protocol-Version
