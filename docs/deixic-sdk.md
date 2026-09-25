@@ -25,6 +25,12 @@ Python client with `pip install deixic-sdk`. Both clients default to
 `https://app.deixic.com` and accept an explicit base URL for another deployed
 environment.
 
+New to the SDK? Start with the getting started guide for
+[TypeScript](sdk/getting-started-typescript.md),
+[Python](sdk/getting-started-python.md), or
+[Go](sdk/getting-started-go.md). Each one walks from installation to a
+completed task and an approval decision.
+
 ## Safety contract
 
 - Choose the organization and workspace when constructing the client. Method
