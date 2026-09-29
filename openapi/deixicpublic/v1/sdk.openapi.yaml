@@ -631,6 +631,10 @@ components:
         - EVENT_KIND_TURN_INTERRUPTED
         - EVENT_KIND_CLIENT_TOOL_REQUIRED
         - EVENT_KIND_EXTERNAL_RETRY_REQUIRED
+        - EVENT_KIND_ASSISTANT_TEXT_DELTA
+        - EVENT_KIND_ASSISTANT_TEXT_OBSERVED
+        - EVENT_KIND_MODEL_ATTEMPT_ABANDONED
+        - EVENT_KIND_TOOL_PROPOSED
     deixicpublic.v1.MessageRole:
       type: string
       title: MessageRole
