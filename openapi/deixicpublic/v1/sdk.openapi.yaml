@@ -213,6 +213,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.SubmitTaskResponse'
+  /deixicpublic.v1.DeixicPublicService/SubmitVoicedTask:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: SubmitVoicedTask
+      description: Explicit voice requests use a distinct method so older servers refuse them.
+      operationId: deixicpublic.v1.DeixicPublicService.SubmitVoicedTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.SubmitVoicedTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.SubmitVoicedTaskResponse'
+  /deixicpublic.v1.DeixicPublicService/GetVoiceCatalog:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetVoiceCatalog
+      operationId: deixicpublic.v1.DeixicPublicService.GetVoiceCatalog
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetVoiceCatalogRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetVoiceCatalogResponse'
   /deixicpublic.v1.DeixicPublicService/InterruptTask:
     post:
       tags:
@@ -715,6 +786,23 @@ components:
         - TURN_STATE_COMPLETED
         - TURN_STATE_FAILED
         - TURN_STATE_INTERRUPTED
+    deixicpublic.v1.VoiceMode:
+      type: string
+      title: VoiceMode
+      enum:
+        - VOICE_MODE_UNSPECIFIED
+        - VOICE_MODE_WORKSPACE_DEFAULT
+        - VOICE_MODE_BRAND_VOICE
+        - VOICE_MODE_NEUTRAL
+      description: IDs select Settings-owned voices. Clients never supply trusted guidance.
+    deixicpublic.v1.VoiceTone:
+      type: string
+      title: VoiceTone
+      enum:
+        - VOICE_TONE_UNSPECIFIED
+        - VOICE_TONE_CONCISE
+        - VOICE_TONE_FORMAL
+        - VOICE_TONE_WARMER
     deixicpublic.v1.WaitingReason:
       type: string
       title: WaitingReason
@@ -771,6 +859,26 @@ components:
           type: string
           title: display_name
       title: AvailableModel
+      additionalProperties: false
+    deixicpublic.v1.BrandVoice:
+      type: object
+      properties:
+        voiceId:
+          type: string
+          title: voice_id
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        version:
+          type:
+            - integer
+            - string
+          title: version
+          format: int64
+      title: BrandVoice
       additionalProperties: false
     deixicpublic.v1.BusinessArtifactReference:
       type: object
@@ -1416,6 +1524,33 @@ components:
           $ref: '#/components/schemas/deixicpublic.v1.SetupReadiness'
       title: GetThreadResponse
       additionalProperties: false
+    deixicpublic.v1.GetVoiceCatalogRequest:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+      title: GetVoiceCatalogRequest
+      additionalProperties: false
+    deixicpublic.v1.GetVoiceCatalogResponse:
+      type: object
+      properties:
+        scope:
+          title: scope
+          $ref: '#/components/schemas/deixicpublic.v1.Scope'
+        enabled:
+          type: boolean
+          title: enabled
+        defaultVoiceId:
+          type: string
+          title: default_voice_id
+        voices:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BrandVoice'
+          title: voices
+      title: GetVoiceCatalogResponse
+      additionalProperties: false
     deixicpublic.v1.InterruptTaskRequest:
       type: object
       properties:
@@ -1870,6 +2005,25 @@ components:
           title: receipts
       title: SubmitTaskResponse
       additionalProperties: false
+    deixicpublic.v1.SubmitVoicedTaskRequest:
+      type: object
+      properties:
+        task:
+          title: task
+          $ref: '#/components/schemas/deixicpublic.v1.SubmitTaskRequest'
+        voiceSelection:
+          title: voice_selection
+          $ref: '#/components/schemas/deixicpublic.v1.VoiceSelection'
+      title: SubmitVoicedTaskRequest
+      additionalProperties: false
+    deixicpublic.v1.SubmitVoicedTaskResponse:
+      type: object
+      properties:
+        result:
+          title: result
+          $ref: '#/components/schemas/deixicpublic.v1.SubmitTaskResponse'
+      title: SubmitVoicedTaskResponse
+      additionalProperties: false
     deixicpublic.v1.TaskEvent:
       type: object
       properties:
@@ -2066,6 +2220,25 @@ components:
           title: object
           $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
       title: UpdateBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.VoiceSelection:
+      type: object
+      properties:
+        mode:
+          title: mode
+          $ref: '#/components/schemas/deixicpublic.v1.VoiceMode'
+        voiceIds:
+          type: array
+          items:
+            type: string
+          title: voice_ids
+          description: Up to four distinct active IDs. The first is lead; later IDs support it.
+        toneAdjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.VoiceTone'
+          title: tone_adjustments
+      title: VoiceSelection
       additionalProperties: false
     deixicpublic.v1.WatchEventsRequest:
       type: object

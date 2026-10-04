@@ -41,7 +41,8 @@
       "facade": "messages.send",
       "kind": "mutation",
       "requiresIdempotencyKey": true,
-      "acceptedIsTerminal": false
+      "acceptedIsTerminal": false,
+      "explicitVoiceRpc": "SubmitVoicedTask"
     },
     {
       "rpc": "InterruptTask",
@@ -65,6 +66,11 @@
       "facade": "receipts.resolve",
       "kind": "mutation",
       "requiresIdempotencyKey": true
+    },
+    {
+      "rpc": "GetVoiceCatalog",
+      "facade": "voices.list",
+      "kind": "query"
     }
   ]
 }
