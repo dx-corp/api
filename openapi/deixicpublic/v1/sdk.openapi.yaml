@@ -669,6 +669,391 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.DeleteBusinessObjectResponse'
+  /deixicpublic.v1.DeixicPublicService/ListBusinessObjects:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListBusinessObjects
+      operationId: deixicpublic.v1.DeixicPublicService.ListBusinessObjects
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectsResponse'
+  /deixicpublic.v1.DeixicPublicService/ListBusinessObjectTypes:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListBusinessObjectTypes
+      operationId: deixicpublic.v1.DeixicPublicService.ListBusinessObjectTypes
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectTypesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectTypesResponse'
+  /deixicpublic.v1.DeixicPublicService/ListBusinessBlueprints:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListBusinessBlueprints
+      operationId: deixicpublic.v1.DeixicPublicService.ListBusinessBlueprints
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListBusinessBlueprintsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListBusinessBlueprintsResponse'
+  /deixicpublic.v1.DeixicPublicService/BindBusinessObjectSource:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: BindBusinessObjectSource
+      operationId: deixicpublic.v1.DeixicPublicService.BindBusinessObjectSource
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.BindBusinessObjectSourceRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.BindBusinessObjectSourceResponse'
+  /deixicpublic.v1.DeixicPublicService/ListBusinessObjectRelationships:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListBusinessObjectRelationships
+      operationId: deixicpublic.v1.DeixicPublicService.ListBusinessObjectRelationships
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectRelationshipsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectRelationshipsResponse'
+  /deixicpublic.v1.DeixicPublicService/CreateBusinessObjectRelationship:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: CreateBusinessObjectRelationship
+      operationId: deixicpublic.v1.DeixicPublicService.CreateBusinessObjectRelationship
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.CreateBusinessObjectRelationshipRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.CreateBusinessObjectRelationshipResponse'
+  /deixicpublic.v1.DeixicPublicService/DeleteBusinessObjectRelationship:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: DeleteBusinessObjectRelationship
+      operationId: deixicpublic.v1.DeixicPublicService.DeleteBusinessObjectRelationship
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.DeleteBusinessObjectRelationshipRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.DeleteBusinessObjectRelationshipResponse'
+  /deixicpublic.v1.DeixicPublicService/GetProgram:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetProgram
+      operationId: deixicpublic.v1.DeixicPublicService.GetProgram
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetProgramRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetProgramResponse'
+  /deixicpublic.v1.DeixicPublicService/CreateProgram:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: CreateProgram
+      operationId: deixicpublic.v1.DeixicPublicService.CreateProgram
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.CreateProgramRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.CreateProgramResponse'
+  /deixicpublic.v1.DeixicPublicService/UpdateProgram:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: UpdateProgram
+      operationId: deixicpublic.v1.DeixicPublicService.UpdateProgram
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.UpdateProgramRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.UpdateProgramResponse'
+  /deixicpublic.v1.DeixicPublicService/ReconcileComplianceLibrary:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ReconcileComplianceLibrary
+      operationId: deixicpublic.v1.DeixicPublicService.ReconcileComplianceLibrary
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ReconcileComplianceLibraryRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ReconcileComplianceLibraryResponse'
 components:
   schemas:
     deixicpublic.v1.ClientMcpMode:
@@ -686,6 +1071,24 @@ components:
         - CLIENT_RULE_SCOPE_UNSPECIFIED
         - CLIENT_RULE_SCOPE_ORGANIZATION
         - CLIENT_RULE_SCOPE_WORKSPACE
+    deixicpublic.v1.ComplianceLibraryChangeKind:
+      type: string
+      title: ComplianceLibraryChangeKind
+      enum:
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_UNSPECIFIED
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_ADD
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_UPDATE
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_WITHDRAW
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_MAPPING
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_CONFLICT
+        - COMPLIANCE_LIBRARY_CHANGE_KIND_PRESERVE_LOCAL
+    deixicpublic.v1.ComplianceLibraryReconcileMode:
+      type: string
+      title: ComplianceLibraryReconcileMode
+      enum:
+        - COMPLIANCE_LIBRARY_RECONCILE_MODE_UNSPECIFIED
+        - COMPLIANCE_LIBRARY_RECONCILE_MODE_PREVIEW
+        - COMPLIANCE_LIBRARY_RECONCILE_MODE_APPLY
     deixicpublic.v1.EventKind:
       type: string
       title: EventKind
@@ -860,6 +1263,66 @@ components:
           title: display_name
       title: AvailableModel
       additionalProperties: false
+    deixicpublic.v1.BindBusinessObjectSourceRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        objectId:
+          type: string
+          title: object_id
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+        connectionId:
+          type: string
+          title: connection_id
+        familyStableId:
+          type: string
+          title: family_stable_id
+        recordId:
+          type: string
+          title: record_id
+      title: BindBusinessObjectSourceRequest
+      additionalProperties: false
+      description: |-
+        Binds a record to a caller-named connection resource. The response is the
+         projected record; the binding itself stays with the implementation.
+    deixicpublic.v1.BindBusinessObjectSourceResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: BindBusinessObjectSourceResponse
+      additionalProperties: false
+    deixicpublic.v1.BlueprintSelection:
+      type: object
+      properties:
+        blueprintId:
+          type: string
+          title: blueprint_id
+        version:
+          type:
+            - integer
+            - string
+          title: version
+          format: int64
+        contentDigest:
+          type: string
+          title: content_digest
+      title: BlueprintSelection
+      additionalProperties: false
     deixicpublic.v1.BrandVoice:
       type: object
       properties:
@@ -888,6 +1351,47 @@ components:
           title: artifact_version_id
       title: BusinessArtifactReference
       additionalProperties: false
+    deixicpublic.v1.BusinessBlueprint:
+      type: object
+      properties:
+        blueprintId:
+          type: string
+          title: blueprint_id
+        version:
+          type:
+            - integer
+            - string
+          title: version
+          format: int64
+        contentDigest:
+          type: string
+          title: content_digest
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+      title: BusinessBlueprint
+      additionalProperties: false
+    deixicpublic.v1.BusinessBlueprintOrigin:
+      type: object
+      properties:
+        blueprintId:
+          type: string
+          title: blueprint_id
+        version:
+          type:
+            - integer
+            - string
+          title: version
+          format: int64
+        sourceTypeId:
+          type: string
+          title: source_type_id
+      title: BusinessBlueprintOrigin
+      additionalProperties: false
+      description: Names the built-in blueprint member a tenant type was cloned from.
     deixicpublic.v1.BusinessFieldValue:
       type: object
       oneOf:
@@ -1072,6 +1576,40 @@ components:
           title: object_id
       title: BusinessObjectReference
       additionalProperties: false
+    deixicpublic.v1.BusinessObjectRelationship:
+      type: object
+      properties:
+        sourceObjectId:
+          type: string
+          title: source_object_id
+        relationshipId:
+          type: string
+          title: relationship_id
+        targetObjectId:
+          type: string
+          title: target_object_id
+      title: BusinessObjectRelationship
+      additionalProperties: false
+    deixicpublic.v1.BusinessObjectType:
+      type: object
+      properties:
+        typeId:
+          type: string
+          title: type_id
+        name:
+          type: string
+          title: name
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+        blueprintOrigin:
+          title: blueprint_origin
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessBlueprintOrigin'
+      title: BusinessObjectType
+      additionalProperties: false
     deixicpublic.v1.BusinessTextList:
       type: object
       properties:
@@ -1243,6 +1781,48 @@ components:
           description: Included only in an explicitly requested receipt read by the authorized actor.
       title: CodingOutput
       additionalProperties: false
+    deixicpublic.v1.ComplianceLibraryChange:
+      type: object
+      properties:
+        kind:
+          title: kind
+          $ref: '#/components/schemas/deixicpublic.v1.ComplianceLibraryChangeKind'
+        objectId:
+          type: string
+          title: object_id
+      title: ComplianceLibraryChange
+      additionalProperties: false
+    deixicpublic.v1.CreateBusinessObjectRelationshipRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        relationship:
+          title: relationship
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectRelationship'
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+      title: CreateBusinessObjectRelationshipRequest
+      additionalProperties: false
+    deixicpublic.v1.CreateBusinessObjectRelationshipResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: CreateBusinessObjectRelationshipResponse
+      additionalProperties: false
     deixicpublic.v1.CreateBusinessObjectRequest:
       type: object
       properties:
@@ -1278,6 +1858,71 @@ components:
           title: object
           $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
       title: CreateBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.CreateProgramRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        name:
+          type: string
+          title: name
+        goal:
+          type: string
+          title: goal
+        ownerLabel:
+          type: string
+          title: owner_label
+        dueDate:
+          type: string
+          title: due_date
+      title: CreateProgramRequest
+      additionalProperties: false
+    deixicpublic.v1.CreateProgramResponse:
+      type: object
+      properties:
+        program:
+          title: program
+          $ref: '#/components/schemas/deixicpublic.v1.Program'
+      title: CreateProgramResponse
+      additionalProperties: false
+    deixicpublic.v1.DeleteBusinessObjectRelationshipRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        relationship:
+          title: relationship
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectRelationship'
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+      title: DeleteBusinessObjectRelationshipRequest
+      additionalProperties: false
+    deixicpublic.v1.DeleteBusinessObjectRelationshipResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+      title: DeleteBusinessObjectRelationshipResponse
       additionalProperties: false
     deixicpublic.v1.DeleteBusinessObjectRequest:
       type: object
@@ -1445,6 +2090,28 @@ components:
           title: evaluated_at
           $ref: '#/components/schemas/google.protobuf.Timestamp'
       title: GetModelReadinessResponse
+      additionalProperties: false
+    deixicpublic.v1.GetProgramRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        programId:
+          type: string
+          title: program_id
+      title: GetProgramRequest
+      additionalProperties: false
+    deixicpublic.v1.GetProgramResponse:
+      type: object
+      properties:
+        program:
+          title: program
+          $ref: '#/components/schemas/deixicpublic.v1.Program'
+      title: GetProgramResponse
       additionalProperties: false
     deixicpublic.v1.GetReceiptRequest:
       type: object
@@ -1634,6 +2301,129 @@ components:
           title: reference
       title: IssueReport
       additionalProperties: false
+    deixicpublic.v1.ListBusinessBlueprintsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+      title: ListBusinessBlueprintsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessBlueprintsResponse:
+      type: object
+      properties:
+        blueprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessBlueprint'
+          title: blueprints
+      title: ListBusinessBlueprintsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessObjectRelationshipsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        objectId:
+          type: string
+          title: object_id
+        relationshipId:
+          type: string
+          title: relationship_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+        afterKey:
+          type: string
+          title: after_key
+      title: ListBusinessObjectRelationshipsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessObjectRelationshipsResponse:
+      type: object
+      properties:
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectRelationship'
+          title: relationships
+        nextKey:
+          type: string
+          title: next_key
+      title: ListBusinessObjectRelationshipsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessObjectTypesRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+        afterTypeId:
+          type: string
+          title: after_type_id
+      title: ListBusinessObjectTypesRequest
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessObjectTypesResponse:
+      type: object
+      properties:
+        objectTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectType'
+          title: object_types
+        nextTypeId:
+          type: string
+          title: next_type_id
+      title: ListBusinessObjectTypesResponse
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessObjectsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        typeId:
+          type: string
+          title: type_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+        afterObjectId:
+          type: string
+          title: after_object_id
+      title: ListBusinessObjectsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListBusinessObjectsResponse:
+      type: object
+      properties:
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+          title: objects
+        nextObjectId:
+          type: string
+          title: next_object_id
+      title: ListBusinessObjectsResponse
+      additionalProperties: false
     deixicpublic.v1.ListEventsRequest:
       type: object
       properties:
@@ -1717,6 +2507,36 @@ components:
           title: model
       title: ModelSelection
       additionalProperties: false
+    deixicpublic.v1.Program:
+      type: object
+      properties:
+        programId:
+          type: string
+          title: program_id
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+        name:
+          type: string
+          title: name
+        goal:
+          type: string
+          title: goal
+        ownerLabel:
+          type: string
+          title: owner_label
+        dueDate:
+          type: string
+          title: due_date
+        planningStatus:
+          type: string
+          title: planning_status
+          description: One of planned, active, paused or archived.
+      title: Program
+      additionalProperties: false
     deixicpublic.v1.Receipt:
       type: object
       properties:
@@ -1772,6 +2592,56 @@ components:
           type: string
           title: disabled_reason
       title: ReceiptAction
+      additionalProperties: false
+    deixicpublic.v1.ReconcileComplianceLibraryRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        libraryTypeId:
+          type: string
+          title: library_type_id
+        selections:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BlueprintSelection'
+          title: selections
+        expectedPlanDigest:
+          type: string
+          title: expected_plan_digest
+        mode:
+          title: mode
+          $ref: '#/components/schemas/deixicpublic.v1.ComplianceLibraryReconcileMode'
+      title: ReconcileComplianceLibraryRequest
+      additionalProperties: false
+      description: |-
+        Preview returns the plan digest; apply must name that digest and is polled
+         with the same idempotency key until applied is true.
+    deixicpublic.v1.ReconcileComplianceLibraryResponse:
+      type: object
+      properties:
+        libraryCloneId:
+          type: string
+          title: library_clone_id
+        planDigest:
+          type: string
+          title: plan_digest
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ComplianceLibraryChange'
+          title: changes
+        applied:
+          type: boolean
+          title: applied
+      title: ReconcileComplianceLibraryResponse
       additionalProperties: false
     deixicpublic.v1.RenameThreadRequest:
       type: object
@@ -2220,6 +3090,53 @@ components:
           title: object
           $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
       title: UpdateBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.UpdateProgramRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        programId:
+          type: string
+          title: program_id
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+        name:
+          type: string
+          title: name
+        goal:
+          type: string
+          title: goal
+        ownerLabel:
+          type: string
+          title: owner_label
+        dueDate:
+          type: string
+          title: due_date
+        planningStatus:
+          type: string
+          title: planning_status
+          description: Required by the owner; send the current value to leave it unchanged.
+      title: UpdateProgramRequest
+      additionalProperties: false
+    deixicpublic.v1.UpdateProgramResponse:
+      type: object
+      properties:
+        program:
+          title: program
+          $ref: '#/components/schemas/deixicpublic.v1.Program'
+      title: UpdateProgramResponse
       additionalProperties: false
     deixicpublic.v1.VoiceSelection:
       type: object
