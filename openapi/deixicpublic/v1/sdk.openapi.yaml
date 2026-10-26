@@ -1056,6 +1056,16 @@ paths:
                 $ref: '#/components/schemas/deixicpublic.v1.ReconcileComplianceLibraryResponse'
 components:
   schemas:
+    deixicpublic.v1.BusinessSourceFieldProperty:
+      type: string
+      title: BusinessSourceFieldProperty
+      enum:
+        - BUSINESS_SOURCE_FIELD_PROPERTY_UNSPECIFIED
+        - BUSINESS_SOURCE_FIELD_PROPERTY_DISPLAY_NAME
+        - BUSINESS_SOURCE_FIELD_PROPERTY_EXTERNAL_ID
+      description: |-
+        Binds a record to a caller-named connection resource. The response is the
+         projected record; the binding itself stays with the implementation.
     deixicpublic.v1.ClientMcpMode:
       type: string
       title: ClientMcpMode
@@ -1293,11 +1303,18 @@ components:
         recordId:
           type: string
           title: record_id
+        groupIds:
+          type: array
+          items:
+            type: string
+          title: group_ids
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessSourceFieldMapping'
+          title: fields
       title: BindBusinessObjectSourceRequest
       additionalProperties: false
-      description: |-
-        Binds a record to a caller-named connection resource. The response is the
-         projected record; the binding itself stays with the implementation.
     deixicpublic.v1.BindBusinessObjectSourceResponse:
       type: object
       properties:
@@ -1608,7 +1625,40 @@ components:
         blueprintOrigin:
           title: blueprint_origin
           $ref: '#/components/schemas/deixicpublic.v1.BusinessBlueprintOrigin'
+        displayFieldId:
+          type: string
+          title: display_field_id
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectTypeField'
+          title: fields
       title: BusinessObjectType
+      additionalProperties: false
+    deixicpublic.v1.BusinessObjectTypeField:
+      type: object
+      properties:
+        fieldId:
+          type: string
+          title: field_id
+        groupId:
+          type: string
+          title: group_id
+        sourceMappable:
+          type: boolean
+          title: source_mappable
+      title: BusinessObjectTypeField
+      additionalProperties: false
+    deixicpublic.v1.BusinessSourceFieldMapping:
+      type: object
+      properties:
+        fieldId:
+          type: string
+          title: field_id
+        property:
+          title: property
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessSourceFieldProperty'
+      title: BusinessSourceFieldMapping
       additionalProperties: false
     deixicpublic.v1.BusinessTextList:
       type: object
@@ -2344,6 +2394,9 @@ components:
         afterKey:
           type: string
           title: after_key
+        peerObjectId:
+          type: string
+          title: peer_object_id
       title: ListBusinessObjectRelationshipsRequest
       additionalProperties: false
     deixicpublic.v1.ListBusinessObjectRelationshipsResponse:
