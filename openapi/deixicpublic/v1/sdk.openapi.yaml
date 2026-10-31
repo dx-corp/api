@@ -1200,6 +1200,114 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.GetTestResponse'
+  /deixicpublic.v1.DeixicPublicService/ListEvidence:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListEvidence
+      description: |-
+        Read-only evidence (public API v1): one page of the workspace's evidence,
+         one evidence record's retained versions, and one version's file.
+      operationId: deixicpublic.v1.DeixicPublicService.ListEvidence
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListEvidenceRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListEvidenceResponse'
+  /deixicpublic.v1.DeixicPublicService/ListEvidenceVersions:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListEvidenceVersions
+      operationId: deixicpublic.v1.DeixicPublicService.ListEvidenceVersions
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListEvidenceVersionsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListEvidenceVersionsResponse'
+  /deixicpublic.v1.DeixicPublicService/GetEvidenceContent:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetEvidenceContent
+      operationId: deixicpublic.v1.DeixicPublicService.GetEvidenceContent
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetEvidenceContentRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetEvidenceContentResponse'
 components:
   schemas:
     deixicpublic.v1.BusinessSourceFieldProperty:
@@ -2264,6 +2372,55 @@ components:
           title: retryable
       title: ErrorDetail
       additionalProperties: false
+    deixicpublic.v1.Evidence:
+      type: object
+      properties:
+        evidenceId:
+          type: string
+          title: evidence_id
+        name:
+          type: string
+          title: name
+        state:
+          title: state
+          description: Whether the evidence currently satisfies its controls.
+          $ref: '#/components/schemas/deixicpublic.v1.ControlState'
+        reasonCode:
+          type: string
+          title: reason_code
+        controlIds:
+          type: array
+          items:
+            type: string
+          title: control_ids
+        frameworkIds:
+          type: array
+          items:
+            type: string
+          title: framework_ids
+        dueAt:
+          title: due_at
+          description: When fresh evidence is next due; unset when it does not expire.
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        currentVersionId:
+          type: string
+          title: current_version_id
+          description: The current version; empty when nothing has been collected.
+        status:
+          type: string
+          title: status
+          description: Management status and approval state as the Evidence page shows them.
+        approvalState:
+          type: string
+          title: approval_state
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+      title: Evidence
+      additionalProperties: false
     deixicpublic.v1.EvidenceReference:
       type: object
       properties:
@@ -2280,6 +2437,30 @@ components:
           type: string
           title: uri
       title: EvidenceReference
+      additionalProperties: false
+    deixicpublic.v1.EvidenceVersion:
+      type: object
+      properties:
+        versionId:
+          type: string
+          title: version_id
+        collectedAt:
+          title: collected_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        sha256:
+          type: string
+          title: sha256
+        coversStart:
+          title: covers_start
+          description: The period the version covers, when the evidence declares one.
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        coversEnd:
+          title: covers_end
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        current:
+          type: boolean
+          title: current
+      title: EvidenceVersion
       additionalProperties: false
     deixicpublic.v1.GetBusinessObjectRequest:
       type: object
@@ -2384,6 +2565,45 @@ components:
           title: complete
           description: False when an owner source was unavailable or the read was truncated.
       title: GetControlResponse
+      additionalProperties: false
+    deixicpublic.v1.GetEvidenceContentRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        evidenceId:
+          type: string
+          title: evidence_id
+        versionId:
+          type: string
+          title: version_id
+      title: GetEvidenceContentRequest
+      additionalProperties: false
+    deixicpublic.v1.GetEvidenceContentResponse:
+      type: object
+      properties:
+        versionId:
+          type: string
+          title: version_id
+        filename:
+          type: string
+          title: filename
+        contentType:
+          type: string
+          title: content_type
+        content:
+          type: string
+          title: content
+          format: byte
+        sha256:
+          type: string
+          title: sha256
+          description: Hex SHA-256 of content, as recorded when the version was collected.
+      title: GetEvidenceContentResponse
       additionalProperties: false
     deixicpublic.v1.GetModelReadinessRequest:
       type: object
@@ -2877,6 +3097,91 @@ components:
             $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
           title: snapshot_turns
       title: ListEventsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListEvidenceRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+          description: At most 200 per page; zero means 50.
+        pageToken:
+          type: string
+          title: page_token
+          description: Opaque; pass next_page_token from the previous page.
+        controlIds:
+          type: array
+          items:
+            type: string
+          title: control_ids
+          description: Only evidence for one of these controls.
+      title: ListEvidenceRequest
+      additionalProperties: false
+    deixicpublic.v1.ListEvidenceResponse:
+      type: object
+      properties:
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Evidence'
+          title: evidence
+        total:
+          type: integer
+          title: total
+          description: Matching evidence across all pages.
+        nextPageToken:
+          type: string
+          title: next_page_token
+        complete:
+          type: boolean
+          title: complete
+          description: False when an owner source was unavailable or the read was truncated.
+      title: ListEvidenceResponse
+      additionalProperties: false
+    deixicpublic.v1.ListEvidenceVersionsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        evidenceId:
+          type: string
+          title: evidence_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+          description: At most 50 per page; zero means 3.
+        pageToken:
+          type: string
+          title: page_token
+      title: ListEvidenceVersionsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListEvidenceVersionsResponse:
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.EvidenceVersion'
+          title: versions
+        nextPageToken:
+          type: string
+          title: next_page_token
+        complete:
+          type: boolean
+          title: complete
+      title: ListEvidenceVersionsResponse
       additionalProperties: false
     deixicpublic.v1.ListTestsRequest:
       type: object
