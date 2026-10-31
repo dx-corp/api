@@ -1054,6 +1054,152 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.ReconcileComplianceLibraryResponse'
+  /deixicpublic.v1.DeixicPublicService/ListControls:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListControls
+      description: |-
+        Read-only compliance controls (public API v1): one page of the workspace's
+         controls with their current verification state, and one control's detail.
+      operationId: deixicpublic.v1.DeixicPublicService.ListControls
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListControlsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListControlsResponse'
+  /deixicpublic.v1.DeixicPublicService/GetControl:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetControl
+      operationId: deixicpublic.v1.DeixicPublicService.GetControl
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetControlRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetControlResponse'
+  /deixicpublic.v1.DeixicPublicService/ListTests:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListTests
+      description: |-
+        Read-only compliance tests (public API v1): one page of the workspace's
+         tests with their current result, and one test's per-resource results.
+      operationId: deixicpublic.v1.DeixicPublicService.ListTests
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListTestsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListTestsResponse'
+  /deixicpublic.v1.DeixicPublicService/GetTest:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetTest
+      operationId: deixicpublic.v1.DeixicPublicService.GetTest
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetTestRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetTestResponse'
 components:
   schemas:
     deixicpublic.v1.BusinessSourceFieldProperty:
@@ -1099,6 +1245,20 @@ components:
         - COMPLIANCE_LIBRARY_RECONCILE_MODE_UNSPECIFIED
         - COMPLIANCE_LIBRARY_RECONCILE_MODE_PREVIEW
         - COMPLIANCE_LIBRARY_RECONCILE_MODE_APPLY
+    deixicpublic.v1.ControlState:
+      type: string
+      title: ControlState
+      enum:
+        - CONTROL_STATE_UNSPECIFIED
+        - CONTROL_STATE_VERIFIED
+        - CONTROL_STATE_FAILING
+        - CONTROL_STATE_UNKNOWN
+        - CONTROL_STATE_ATTESTED
+        - CONTROL_STATE_NOT_APPLICABLE
+        - CONTROL_STATE_EXCEPTED
+      description: |-
+        A control's current verification state, from the same owner read the
+         Controls page uses.
     deixicpublic.v1.EventKind:
       type: string
       title: EventKind
@@ -1187,6 +1347,19 @@ components:
         - RESPONSE_ACTION_RETRY
         - RESPONSE_ACTION_SKIP
         - RESPONSE_ACTION_ABORT
+    deixicpublic.v1.TestResultState:
+      type: string
+      title: TestResultState
+      enum:
+        - TEST_RESULT_STATE_UNSPECIFIED
+        - TEST_RESULT_STATE_VERIFIED
+        - TEST_RESULT_STATE_FAILING
+        - TEST_RESULT_STATE_INDETERMINATE
+        - TEST_RESULT_STATE_NOT_RUN
+        - TEST_RESULT_STATE_NOT_APPLICABLE
+        - TEST_RESULT_STATE_EXCEPTED
+        - TEST_RESULT_STATE_NOT_RUNNING
+      description: A resource's latest result for one test.
     deixicpublic.v1.TurnState:
       type: string
       title: TurnState
@@ -1842,6 +2015,75 @@ components:
           title: object_id
       title: ComplianceLibraryChange
       additionalProperties: false
+    deixicpublic.v1.Control:
+      type: object
+      properties:
+        controlId:
+          type: string
+          title: control_id
+        key:
+          type: string
+          title: key
+        name:
+          type: string
+          title: name
+        state:
+          title: state
+          $ref: '#/components/schemas/deixicpublic.v1.ControlState'
+        reasonCode:
+          type: string
+          title: reason_code
+        assessedAt:
+          title: assessed_at
+          description: Unset when the control has no assessment receipt.
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        ownerIds:
+          type: array
+          items:
+            type: string
+          title: owner_ids
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+      title: Control
+      additionalProperties: false
+    deixicpublic.v1.ControlRequirement:
+      type: object
+      properties:
+        frameworkId:
+          type: string
+          title: framework_id
+        requirementId:
+          type: string
+          title: requirement_id
+        reviewState:
+          type: string
+          title: review_state
+          description: automatic, reviewed or proposed; proposed mappings do not count.
+      title: ControlRequirement
+      additionalProperties: false
+      description: One framework requirement a control maps to.
+    deixicpublic.v1.ControlTestState:
+      type: object
+      properties:
+        testId:
+          type: string
+          title: test_id
+        state:
+          title: state
+          $ref: '#/components/schemas/deixicpublic.v1.ControlState'
+        reasonCode:
+          type: string
+          title: reason_code
+        assessedAt:
+          title: assessed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: ControlTestState
+      additionalProperties: false
+      description: One test that verifies a control, with its own state.
     deixicpublic.v1.CreateBusinessObjectRelationshipRequest:
       type: object
       properties:
@@ -2102,6 +2344,47 @@ components:
           title: sandbox_policy_toml
       title: GetClientSetupResponse
       additionalProperties: false
+    deixicpublic.v1.GetControlRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        controlId:
+          type: string
+          title: control_id
+      title: GetControlRequest
+      additionalProperties: false
+    deixicpublic.v1.GetControlResponse:
+      type: object
+      properties:
+        control:
+          title: control
+          $ref: '#/components/schemas/deixicpublic.v1.Control'
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ControlRequirement'
+          title: requirements
+        tests:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.ControlTestState'
+          title: tests
+        evidenceIds:
+          type: array
+          items:
+            type: string
+          title: evidence_ids
+        complete:
+          type: boolean
+          title: complete
+          description: False when an owner source was unavailable or the read was truncated.
+      title: GetControlResponse
+      additionalProperties: false
     deixicpublic.v1.GetModelReadinessRequest:
       type: object
       properties:
@@ -2187,6 +2470,40 @@ components:
           title: receipt
           $ref: '#/components/schemas/deixicpublic.v1.Receipt'
       title: GetReceiptResponse
+      additionalProperties: false
+    deixicpublic.v1.GetTestRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        testId:
+          type: string
+          title: test_id
+      title: GetTestRequest
+      additionalProperties: false
+    deixicpublic.v1.GetTestResponse:
+      type: object
+      properties:
+        test:
+          title: test
+          $ref: '#/components/schemas/deixicpublic.v1.Test'
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.TestResourceResult'
+          title: resources
+        lastEvaluatedAt:
+          title: last_evaluated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        complete:
+          type: boolean
+          title: complete
+          description: False when an owner source was unavailable or the read was truncated.
+      title: GetTestResponse
       additionalProperties: false
     deixicpublic.v1.GetThreadRequest:
       type: object
@@ -2477,6 +2794,39 @@ components:
           title: next_object_id
       title: ListBusinessObjectsResponse
       additionalProperties: false
+    deixicpublic.v1.ListControlsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+          description: At most 25 per page; zero means 25.
+        pageToken:
+          type: string
+          title: page_token
+          description: Opaque; pass next_page_token from the previous page.
+      title: ListControlsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListControlsResponse:
+      type: object
+      properties:
+        controls:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Control'
+          title: controls
+        nextPageToken:
+          type: string
+          title: next_page_token
+      title: ListControlsResponse
+      additionalProperties: false
     deixicpublic.v1.ListEventsRequest:
       type: object
       properties:
@@ -2527,6 +2877,57 @@ components:
             $ref: '#/components/schemas/deixicpublic.v1.TaskTurn'
           title: snapshot_turns
       title: ListEventsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListTestsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        limit:
+          type: integer
+          title: limit
+          format: int32
+          description: At most 100 per page; zero means 25.
+        pageToken:
+          type: string
+          title: page_token
+          description: Opaque; pass next_page_token from the previous page.
+        controlIds:
+          type: array
+          items:
+            type: string
+          title: control_ids
+          description: Only tests that verify one of these controls.
+        deactivated:
+          type: boolean
+          title: deactivated
+          description: List deactivated tests instead of active ones.
+      title: ListTestsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListTestsResponse:
+      type: object
+      properties:
+        tests:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Test'
+          title: tests
+        total:
+          type: integer
+          title: total
+          description: Matching tests across all pages.
+        nextPageToken:
+          type: string
+          title: next_page_token
+        complete:
+          type: boolean
+          title: complete
+          description: False when an owner source was unavailable or the read was truncated.
+      title: ListTestsResponse
       additionalProperties: false
     deixicpublic.v1.ListThreadsRequest:
       type: object
@@ -3064,6 +3465,65 @@ components:
           title: completed_at
           $ref: '#/components/schemas/google.protobuf.Timestamp'
       title: TaskTurn
+      additionalProperties: false
+    deixicpublic.v1.Test:
+      type: object
+      properties:
+        testId:
+          type: string
+          title: test_id
+        name:
+          type: string
+          title: name
+        state:
+          title: state
+          description: The test's qualified state, from the same owner read as the Tests page.
+          $ref: '#/components/schemas/deixicpublic.v1.ControlState'
+        reasonCode:
+          type: string
+          title: reason_code
+        assessedAt:
+          title: assessed_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        controlIds:
+          type: array
+          items:
+            type: string
+          title: control_ids
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+        deactivated:
+          type: boolean
+          title: deactivated
+          description: Deactivated tests are listed only when requested and never count.
+      title: Test
+      additionalProperties: false
+    deixicpublic.v1.TestResourceResult:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          title: resource_id
+        resourceKind:
+          type: string
+          title: resource_kind
+        state:
+          title: state
+          $ref: '#/components/schemas/deixicpublic.v1.TestResultState'
+        reason:
+          type: string
+          title: reason
+        evaluatedAt:
+          title: evaluated_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        stateSince:
+          title: state_since
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+      title: TestResourceResult
       additionalProperties: false
     deixicpublic.v1.Thread:
       type: object
