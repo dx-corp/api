@@ -1308,6 +1308,220 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.GetEvidenceContentResponse'
+  /deixicpublic.v1.DeixicPublicService/ListAssets:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListAssets
+      description: |-
+        Read-only asset inventory (public API v1): one page of the workspace's
+         assets and one asset.
+      operationId: deixicpublic.v1.DeixicPublicService.ListAssets
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListAssetsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListAssetsResponse'
+  /deixicpublic.v1.DeixicPublicService/GetAsset:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetAsset
+      operationId: deixicpublic.v1.DeixicPublicService.GetAsset
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetAssetRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetAssetResponse'
+  /deixicpublic.v1.DeixicPublicService/ListAudits:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListAudits
+      description: Read-only audits and their request lists (public API v1).
+      operationId: deixicpublic.v1.DeixicPublicService.ListAudits
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListAuditsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListAuditsResponse'
+  /deixicpublic.v1.DeixicPublicService/GetAudit:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetAudit
+      operationId: deixicpublic.v1.DeixicPublicService.GetAudit
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetAuditRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetAuditResponse'
+  /deixicpublic.v1.DeixicPublicService/ListAuditRequests:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: ListAuditRequests
+      operationId: deixicpublic.v1.DeixicPublicService.ListAuditRequests
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.ListAuditRequestsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.ListAuditRequestsResponse'
+  /deixicpublic.v1.DeixicPublicService/GetAuditRequestItem:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetAuditRequestItem
+      operationId: deixicpublic.v1.DeixicPublicService.GetAuditRequestItem
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetAuditRequestItemRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetAuditRequestItemResponse'
 components:
   schemas:
     deixicpublic.v1.BusinessSourceFieldProperty:
@@ -1537,6 +1751,187 @@ components:
           title: replayed
       title: ArchiveThreadResponse
       additionalProperties: false
+    deixicpublic.v1.Asset:
+      type: object
+      properties:
+        assetId:
+          type: string
+          title: asset_id
+        name:
+          type: string
+          title: name
+        assetType:
+          type: string
+          title: asset_type
+          description: The asset's record type, as the Assets page groups it.
+        ownerId:
+          type: string
+          title: owner_id
+          description: The owning person or team record, when one is assigned.
+        ownerDisplayName:
+          type: string
+          title: owner_display_name
+        environment:
+          type: string
+          title: environment
+        source:
+          type: string
+          title: source
+          description: The connected system that reported the asset.
+        managedByProviderId:
+          type: string
+          title: managed_by_provider_id
+        status:
+          type: string
+          title: status
+        lastSeenAt:
+          title: last_seen_at
+          $ref: '#/components/schemas/google.protobuf.Timestamp'
+        sourceObservedAt:
+          type: string
+          title: source_observed_at
+          description: RFC 3339 time the source last observed the asset; empty when unknown.
+        tags:
+          type: array
+          items:
+            type: string
+          title: tags
+        sourceUrl:
+          type: string
+          title: source_url
+          description: A link to the asset in its source system, when the source provides one.
+      title: Asset
+      additionalProperties: false
+    deixicpublic.v1.Audit:
+      type: object
+      properties:
+        auditId:
+          type: string
+          title: audit_id
+        programId:
+          type: string
+          title: program_id
+        name:
+          type: string
+          title: name
+        status:
+          type: string
+          title: status
+        reportType:
+          type: string
+          title: report_type
+          description: Report type, such as soc2_type2.
+        frameworks:
+          type: array
+          items:
+            type: string
+          title: frameworks
+        periodStartDate:
+          type: string
+          title: period_start_date
+          description: ISO dates; empty when not set.
+        periodEndDate:
+          type: string
+          title: period_end_date
+        asOfDate:
+          type: string
+          title: as_of_date
+        auditFirmId:
+          type: string
+          title: audit_firm_id
+        auditFirm:
+          type: string
+          title: audit_firm
+        leadOwnerId:
+          type: string
+          title: lead_owner_id
+        createdAt:
+          type: string
+          title: created_at
+          description: RFC 3339.
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+      title: Audit
+      additionalProperties: false
+    deixicpublic.v1.AuditRequestCounts:
+      type: object
+      properties:
+        total:
+          type: integer
+          title: total
+        open:
+          type: integer
+          title: open
+        evidenceSubmitted:
+          type: integer
+          title: evidence_submitted
+        changesRequested:
+          type: integer
+          title: changes_requested
+        accepted:
+          type: integer
+          title: accepted
+      title: AuditRequestCounts
+      additionalProperties: false
+    deixicpublic.v1.AuditRequestItem:
+      type: object
+      properties:
+        itemId:
+          type: string
+          title: item_id
+        requestId:
+          type: string
+          title: request_id
+        title:
+          type: string
+          title: title
+        description:
+          type: string
+          title: description
+        requestType:
+          type: string
+          title: request_type
+        controlIds:
+          type: array
+          items:
+            type: string
+          title: control_ids
+        ownerId:
+          type: string
+          title: owner_id
+        status:
+          type: string
+          title: status
+        dueDate:
+          type: string
+          title: due_date
+          description: ISO date; empty when not set.
+        dueState:
+          type: string
+          title: due_state
+        evidenceCount:
+          type: integer
+          title: evidence_count
+        lastCapturedAt:
+          type: string
+          title: last_captured_at
+          description: RFC 3339; empty when nothing was captured.
+        readiness:
+          type: string
+          title: readiness
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+      title: AuditRequestItem
+      additionalProperties: false
+      description: One item on an audit's request list (the auditor's information request list).
     deixicpublic.v1.AvailableModel:
       type: object
       properties:
@@ -2462,6 +2857,75 @@ components:
           title: current
       title: EvidenceVersion
       additionalProperties: false
+    deixicpublic.v1.GetAssetRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        assetId:
+          type: string
+          title: asset_id
+      title: GetAssetRequest
+      additionalProperties: false
+    deixicpublic.v1.GetAssetResponse:
+      type: object
+      properties:
+        asset:
+          title: asset
+          $ref: '#/components/schemas/deixicpublic.v1.Asset'
+      title: GetAssetResponse
+      additionalProperties: false
+    deixicpublic.v1.GetAuditRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        auditId:
+          type: string
+          title: audit_id
+      title: GetAuditRequest
+      additionalProperties: false
+    deixicpublic.v1.GetAuditRequestItemRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        auditId:
+          type: string
+          title: audit_id
+        itemId:
+          type: string
+          title: item_id
+      title: GetAuditRequestItemRequest
+      additionalProperties: false
+    deixicpublic.v1.GetAuditRequestItemResponse:
+      type: object
+      properties:
+        request:
+          title: request
+          $ref: '#/components/schemas/deixicpublic.v1.AuditRequestItem'
+      title: GetAuditRequestItemResponse
+      additionalProperties: false
+    deixicpublic.v1.GetAuditResponse:
+      type: object
+      properties:
+        audit:
+          title: audit
+          $ref: '#/components/schemas/deixicpublic.v1.Audit'
+      title: GetAuditResponse
+      additionalProperties: false
     deixicpublic.v1.GetBusinessObjectRequest:
       type: object
       properties:
@@ -2887,6 +3351,108 @@ components:
           type: string
           title: reference
       title: IssueReport
+      additionalProperties: false
+    deixicpublic.v1.ListAssetsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        pageToken:
+          type: string
+          title: page_token
+          description: Opaque; pass next_page_token from the previous page.
+        typeId:
+          type: string
+          title: type_id
+          description: Only assets of this record type.
+      title: ListAssetsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListAssetsResponse:
+      type: object
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Asset'
+          title: assets
+        total:
+          type: integer
+          title: total
+          format: int32
+          description: Matching assets; exact when total_is_exact.
+        totalIsExact:
+          type: boolean
+          title: total_is_exact
+        nextPageToken:
+          type: string
+          title: next_page_token
+      title: ListAssetsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListAuditRequestsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        auditId:
+          type: string
+          title: audit_id
+      title: ListAuditRequestsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListAuditRequestsResponse:
+      type: object
+      properties:
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.AuditRequestItem'
+          title: requests
+        counts:
+          title: counts
+          $ref: '#/components/schemas/deixicpublic.v1.AuditRequestCounts'
+      title: ListAuditRequestsResponse
+      additionalProperties: false
+    deixicpublic.v1.ListAuditsRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        programId:
+          type: string
+          title: program_id
+          description: Only audits of this program.
+        limit:
+          type: integer
+          title: limit
+          format: int32
+        afterAuditId:
+          type: string
+          title: after_audit_id
+      title: ListAuditsRequest
+      additionalProperties: false
+    deixicpublic.v1.ListAuditsResponse:
+      type: object
+      properties:
+        audits:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.Audit'
+          title: audits
+        nextAuditId:
+          type: string
+          title: next_audit_id
+      title: ListAuditsResponse
       additionalProperties: false
     deixicpublic.v1.ListBusinessBlueprintsRequest:
       type: object
