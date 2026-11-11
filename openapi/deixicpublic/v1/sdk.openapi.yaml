@@ -739,6 +739,116 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.ListBusinessObjectTypesResponse'
+  /deixicpublic.v1.DeixicPublicService/DefineBusinessObjectType:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: DefineBusinessObjectType
+      description: Publishes a workspace type revision; expected_revision 0 creates the type.
+      operationId: deixicpublic.v1.DeixicPublicService.DefineBusinessObjectType
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.DefineBusinessObjectTypeRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.DefineBusinessObjectTypeResponse'
+  /deixicpublic.v1.DeixicPublicService/GetBusinessObjectType:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: GetBusinessObjectType
+      description: Reads one immutable published revision of a type.
+      operationId: deixicpublic.v1.DeixicPublicService.GetBusinessObjectType
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.GetBusinessObjectTypeRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.GetBusinessObjectTypeResponse'
+  /deixicpublic.v1.DeixicPublicService/UpsertBusinessObject:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: UpsertBusinessObject
+      description: |-
+        Creates the record whose declared unique field holds the given value, or
+         updates the one that already does, atomically on the server.
+      operationId: deixicpublic.v1.DeixicPublicService.UpsertBusinessObject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.UpsertBusinessObjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.UpsertBusinessObjectResponse'
   /deixicpublic.v1.DeixicPublicService/ListBusinessBlueprints:
     post:
       tags:
@@ -1524,6 +1634,22 @@ paths:
                 $ref: '#/components/schemas/deixicpublic.v1.GetAuditRequestItemResponse'
 components:
   schemas:
+    deixicpublic.v1.BusinessFieldKind:
+      type: string
+      title: BusinessFieldKind
+      enum:
+        - BUSINESS_FIELD_KIND_UNSPECIFIED
+        - BUSINESS_FIELD_KIND_TEXT
+        - BUSINESS_FIELD_KIND_INTEGER
+        - BUSINESS_FIELD_KIND_BOOLEAN
+        - BUSINESS_FIELD_KIND_DECIMAL
+        - BUSINESS_FIELD_KIND_MONEY
+        - BUSINESS_FIELD_KIND_ENUM
+        - BUSINESS_FIELD_KIND_DATE
+        - BUSINESS_FIELD_KIND_TIMESTAMP
+        - BUSINESS_FIELD_KIND_REFERENCE
+        - BUSINESS_FIELD_KIND_ARTIFACT
+        - BUSINESS_FIELD_KIND_TEXT_LIST
     deixicpublic.v1.BusinessSourceFieldProperty:
       type: string
       title: BusinessSourceFieldProperty
@@ -2298,8 +2424,10 @@ components:
             - string
           title: revision
           format: int64
+          description: 'Output only: the published revision.'
         blueprintOrigin:
           title: blueprint_origin
+          description: 'Output only: assigned when a built-in blueprint member is cloned.'
           $ref: '#/components/schemas/deixicpublic.v1.BusinessBlueprintOrigin'
         displayFieldId:
           type: string
@@ -2309,6 +2437,17 @@ components:
           items:
             $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectTypeField'
           title: fields
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectTypeRelationship'
+          title: relationships
+        pluralName:
+          type: string
+          title: plural_name
+        description:
+          type: string
+          title: description
       title: BusinessObjectType
       additionalProperties: false
     deixicpublic.v1.BusinessObjectTypeField:
@@ -2323,7 +2462,51 @@ components:
         sourceMappable:
           type: boolean
           title: source_mappable
+          description: 'Output only: derived from the field kind.'
+        name:
+          type: string
+          title: name
+        kind:
+          title: kind
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessFieldKind'
+        required:
+          type: boolean
+          title: required
+        unique:
+          type: boolean
+          title: unique
+          description: At most one live record of the type holds a given value.
+        enumValues:
+          type: array
+          items:
+            type: string
+          title: enum_values
+        referenceTypeId:
+          type: string
+          title: reference_type_id
+        description:
+          type: string
+          title: description
+        maxLength:
+          type: integer
+          title: max_length
+          description: 'TEXT only: maximum Unicode code points, from 1 through 8192.'
+          nullable: true
       title: BusinessObjectTypeField
+      additionalProperties: false
+    deixicpublic.v1.BusinessObjectTypeRelationship:
+      type: object
+      properties:
+        relationshipId:
+          type: string
+          title: relationship_id
+        name:
+          type: string
+          title: name
+        targetTypeId:
+          type: string
+          title: target_type_id
+      title: BusinessObjectTypeRelationship
       additionalProperties: false
     deixicpublic.v1.BusinessSourceFieldMapping:
       type: object
@@ -2688,6 +2871,38 @@ components:
           $ref: '#/components/schemas/deixicpublic.v1.Program'
       title: CreateProgramResponse
       additionalProperties: false
+    deixicpublic.v1.DefineBusinessObjectTypeRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        definition:
+          title: definition
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectType'
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+          description: The revision this change replaces; 0 creates the type.
+      title: DefineBusinessObjectTypeRequest
+      additionalProperties: false
+    deixicpublic.v1.DefineBusinessObjectTypeResponse:
+      type: object
+      properties:
+        definition:
+          title: definition
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectType'
+      title: DefineBusinessObjectTypeResponse
+      additionalProperties: false
     deixicpublic.v1.DeleteBusinessObjectRelationshipRequest:
       type: object
       properties:
@@ -2947,6 +3162,35 @@ components:
           title: object
           $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
       title: GetBusinessObjectResponse
+      additionalProperties: false
+    deixicpublic.v1.GetBusinessObjectTypeRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        typeId:
+          type: string
+          title: type_id
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+          description: A published revision, from DefineBusinessObjectType or ListBusinessObjectTypes.
+      title: GetBusinessObjectTypeRequest
+      additionalProperties: false
+    deixicpublic.v1.GetBusinessObjectTypeResponse:
+      type: object
+      properties:
+        definition:
+          title: definition
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObjectType'
+      title: GetBusinessObjectTypeResponse
       additionalProperties: false
     deixicpublic.v1.GetClientSetupRequest:
       type: object
@@ -4521,6 +4765,51 @@ components:
           title: program
           $ref: '#/components/schemas/deixicpublic.v1.Program'
       title: UpdateProgramResponse
+      additionalProperties: false
+    deixicpublic.v1.UpsertBusinessObjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        typeId:
+          type: string
+          title: type_id
+        schemaRevision:
+          type:
+            - integer
+            - string
+          title: schema_revision
+          format: int64
+          description: Published schema revision for a new record; zero keeps an existing record's.
+        uniqueFieldId:
+          type: string
+          title: unique_field_id
+          description: A field the type declares unique; `values` must carry it.
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessFieldValue'
+          title: values
+      title: UpsertBusinessObjectRequest
+      additionalProperties: false
+    deixicpublic.v1.UpsertBusinessObjectResponse:
+      type: object
+      properties:
+        object:
+          title: object
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessObject'
+        created:
+          type: boolean
+          title: created
+          description: True when this call created the record, false when it updated one.
+      title: UpsertBusinessObjectResponse
       additionalProperties: false
     deixicpublic.v1.VoiceSelection:
       type: object
