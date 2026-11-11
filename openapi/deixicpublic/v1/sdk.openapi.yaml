@@ -849,6 +849,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deixicpublic.v1.UpsertBusinessObjectResponse'
+  /deixicpublic.v1.DeixicPublicService/TransitionBusinessObject:
+    post:
+      tags:
+        - deixicpublic.v1.DeixicPublicService
+      summary: TransitionBusinessObject
+      description: |-
+        Moves a record of a type with a lifecycle facet through one declared
+         transition at an exact revision.
+      operationId: deixicpublic.v1.DeixicPublicService.TransitionBusinessObject
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deixicpublic.v1.TransitionBusinessObjectRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deixicpublic.v1.TransitionBusinessObjectResponse'
   /deixicpublic.v1.DeixicPublicService/ListBusinessBlueprints:
     post:
       tags:
@@ -2211,6 +2249,23 @@ components:
       title: BusinessBlueprintOrigin
       additionalProperties: false
       description: Names the built-in blueprint member a tenant type was cloned from.
+    deixicpublic.v1.BusinessDisplayFacet:
+      type: object
+      properties:
+        icon:
+          type: string
+          title: icon
+        navSection:
+          type: string
+          title: nav_section
+        listFieldIds:
+          type: array
+          items:
+            type: string
+          title: list_field_ids
+      title: BusinessDisplayFacet
+      additionalProperties: false
+      description: Navigation and list presentation.
     deixicpublic.v1.BusinessFieldValue:
       type: object
       oneOf:
@@ -2336,6 +2391,167 @@ components:
           title: field_id
       title: BusinessFieldValue
       additionalProperties: false
+    deixicpublic.v1.BusinessGraphFacet:
+      type: object
+      properties:
+        thingKind:
+          type: string
+          title: thing_kind
+        relations:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessGraphRelation'
+          title: relations
+      title: BusinessGraphFacet
+      additionalProperties: false
+      description: How records project into the graph.
+    deixicpublic.v1.BusinessGraphRelation:
+      type: object
+      properties:
+        fieldId:
+          type: string
+          title: field_id
+        relation:
+          type: string
+          title: relation
+        inbound:
+          type: boolean
+          title: inbound
+          description: The referenced record is the edge's source.
+      title: BusinessGraphRelation
+      additionalProperties: false
+      description: The relation one reference field draws.
+    deixicpublic.v1.BusinessIndexFacet:
+      type: object
+      properties:
+        indexedFieldIds:
+          type: array
+          items:
+            type: string
+          title: indexed_field_ids
+        sortableFieldIds:
+          type: array
+          items:
+            type: string
+          title: sortable_field_ids
+      title: BusinessIndexFacet
+      additionalProperties: false
+      description: Fields readers filter and sort by.
+    deixicpublic.v1.BusinessLifecycleApproval:
+      type: object
+      properties:
+        reviewerEntitlement:
+          type: string
+          title: reviewer_entitlement
+        distinctFromCreator:
+          type: boolean
+          title: distinct_from_creator
+        notify:
+          type: string
+          title: notify
+        toState:
+          type: string
+          title: to_state
+          description: A declared state the approval also moves the record to.
+      title: BusinessLifecycleApproval
+      additionalProperties: false
+    deixicpublic.v1.BusinessLifecycleDue:
+      type: object
+      properties:
+        fieldId:
+          type: string
+          title: field_id
+        assigneeFieldId:
+          type: string
+          title: assignee_field_id
+        future:
+          type: boolean
+          title: future
+        maxDaysAhead:
+          type: integer
+          title: max_days_ahead
+          nullable: true
+      title: BusinessLifecycleDue
+      additionalProperties: false
+    deixicpublic.v1.BusinessLifecycleFacet:
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessLifecycleState'
+          title: states
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/deixicpublic.v1.BusinessLifecycleTransition'
+          title: transitions
+        approval:
+          title: approval
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessLifecycleApproval'
+        due:
+          title: due
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessLifecycleDue'
+      title: BusinessLifecycleFacet
+      additionalProperties: false
+      description: States, transitions, approval and due date.
+    deixicpublic.v1.BusinessLifecycleState:
+      type: object
+      properties:
+        stateId:
+          type: string
+          title: state_id
+        name:
+          type: string
+          title: name
+        initial:
+          type: boolean
+          title: initial
+        terminal:
+          type: boolean
+          title: terminal
+      title: BusinessLifecycleState
+      additionalProperties: false
+    deixicpublic.v1.BusinessLifecycleTransition:
+      type: object
+      properties:
+        transitionId:
+          type: string
+          title: transition_id
+        name:
+          type: string
+          title: name
+        fromStates:
+          type: array
+          items:
+            type: string
+          title: from_states
+        toState:
+          type: string
+          title: to_state
+        noteRequired:
+          type: boolean
+          title: note_required
+        requiresApproval:
+          type: boolean
+          title: requires_approval
+          description: Refused unless the record's current revision is approved.
+        entitlements:
+          type: array
+          items:
+            type: string
+          title: entitlements
+          description: Entitlements a workspace member needs, beyond write access.
+        createsKind:
+          type: string
+          title: creates_kind
+          description: Kind of the record this transition creates, if any.
+        notify:
+          type: string
+          title: notify
+          description: Event kind sent through the record notification owner, if any.
+      title: BusinessLifecycleTransition
+      additionalProperties: false
     deixicpublic.v1.BusinessMoney:
       type: object
       properties:
@@ -2448,6 +2664,12 @@ components:
         description:
           type: string
           title: description
+        facets:
+          title: facets
+          description: |-
+            Optional behaviour of this revision; unset keeps the default behaviour.
+             Immutable with the published revision.
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessTypeFacets'
       title: BusinessObjectType
       additionalProperties: false
     deixicpublic.v1.BusinessObjectTypeField:
@@ -2508,6 +2730,18 @@ components:
           title: target_type_id
       title: BusinessObjectTypeRelationship
       additionalProperties: false
+    deixicpublic.v1.BusinessPermissionFacet:
+      type: object
+      properties:
+        readEntitlement:
+          type: string
+          title: read_entitlement
+        writeEntitlement:
+          type: string
+          title: write_entitlement
+      title: BusinessPermissionFacet
+      additionalProperties: false
+      description: Entitlement names a member needs to read or write records.
     deixicpublic.v1.BusinessSourceFieldMapping:
       type: object
       properties:
@@ -2529,6 +2763,29 @@ components:
           title: values
       title: BusinessTextList
       additionalProperties: false
+    deixicpublic.v1.BusinessTypeFacets:
+      type: object
+      properties:
+        lifecycle:
+          title: lifecycle
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessLifecycleFacet'
+        graph:
+          title: graph
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessGraphFacet'
+        index:
+          title: index
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessIndexFacet'
+        display:
+          title: display
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessDisplayFacet'
+        permissions:
+          title: permissions
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessPermissionFacet'
+      title: BusinessTypeFacets
+      additionalProperties: false
+      description: |-
+        Behaviour facets of one published type revision, in the workflow-record
+         grammar. Every facet is optional.
     deixicpublic.v1.ClientMcpPolicy:
       type: object
       properties:
@@ -4676,6 +4933,62 @@ components:
           type: boolean
           title: archived
       title: Thread
+      additionalProperties: false
+    deixicpublic.v1.TransitionBusinessObjectRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          title: organization_id
+        workspaceId:
+          type: string
+          title: workspace_id
+        idempotencyKey:
+          type: string
+          title: idempotency_key
+        typeId:
+          type: string
+          title: type_id
+        objectId:
+          type: string
+          title: object_id
+        expectedRevision:
+          type:
+            - integer
+            - string
+          title: expected_revision
+          format: int64
+        transitionId:
+          type: string
+          title: transition_id
+        note:
+          type: string
+          title: note
+          description: A person's reason; required when the transition declares note_required.
+      title: TransitionBusinessObjectRequest
+      additionalProperties: false
+    deixicpublic.v1.TransitionBusinessObjectResponse:
+      type: object
+      properties:
+        objectId:
+          type: string
+          title: object_id
+        revision:
+          type:
+            - integer
+            - string
+          title: revision
+          format: int64
+          description: The record's revision after the transition.
+        state:
+          type: string
+          title: state
+          description: The state the record is now in.
+        createdObjectId:
+          type: string
+          title: created_object_id
+          description: The record the transition created, when it declares one.
+      title: TransitionBusinessObjectResponse
       additionalProperties: false
     deixicpublic.v1.UpdateBusinessObjectRequest:
       type: object
