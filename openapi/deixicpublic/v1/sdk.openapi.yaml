@@ -1688,6 +1688,7 @@ components:
         - BUSINESS_FIELD_KIND_REFERENCE
         - BUSINESS_FIELD_KIND_ARTIFACT
         - BUSINESS_FIELD_KIND_TEXT_LIST
+        - BUSINESS_FIELD_KIND_ENUM_LIST
     deixicpublic.v1.BusinessSourceFieldProperty:
       type: string
       title: BusinessSourceFieldProperty
@@ -2298,6 +2299,13 @@ components:
           required:
             - decimal
         - properties:
+            enumList:
+              title: enum_list
+              $ref: '#/components/schemas/deixicpublic.v1.BusinessTextList'
+          title: enum_list
+          required:
+            - enumList
+        - properties:
             enumValue:
               type: string
               title: enum_value
@@ -2362,6 +2370,9 @@ components:
         decimal:
           type: string
           title: decimal
+        enumList:
+          title: enum_list
+          $ref: '#/components/schemas/deixicpublic.v1.BusinessTextList'
         enumValue:
           type: string
           title: enum_value
