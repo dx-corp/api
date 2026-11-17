@@ -42,7 +42,7 @@ completed task and an approval decision.
 - Save event cursors. On `resetRequired`, replace the local projection with the
   supplied snapshot before continuing.
 - Keep API keys in trusted server-side code. A browser application should use
-  its authenticated backend or an OAuth credential source.
+  its authenticated server or an OAuth credential source.
 - The clients do not retry unavailable or transport failures. They allow one
   authentication replay only when the refreshed credential preserves the same
   subject, tenant, and declared scopes.

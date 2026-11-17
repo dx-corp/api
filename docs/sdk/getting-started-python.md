@@ -222,8 +222,20 @@ idempotency key only when you mean to resend the same request.
 ## Authenticate without a stored key
 
 CI jobs and cloud workloads can exchange a platform-issued token for a
-short-lived Deixic token instead of storing an API key. Pass a
-`credential_provider` instead of `api_key`:
+short-lived Deixic token instead of storing an API key.
+
+PyPI release `deixic-sdk==0.1.6` does not include
+`WorkloadFederationCredentialProvider` or `github_actions_assertion_source`.
+The example below uses a pinned public source snapshot that reports package
+version `0.1.5`. Install it in a separate virtual environment:
+
+```sh
+python3 -m venv .venv-federation
+. .venv-federation/bin/activate
+python -m pip install 'deixic-sdk @ https://github.com/dx-corp/deixic-python/archive/6deb56f8878ec5b687d6a04b952eb8f527c8a8a3.zip'
+```
+
+Pass a `credential_provider` instead of `api_key`:
 
 ```python
 import os
